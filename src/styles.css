@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -13,8 +14,9 @@
  */
 
 @theme inline {
-  --font-sans: "Inter", "Hind Siliguri", "Noto Sans Bengali", system-ui, sans-serif;
-  --font-display: "Inter", "Hind Siliguri", "Noto Sans Bengali", system-ui, sans-serif;
+  --font-sans: "Inter", "Noto Serif Bengali", system-ui, sans-serif;
+  --font-display: "Inter", "Noto Serif Bengali", system-ui, sans-serif;
+  --font-bangla: "Noto Serif Bengali", serif;
   --font-arabic: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -69,79 +71,79 @@
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 1rem;
 
-  /* Light: warm cream/ivory background, deep teal primary, gold accent */
-  --background: oklch(0.985 0.012 95);
-  --foreground: oklch(0.22 0.025 180);
+  /* Light: airy mint/cream background with sage-green primary, inspired by duaruqyah */
+  --background: oklch(0.985 0.008 150);
+  --foreground: oklch(0.24 0.02 160);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.025 180);
+  --card: oklch(0.98 0.012 150);
+  --card-foreground: oklch(0.24 0.02 160);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.025 180);
+  --popover-foreground: oklch(0.24 0.02 160);
 
-  --primary: oklch(0.42 0.08 180);
-  --primary-foreground: oklch(0.985 0.012 95);
-  --primary-glow: oklch(0.55 0.1 175);
+  --primary: oklch(0.58 0.09 155);
+  --primary-foreground: oklch(0.99 0.005 150);
+  --primary-glow: oklch(0.7 0.1 150);
 
-  --secondary: oklch(0.94 0.018 95);
-  --secondary-foreground: oklch(0.3 0.04 180);
+  --secondary: oklch(0.95 0.025 150);
+  --secondary-foreground: oklch(0.32 0.05 160);
 
-  --muted: oklch(0.95 0.015 95);
-  --muted-foreground: oklch(0.5 0.02 180);
+  --muted: oklch(0.96 0.018 150);
+  --muted-foreground: oklch(0.5 0.02 160);
 
-  --accent: oklch(0.92 0.04 175);
-  --accent-foreground: oklch(0.28 0.06 180);
+  --accent: oklch(0.93 0.04 150);
+  --accent-foreground: oklch(0.32 0.06 160);
 
-  --gold: oklch(0.72 0.13 80);
+  --gold: oklch(0.78 0.13 80);
   --gold-foreground: oklch(0.22 0.05 80);
 
-  --destructive: oklch(0.58 0.22 25);
-  --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.55 0.14 155);
-  --success-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --success: oklch(0.6 0.13 155);
+  --success-foreground: oklch(0.99 0 0);
 
-  --border: oklch(0.9 0.02 95);
-  --input: oklch(0.92 0.02 95);
-  --ring: oklch(0.42 0.08 180);
+  --border: oklch(0.9 0.02 150);
+  --input: oklch(0.93 0.02 150);
+  --ring: oklch(0.58 0.09 155);
 
-  --chart-1: oklch(0.42 0.08 180);
-  --chart-2: oklch(0.72 0.13 80);
-  --chart-3: oklch(0.55 0.14 155);
+  --chart-1: oklch(0.58 0.09 155);
+  --chart-2: oklch(0.78 0.13 80);
+  --chart-3: oklch(0.65 0.14 175);
   --chart-4: oklch(0.6 0.12 30);
   --chart-5: oklch(0.5 0.15 280);
 
-  --sidebar: oklch(0.97 0.012 95);
-  --sidebar-foreground: oklch(0.28 0.03 180);
-  --sidebar-primary: oklch(0.42 0.08 180);
-  --sidebar-primary-foreground: oklch(0.985 0.012 95);
-  --sidebar-accent: oklch(0.93 0.018 95);
-  --sidebar-accent-foreground: oklch(0.3 0.04 180);
-  --sidebar-border: oklch(0.9 0.02 95);
-  --sidebar-ring: oklch(0.42 0.08 180);
+  --sidebar: oklch(0.97 0.012 150);
+  --sidebar-foreground: oklch(0.28 0.03 160);
+  --sidebar-primary: oklch(0.58 0.09 155);
+  --sidebar-primary-foreground: oklch(0.99 0.005 150);
+  --sidebar-accent: oklch(0.93 0.025 150);
+  --sidebar-accent-foreground: oklch(0.32 0.04 160);
+  --sidebar-border: oklch(0.9 0.02 150);
+  --sidebar-ring: oklch(0.58 0.09 155);
 }
 
 .dark {
-  --background: oklch(0.16 0.018 180);
-  --foreground: oklch(0.95 0.012 95);
+  --background: oklch(0.17 0.018 160);
+  --foreground: oklch(0.95 0.012 150);
 
-  --card: oklch(0.21 0.022 180);
-  --card-foreground: oklch(0.95 0.012 95);
-  --popover: oklch(0.21 0.022 180);
-  --popover-foreground: oklch(0.95 0.012 95);
+  --card: oklch(0.22 0.022 160);
+  --card-foreground: oklch(0.95 0.012 150);
+  --popover: oklch(0.22 0.022 160);
+  --popover-foreground: oklch(0.95 0.012 150);
 
-  --primary: oklch(0.7 0.11 175);
-  --primary-foreground: oklch(0.15 0.02 180);
-  --primary-glow: oklch(0.78 0.12 170);
+  --primary: oklch(0.72 0.11 150);
+  --primary-foreground: oklch(0.16 0.02 160);
+  --primary-glow: oklch(0.8 0.12 150);
 
-  --secondary: oklch(0.26 0.025 180);
-  --secondary-foreground: oklch(0.95 0.012 95);
+  --secondary: oklch(0.27 0.025 160);
+  --secondary-foreground: oklch(0.95 0.012 150);
 
-  --muted: oklch(0.24 0.02 180);
-  --muted-foreground: oklch(0.7 0.025 95);
+  --muted: oklch(0.25 0.02 160);
+  --muted-foreground: oklch(0.72 0.025 150);
 
-  --accent: oklch(0.3 0.04 175);
-  --accent-foreground: oklch(0.95 0.012 95);
+  --accent: oklch(0.31 0.04 155);
+  --accent-foreground: oklch(0.95 0.012 150);
 
   --gold: oklch(0.78 0.14 80);
   --gold-foreground: oklch(0.18 0.04 80);
@@ -149,33 +151,31 @@
   --destructive: oklch(0.65 0.2 25);
   --destructive-foreground: oklch(0.985 0 0);
   --success: oklch(0.7 0.15 155);
-  --success-foreground: oklch(0.15 0.02 180);
+  --success-foreground: oklch(0.16 0.02 160);
 
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.7 0.11 175);
+  --ring: oklch(0.72 0.11 150);
 
-  --chart-1: oklch(0.7 0.11 175);
+  --chart-1: oklch(0.72 0.11 150);
   --chart-2: oklch(0.78 0.14 80);
-  --chart-3: oklch(0.7 0.15 155);
+  --chart-3: oklch(0.7 0.15 175);
   --chart-4: oklch(0.7 0.13 30);
   --chart-5: oklch(0.65 0.16 280);
 
-  --sidebar: oklch(0.18 0.02 180);
-  --sidebar-foreground: oklch(0.92 0.012 95);
-  --sidebar-primary: oklch(0.7 0.11 175);
-  --sidebar-primary-foreground: oklch(0.15 0.02 180);
-  --sidebar-accent: oklch(0.24 0.025 180);
-  --sidebar-accent-foreground: oklch(0.95 0.012 95);
+  --sidebar: oklch(0.19 0.02 160);
+  --sidebar-foreground: oklch(0.92 0.012 150);
+  --sidebar-primary: oklch(0.72 0.11 150);
+  --sidebar-primary-foreground: oklch(0.16 0.02 160);
+  --sidebar-accent: oklch(0.25 0.025 160);
+  --sidebar-accent-foreground: oklch(0.95 0.012 150);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.7 0.11 175);
+  --sidebar-ring: oklch(0.72 0.11 150);
 }
 
-/* Bangla font support */
-@import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap");
-
 html[lang="bn"] {
-  --font-sans: "Hind Siliguri", "Noto Sans Bengali", "Inter", system-ui, sans-serif;
+  --font-sans: "Noto Serif Bengali", "Inter", system-ui, serif;
+  --font-display: "Noto Serif Bengali", "Inter", system-ui, serif;
 }
 
 @layer base {
