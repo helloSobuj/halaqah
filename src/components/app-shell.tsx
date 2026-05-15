@@ -14,8 +14,10 @@ import {
   ChevronDown,
   Menu,
   Shield,
+  Trophy,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 import { cn } from "@/lib/utils";
 
@@ -51,6 +53,7 @@ const TOP_NAV: NavItem[] = [
 
 // Extras live under "More"
 const MORE_NAV: NavItem[] = [
+  { to: "/tournaments", labelKey: "nav.tournaments", icon: Trophy },
   { to: "/library", labelKey: "nav.library", icon: Library },
   { to: "/videos", labelKey: "nav.videos", icon: Video },
   { to: "/blog", labelKey: "nav.blog", icon: PenSquare },
@@ -150,6 +153,7 @@ function DesktopTopBar() {
         <div className="flex items-center gap-1.5">
           <LanguageToggle />
           <ThemeToggle />
+          <NotificationsBell />
           {user ? (
             <Button asChild size="sm" variant="ghost" className="rounded-full">
               <Link to="/profile">
@@ -179,6 +183,7 @@ function MobileTopBar() {
       <div className="flex-1" />
       <LanguageToggle />
       <ThemeToggle />
+      <NotificationsBell />
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" aria-label="Menu" className="rounded-full">

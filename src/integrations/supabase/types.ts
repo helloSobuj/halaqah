@@ -65,6 +65,36 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       quiz_attempts: {
         Row: {
           answers: Json
@@ -268,6 +298,63 @@ export type Database = {
           },
         ]
       }
+      quiz_reminders: {
+        Row: {
+          channels: string[]
+          created_at: string
+          id: string
+          message_bn: string | null
+          message_en: string | null
+          quiz_id: string | null
+          read_at: string | null
+          remind_at: string
+          sent_at: string | null
+          tournament_id: string | null
+          user_id: string
+        }
+        Insert: {
+          channels?: string[]
+          created_at?: string
+          id?: string
+          message_bn?: string | null
+          message_en?: string | null
+          quiz_id?: string | null
+          read_at?: string | null
+          remind_at: string
+          sent_at?: string | null
+          tournament_id?: string | null
+          user_id: string
+        }
+        Update: {
+          channels?: string[]
+          created_at?: string
+          id?: string
+          message_bn?: string | null
+          message_en?: string | null
+          quiz_id?: string | null
+          read_at?: string | null
+          remind_at?: string
+          sent_at?: string | null
+          tournament_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_reminders_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_reminders_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quizzes: {
         Row: {
           category_id: string | null
@@ -339,6 +426,189 @@ export type Database = {
           },
         ]
       }
+      tournament_matches: {
+        Row: {
+          closes_at: string | null
+          created_at: string
+          id: string
+          match_index: number
+          next_match_id: string | null
+          next_slot: number | null
+          p1_attempt_id: string | null
+          p1_score: number | null
+          p1_time_seconds: number | null
+          p1_user_id: string | null
+          p2_attempt_id: string | null
+          p2_score: number | null
+          p2_time_seconds: number | null
+          p2_user_id: string | null
+          round: number
+          starts_at: string | null
+          status: string
+          tournament_id: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          closes_at?: string | null
+          created_at?: string
+          id?: string
+          match_index: number
+          next_match_id?: string | null
+          next_slot?: number | null
+          p1_attempt_id?: string | null
+          p1_score?: number | null
+          p1_time_seconds?: number | null
+          p1_user_id?: string | null
+          p2_attempt_id?: string | null
+          p2_score?: number | null
+          p2_time_seconds?: number | null
+          p2_user_id?: string | null
+          round: number
+          starts_at?: string | null
+          status?: string
+          tournament_id: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          closes_at?: string | null
+          created_at?: string
+          id?: string
+          match_index?: number
+          next_match_id?: string | null
+          next_slot?: number | null
+          p1_attempt_id?: string | null
+          p1_score?: number | null
+          p1_time_seconds?: number | null
+          p1_user_id?: string | null
+          p2_attempt_id?: string | null
+          p2_score?: number | null
+          p2_time_seconds?: number | null
+          p2_user_id?: string | null
+          round?: number
+          starts_at?: string | null
+          status?: string
+          tournament_id?: string
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          seed: number | null
+          status: string
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          seed?: number | null
+          status?: string
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          seed?: number | null
+          status?: string
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_participants_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournaments: {
+        Row: {
+          bracket_size: number
+          created_at: string
+          created_by: string | null
+          current_round: number
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          prize_bn: string | null
+          prize_en: string | null
+          quiz_id: string
+          registration_closes_at: string
+          registration_opens_at: string
+          round_minutes: number
+          starts_at: string
+          status: string
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          bracket_size?: number
+          created_at?: string
+          created_by?: string | null
+          current_round?: number
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          prize_bn?: string | null
+          prize_en?: string | null
+          quiz_id: string
+          registration_closes_at: string
+          registration_opens_at?: string
+          round_minutes?: number
+          starts_at: string
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          bracket_size?: number
+          created_at?: string
+          created_by?: string | null
+          current_round?: number
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          prize_bn?: string | null
+          prize_en?: string | null
+          quiz_id?: string
+          registration_closes_at?: string
+          registration_opens_at?: string
+          round_minutes?: number
+          starts_at?: string
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournaments_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -365,6 +635,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _advance_byes: { Args: { _tournament_id: string }; Returns: undefined }
       attempts_left:
         | {
             Args: { _fingerprint: string; _ip: string; _quiz_id: string }
@@ -402,6 +673,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      set_quiz_reminder: {
+        Args: { _minutes_before?: number; _quiz_id: string }
+        Returns: string
+      }
+      start_tournament: { Args: { _tournament_id: string }; Returns: Json }
       submit_quiz_attempt: {
         Args: {
           _answers: Json
@@ -411,6 +687,10 @@ export type Database = {
           _time_taken: number
           _ua: string
         }
+        Returns: Json
+      }
+      submit_tournament_match: {
+        Args: { _attempt_id: string; _match_id: string }
         Returns: Json
       }
     }
