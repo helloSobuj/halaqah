@@ -13,12 +13,14 @@ import {
   LogIn,
   ChevronDown,
   Menu,
+  Shield,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/use-auth";
+import { useUserRole } from "@/hooks/use-user-role";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
@@ -91,6 +93,7 @@ function NavLinkPill({ item, active }: { item: NavItem; active: boolean }) {
 function DesktopTopBar() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { isStaff } = useUserRole();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isActive = (to: string) =>
@@ -128,6 +131,13 @@ function DesktopTopBar() {
                   </DropdownMenuItem>
                 );
               })}
+              {isStaff && (
+                <DropdownMenuItem asChild>
+                  <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
+                    <Shield className="h-4 w-4" /> {t("nav.admin")}
+                  </Link>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
