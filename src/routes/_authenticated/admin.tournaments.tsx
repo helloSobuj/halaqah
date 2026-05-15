@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Plus, Trophy, Trash2, Play, ArrowLeft } from "lucide-react";
+import { Plus, Trophy, Trash2, Play, ArrowLeft, Pencil } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,22 +38,48 @@ function AdminTournaments() {
   const list = useQuery({ queryKey: ["admin-tournaments"], queryFn: () => listFn() });
   const quizzes = useQuery({ queryKey: ["all-quizzes-for-tournaments"], queryFn: () => quizzesFn({ data: { publishedOnly: false } }) });
 
-  const [open, setOpen] = React.useState(false);
-  const [form, setForm] = React.useState({
+  const toLocal = (iso: string) => {
+    const d = new Date(iso);
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  };
+  const blankForm = () => ({
+    id: undefined as string | undefined,
     quiz_id: "",
     name_en: "",
     name_bn: "",
     description_en: "",
     description_bn: "",
     bracket_size: 8 as 4 | 8 | 16 | 32,
-    registration_opens_at: new Date().toISOString().slice(0, 16),
-    registration_closes_at: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
-    starts_at: new Date(Date.now() + 90000000).toISOString().slice(0, 16),
+    registration_opens_at: toLocal(new Date().toISOString()),
+    registration_closes_at: toLocal(new Date(Date.now() + 86400000).toISOString()),
+    starts_at: toLocal(new Date(Date.now() + 90000000).toISOString()),
     round_minutes: 30,
     prize_en: "",
     prize_bn: "",
-    status: "open" as const,
+    status: "open" as "draft" | "open" | "in_progress" | "finished" | "cancelled",
   });
+  const [open, setOpen] = React.useState(false);
+  const [form, setForm] = React.useState(blankForm);
+  const openNew = () => { setForm(blankForm()); setOpen(true); };
+  const openEdit = (t: any) => {
+    setForm({
+      id: t.id,
+      quiz_id: t.quiz_id,
+      name_en: t.name_en ?? "",
+      name_bn: t.name_bn ?? "",
+      description_en: t.description_en ?? "",
+      description_bn: t.description_bn ?? "",
+      bracket_size: t.bracket_size,
+      registration_opens_at: toLocal(t.registration_opens_at),
+      registration_closes_at: toLocal(t.registration_closes_at),
+      starts_at: toLocal(t.starts_at),
+      round_minutes: t.round_minutes ?? 30,
+      prize_en: t.prize_en ?? "",
+      prize_bn: t.prize_bn ?? "",
+      status: t.status ?? "open",
+    });
+    setOpen(true);
+  };
 
   const upsertMut = useMutation({
     mutationFn: () =>
@@ -100,10 +126,10 @@ function AdminTournaments() {
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4 mr-1.5" />New tournament</Button>
+              <Button onClick={openNew}><Plus className="h-4 w-4 mr-1.5" />New tournament</Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>New tournament</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{form.id ? "Edit tournament" : "New tournament"}</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div>
                   <Label>Quiz</Label>
@@ -148,9 +174,18 @@ function AdminTournaments() {
                   <div><Label>Prize (EN)</Label><Input value={form.prize_en} onChange={(e) => setForm((f) => ({ ...f, prize_en: e.target.value }))} /></div>
                   <div><Label>Prize (BN)</Label><Input value={form.prize_bn} onChange={(e) => setForm((f) => ({ ...f, prize_bn: e.target.value }))} /></div>
                 </div>
+                <div>
+                  <Label>Status</Label>
+                  <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as typeof f.status }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {["draft", "open", "in_progress", "finished", "cancelled"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => upsertMut.mutate()} disabled={upsertMut.isPending || !form.quiz_id || !form.name_en}>Create</Button>
+                <Button onClick={() => upsertMut.mutate()} disabled={upsertMut.isPending || !form.quiz_id || !form.name_en}>{form.id ? "Save changes" : "Create"}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -172,6 +207,9 @@ function AdminTournaments() {
                       <Play className="h-3.5 w-3.5 mr-1" />Start
                     </Button>
                   )}
+                  <Button size="sm" variant="outline" onClick={() => openEdit(t)}>
+                    <Pencil className="h-3.5 w-3.5 mr-1" />Edit
+                  </Button>
                   <Button asChild size="sm" variant="outline"><Link to="/tournaments/$id" params={{ id: t.id }}>View</Link></Button>
                   <Button size="sm" variant="ghost" onClick={() => confirm("Delete?") && deleteMut.mutate(t.id)}>
                     <Trash2 className="h-3.5 w-3.5" />
