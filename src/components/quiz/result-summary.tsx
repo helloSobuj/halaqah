@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Trophy, Medal, Award, Sparkles, Target } from "lucide-react";
+import { Trophy, Medal, Award, Sparkles, Target, Share2, Eye } from "lucide-react";
+import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -80,7 +81,38 @@ export function ResultSummary({
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-2 justify-center mt-7">
+      <div className="flex flex-col sm:flex-row gap-2 justify-center mt-7 flex-wrap">
+        <Button asChild variant="outline">
+          <Link to="/quiz/review/$attemptId" params={{ attemptId: result.attempt_id }}>
+            <Eye className="h-4 w-4 mr-2" />
+            {t("quiz.review", { defaultValue: "Review answers" })}
+          </Link>
+        </Button>
+        <Button
+          variant="outline"
+          onClick={async () => {
+            const text = t("quiz.shareText", {
+              defaultValue: "I scored {{score}}/{{total}} ({{pct}}%) on a Halaqah quiz!",
+              score: result.score,
+              total: result.total,
+              pct,
+            });
+            const url = typeof window !== "undefined" ? window.location.origin : "";
+            try {
+              if (typeof navigator !== "undefined" && navigator.share) {
+                await navigator.share({ title: "Halaqah Quiz", text, url });
+              } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+                await navigator.clipboard.writeText(`${text} ${url}`);
+                toast.success(t("quiz.copied", { defaultValue: "Copied to clipboard" }));
+              }
+            } catch {
+              /* user cancelled */
+            }
+          }}
+        >
+          <Share2 className="h-4 w-4 mr-2" />
+          {t("quiz.share", { defaultValue: "Share" })}
+        </Button>
         <Button asChild variant="outline">
           <Link to={categorySlug ? "/quiz/$category" : "/quiz"} params={categorySlug ? { category: categorySlug } : undefined}>
             {t("quiz.moreQuizzes")}
