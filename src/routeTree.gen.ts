@@ -19,7 +19,9 @@ import { Route as EventsRouteImport } from './routes/events'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index'
 import { Route as QuizIndexRouteImport } from './routes/quiz.index'
+import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as QuizMyAttemptsRouteImport } from './routes/quiz.my-attempts'
 import { Route as QuizLeaderboardRouteImport } from './routes/quiz.leaderboard'
 import { Route as QuizBookmarksRouteImport } from './routes/quiz.bookmarks'
@@ -30,7 +32,9 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as QuizReviewAttemptIdRouteImport } from './routes/quiz.review.$attemptId'
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminTournamentsRouteImport } from './routes/_authenticated/admin.tournaments'
 import { Route as AuthenticatedAdminQuizIndexRouteImport } from './routes/_authenticated/admin.quiz.index'
+import { Route as ApiPublicHooksDispatchRemindersRouteImport } from './routes/api/public/hooks/dispatch-reminders'
 import { Route as AuthenticatedAdminQuizCategoriesRouteImport } from './routes/_authenticated/admin.quiz.categories'
 import { Route as AuthenticatedAdminQuizAttemptsRouteImport } from './routes/_authenticated/admin.quiz.attempts'
 import { Route as AuthenticatedAdminQuizQuizIdRouteImport } from './routes/_authenticated/admin.quiz.$quizId'
@@ -84,9 +88,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TournamentsIndexRoute = TournamentsIndexRouteImport.update({
+  id: '/tournaments/',
+  path: '/tournaments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuizIndexRoute = QuizIndexRouteImport.update({
   id: '/quiz/',
   path: '/quiz/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentsIdRoute = TournamentsIdRouteImport.update({
+  id: '/tournaments/$id',
+  path: '/tournaments/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuizMyAttemptsRoute = QuizMyAttemptsRouteImport.update({
@@ -139,11 +153,23 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminTournamentsRoute =
+  AuthenticatedAdminTournamentsRouteImport.update({
+    id: '/tournaments',
+    path: '/tournaments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminQuizIndexRoute =
   AuthenticatedAdminQuizIndexRouteImport.update({
     id: '/quiz/',
     path: '/quiz/',
     getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const ApiPublicHooksDispatchRemindersRoute =
+  ApiPublicHooksDispatchRemindersRouteImport.update({
+    id: '/api/public/hooks/dispatch-reminders',
+    path: '/api/public/hooks/dispatch-reminders',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedAdminQuizCategoriesRoute =
   AuthenticatedAdminQuizCategoriesRouteImport.update({
@@ -180,7 +206,10 @@ export interface FileRoutesByFullPath {
   '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
   '/quiz/': typeof QuizIndexRoute
+  '/tournaments/': typeof TournamentsIndexRoute
+  '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -188,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
   '/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
+  '/api/public/hooks/dispatch-reminders': typeof ApiPublicHooksDispatchRemindersRoute
   '/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRoutesByTo {
@@ -205,7 +235,10 @@ export interface FileRoutesByTo {
   '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
   '/quiz': typeof QuizIndexRoute
+  '/tournaments': typeof TournamentsIndexRoute
+  '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -213,6 +246,7 @@ export interface FileRoutesByTo {
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
   '/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
+  '/api/public/hooks/dispatch-reminders': typeof ApiPublicHooksDispatchRemindersRoute
   '/admin/quiz': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRoutesById {
@@ -233,7 +267,10 @@ export interface FileRoutesById {
   '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
   '/quiz/': typeof QuizIndexRoute
+  '/tournaments/': typeof TournamentsIndexRoute
+  '/_authenticated/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -241,6 +278,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/_authenticated/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
   '/_authenticated/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
+  '/api/public/hooks/dispatch-reminders': typeof ApiPublicHooksDispatchRemindersRoute
   '/_authenticated/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRouteTypes {
@@ -261,7 +299,10 @@ export interface FileRouteTypes {
     | '/quiz/bookmarks'
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
+    | '/tournaments/$id'
     | '/quiz/'
+    | '/tournaments/'
+    | '/admin/tournaments'
     | '/admin/users'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -269,6 +310,7 @@ export interface FileRouteTypes {
     | '/admin/quiz/$quizId'
     | '/admin/quiz/attempts'
     | '/admin/quiz/categories'
+    | '/api/public/hooks/dispatch-reminders'
     | '/admin/quiz/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -286,7 +328,10 @@ export interface FileRouteTypes {
     | '/quiz/bookmarks'
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
+    | '/tournaments/$id'
     | '/quiz'
+    | '/tournaments'
+    | '/admin/tournaments'
     | '/admin/users'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -294,6 +339,7 @@ export interface FileRouteTypes {
     | '/admin/quiz/$quizId'
     | '/admin/quiz/attempts'
     | '/admin/quiz/categories'
+    | '/api/public/hooks/dispatch-reminders'
     | '/admin/quiz'
   id:
     | '__root__'
@@ -313,7 +359,10 @@ export interface FileRouteTypes {
     | '/quiz/bookmarks'
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
+    | '/tournaments/$id'
     | '/quiz/'
+    | '/tournaments/'
+    | '/_authenticated/admin/tournaments'
     | '/_authenticated/admin/users'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -321,6 +370,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/quiz/$quizId'
     | '/_authenticated/admin/quiz/attempts'
     | '/_authenticated/admin/quiz/categories'
+    | '/api/public/hooks/dispatch-reminders'
     | '/_authenticated/admin/quiz/'
   fileRoutesById: FileRoutesById
 }
@@ -339,9 +389,12 @@ export interface RootRouteChildren {
   QuizBookmarksRoute: typeof QuizBookmarksRoute
   QuizLeaderboardRoute: typeof QuizLeaderboardRoute
   QuizMyAttemptsRoute: typeof QuizMyAttemptsRoute
+  TournamentsIdRoute: typeof TournamentsIdRoute
   QuizIndexRoute: typeof QuizIndexRoute
+  TournamentsIndexRoute: typeof TournamentsIndexRoute
   QuizPlayQuizIdRoute: typeof QuizPlayQuizIdRoute
   QuizReviewAttemptIdRoute: typeof QuizReviewAttemptIdRoute
+  ApiPublicHooksDispatchRemindersRoute: typeof ApiPublicHooksDispatchRemindersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -416,11 +469,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tournaments/': {
+      id: '/tournaments/'
+      path: '/tournaments'
+      fullPath: '/tournaments/'
+      preLoaderRoute: typeof TournamentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quiz/': {
       id: '/quiz/'
       path: '/quiz'
       fullPath: '/quiz/'
       preLoaderRoute: typeof QuizIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournaments/$id': {
+      id: '/tournaments/$id'
+      path: '/tournaments/$id'
+      fullPath: '/tournaments/$id'
+      preLoaderRoute: typeof TournamentsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quiz/my-attempts': {
@@ -493,12 +560,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/tournaments': {
+      id: '/_authenticated/admin/tournaments'
+      path: '/tournaments'
+      fullPath: '/admin/tournaments'
+      preLoaderRoute: typeof AuthenticatedAdminTournamentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/quiz/': {
       id: '/_authenticated/admin/quiz/'
       path: '/quiz'
       fullPath: '/admin/quiz/'
       preLoaderRoute: typeof AuthenticatedAdminQuizIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/hooks/dispatch-reminders': {
+      id: '/api/public/hooks/dispatch-reminders'
+      path: '/api/public/hooks/dispatch-reminders'
+      fullPath: '/api/public/hooks/dispatch-reminders'
+      preLoaderRoute: typeof ApiPublicHooksDispatchRemindersRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/quiz/categories': {
       id: '/_authenticated/admin/quiz/categories'
@@ -525,6 +606,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminTournamentsRoute: typeof AuthenticatedAdminTournamentsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminQuizQuizIdRoute: typeof AuthenticatedAdminQuizQuizIdRoute
@@ -534,6 +616,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminTournamentsRoute: AuthenticatedAdminTournamentsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminQuizQuizIdRoute: AuthenticatedAdminQuizQuizIdRoute,
@@ -574,20 +657,13 @@ const rootRouteChildren: RootRouteChildren = {
   QuizBookmarksRoute: QuizBookmarksRoute,
   QuizLeaderboardRoute: QuizLeaderboardRoute,
   QuizMyAttemptsRoute: QuizMyAttemptsRoute,
+  TournamentsIdRoute: TournamentsIdRoute,
   QuizIndexRoute: QuizIndexRoute,
+  TournamentsIndexRoute: TournamentsIndexRoute,
   QuizPlayQuizIdRoute: QuizPlayQuizIdRoute,
   QuizReviewAttemptIdRoute: QuizReviewAttemptIdRoute,
+  ApiPublicHooksDispatchRemindersRoute: ApiPublicHooksDispatchRemindersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

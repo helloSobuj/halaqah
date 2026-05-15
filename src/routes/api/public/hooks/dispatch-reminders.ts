@@ -51,10 +51,10 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-reminders")({
                     data: JSON.stringify({ title, body, url, tag: r.id }),
                     options: { ttl: 3600 },
                   },
-                  { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+                  { endpoint: s.endpoint, expirationTime: null, keys: { p256dh: s.p256dh, auth: s.auth } },
                   { subject: VAPID_SUBJECT, publicKey: VAPID_PUBLIC, privateKey: VAPID_PRIVATE },
                 );
-                const res = await fetch(s.endpoint, message);
+                const res = await fetch(s.endpoint, message as unknown as RequestInit);
                 if (res.status === 404 || res.status === 410) {
                   await supabaseAdmin.from("push_subscriptions").delete().eq("endpoint", s.endpoint);
                 } else if (res.ok) {

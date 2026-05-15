@@ -50,9 +50,10 @@ export async function ensurePushSubscribed(): Promise<{ ok: boolean; reason?: st
 
   let sub = await reg.pushManager.getSubscription();
   if (!sub) {
+    const keyArr = urlBase64ToUint8Array(key);
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(key),
+      applicationServerKey: keyArr.buffer.slice(keyArr.byteOffset, keyArr.byteOffset + keyArr.byteLength) as ArrayBuffer,
     });
   }
   const json = sub.toJSON();
