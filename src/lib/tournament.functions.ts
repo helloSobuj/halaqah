@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 async function assertStaff(userId: string) {
   const { data } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
   const roles = (data ?? []).map((r) => r.role as string);
-  if (!roles.some((r) => ["admin", "scholar"].includes(r))) throw new Error("Forbidden");
+  if (!roles.some((r) => ["admin", "moderator", "scholar"].includes(r))) throw new Error("Forbidden");
 }
 
 const tournamentSchema = z.object({
