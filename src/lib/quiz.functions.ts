@@ -181,7 +181,7 @@ export const submitAttempt = createServerFn({ method: "POST" })
     // include correct answers + explanations for review screen
     const { data: questions } = await supabaseAdmin
       .from("quiz_questions")
-      .select("id, correct_indices, explanation_en, explanation_bn")
+      .select("id, correct_indices, correct_text, correct_order, explanation_en, explanation_bn")
       .eq("quiz_id", data.quizId);
 
     return { result, questions: questions ?? [] };
