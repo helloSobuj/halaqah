@@ -79,6 +79,41 @@ export const questionBaseSchema = z.object({
     }
   });
 
+const refineQuestion = (d: z.infer<typeof questionBaseSchema>, ctx: z.RefinementCtx) => {
+  const needsOpts = ["single", "multi", "true_false", "ordering"].includes(d.type);
+  if (needsOpts) {
+    if (d.options_en.length < 2 || d.options_bn.length < 2) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "At least 2 options required" });
+    }
+    if (d.options_en.length !== d.options_bn.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "EN/BN option counts must match" });
+    }
+  }
+  if (d.type === "single" || d.type === "true_false") {
+    if (d.correct_indices.length !== 1)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Exactly 1 correct answer" });
+  }
+  if (d.type === "multi") {
+    if (d.correct_indices.length < 1)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "At least 1 correct answer" });
+  }
+  if (d.type === "fill_blank") {
+    if (d.correct_text.length < 1)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "At least 1 accepted answer" });
+  }
+  if (d.type === "ordering") {
+    if (d.correct_order.length !== d.options_en.length)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "correct_order must include every option" });
+  }
+};
+
+export const questionSchema = questionBaseSchema.superRefine(refineQuestion);
+export const questionImportSchema = questionBaseSchema
+  .omit({ quiz_id: true, id: true, order_index: true })
+  .superRefine(refineQuestion);
+
 export type CategoryInput = z.infer<typeof categorySchema>;
 export type QuizInput = z.infer<typeof quizSchema>;
 export type QuestionInput = z.infer<typeof questionSchema>;
+export type QuestionImportInput = z.infer<typeof questionImportSchema>;
+
