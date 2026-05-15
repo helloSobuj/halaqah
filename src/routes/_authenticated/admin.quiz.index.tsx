@@ -99,16 +99,21 @@ function AdminQuizList() {
   const [editing, setEditing] = React.useState<QuizForm | null>(null);
 
   const upsertM = useMutation({
-    mutationFn: (data: QuizForm) =>
-      upsertFn({
+    mutationFn: (data: QuizForm) => {
+      const tz = data.timezone || "UTC";
+      const startsUtc = data.starts_at ? localInputToUtc(data.starts_at, tz) : null;
+      const endsUtc = data.ends_at ? localInputToUtc(data.ends_at, tz) : null;
+      return upsertFn({
         data: {
           ...data,
           description_en: data.description_en || null,
           description_bn: data.description_bn || null,
-          starts_at: data.starts_at || null,
-          ends_at: data.ends_at || null,
+          starts_at: startsUtc,
+          ends_at: endsUtc,
+          timezone: tz,
         },
-      }),
+      });
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-quizzes"] });
       toast.success(t("common.save"));
