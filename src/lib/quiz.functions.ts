@@ -423,7 +423,7 @@ export const bulkImportQuestions = createServerFn({ method: "POST" })
     z
       .object({
         quizId: z.string().uuid(),
-        items: z.array(questionSchema.omit({ quiz_id: true, id: true, order_index: true })).min(1).max(200),
+        items: z.array(questionImportSchema).min(1).max(200),
       })
       .parse(i),
   )
