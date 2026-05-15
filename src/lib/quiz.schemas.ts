@@ -32,9 +32,7 @@ export const quizSchema = z.object({
   published: z.boolean(),
 });
 
-// Loose schema; refined below per type
-export const questionSchema = z
-  .object({
+export const questionBaseSchema = z.object({
     id: z.string().uuid().optional(),
     quiz_id: z.string().uuid(),
     type: z.enum(QUESTION_TYPES),
