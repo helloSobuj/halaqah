@@ -200,10 +200,15 @@ export type Database = {
       quiz_questions: {
         Row: {
           correct_indices: number[]
+          correct_order: number[]
+          correct_text: string[]
           created_at: string
           explanation_bn: string | null
           explanation_en: string | null
+          hint_bn: string | null
+          hint_en: string | null
           id: string
+          image_url: string | null
           options_bn: Json
           options_en: Json
           order_index: number
@@ -215,10 +220,15 @@ export type Database = {
         }
         Insert: {
           correct_indices?: number[]
+          correct_order?: number[]
+          correct_text?: string[]
           created_at?: string
           explanation_bn?: string | null
           explanation_en?: string | null
+          hint_bn?: string | null
+          hint_en?: string | null
           id?: string
+          image_url?: string | null
           options_bn?: Json
           options_en?: Json
           order_index?: number
@@ -230,10 +240,15 @@ export type Database = {
         }
         Update: {
           correct_indices?: number[]
+          correct_order?: number[]
+          correct_text?: string[]
           created_at?: string
           explanation_bn?: string | null
           explanation_en?: string | null
+          hint_bn?: string | null
+          hint_en?: string | null
           id?: string
+          image_url?: string | null
           options_bn?: Json
           options_en?: Json
           order_index?: number

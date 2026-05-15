@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   categorySchema,
   questionSchema,
+  questionImportSchema,
   quizSchema,
 } from "@/lib/quiz.schemas";
 
@@ -116,7 +117,7 @@ export const getQuizForPlay = createServerFn({ method: "POST" })
 
     const { data: questions, error: qErr } = await supabaseAdmin
       .from("quiz_questions")
-      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, explanation_en, explanation_bn")
+      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, correct_text, correct_order, image_url, hint_en, hint_bn, explanation_en, explanation_bn")
       .eq("quiz_id", data.quizId)
       .order("order_index", { ascending: true });
     if (qErr) throw new Error(qErr.message);
@@ -125,7 +126,7 @@ export const getQuizForPlay = createServerFn({ method: "POST" })
     const cleaned = (questions ?? []).map((q) =>
       quiz.instant_feedback
         ? q
-        : { ...q, correct_indices: [] as number[], explanation_en: null, explanation_bn: null },
+        : { ...q, correct_indices: [] as number[], correct_text: [] as string[], correct_order: [] as number[], explanation_en: null, explanation_bn: null },
     );
     return { quiz, questions: cleaned };
   });
@@ -153,7 +154,10 @@ export const submitAttempt = createServerFn({ method: "POST" })
     z
       .object({
         quizId: z.string().uuid(),
-        answers: z.record(z.string().uuid(), z.array(z.number().int().min(0).max(7))),
+        answers: z.record(
+          z.string().uuid(),
+          z.union([z.array(z.number().int().min(0).max(7)), z.string().max(300)]),
+        ),
         timeTaken: z.number().int().min(0).max(7200),
         fingerprint: z.string().max(120).nullable(),
       })
@@ -177,7 +181,7 @@ export const submitAttempt = createServerFn({ method: "POST" })
     // include correct answers + explanations for review screen
     const { data: questions } = await supabaseAdmin
       .from("quiz_questions")
-      .select("id, correct_indices, explanation_en, explanation_bn")
+      .select("id, correct_indices, correct_text, correct_order, explanation_en, explanation_bn")
       .eq("quiz_id", data.quizId);
 
     return { result, questions: questions ?? [] };
@@ -272,7 +276,7 @@ export const getAttemptReview = createServerFn({ method: "POST" })
 
     const { data: questions } = await supabaseAdmin
       .from("quiz_questions")
-      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, explanation_en, explanation_bn")
+      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, correct_text, correct_order, image_url, hint_en, hint_bn, explanation_en, explanation_bn")
       .eq("quiz_id", attempt.quiz_id)
       .order("order_index", { ascending: true });
 
@@ -422,7 +426,7 @@ export const bulkImportQuestions = createServerFn({ method: "POST" })
     z
       .object({
         quizId: z.string().uuid(),
-        items: z.array(questionSchema.omit({ quiz_id: true, id: true, order_index: true })).min(1).max(200),
+        items: z.array(questionImportSchema).min(1).max(200),
       })
       .parse(i),
   )
