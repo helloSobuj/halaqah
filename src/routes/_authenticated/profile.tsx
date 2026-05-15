@@ -2,11 +2,14 @@ import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, History } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, History, Eye } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
+import { Skeleton } from "@/components/ui/skeleton";
+import { listMyAttempts } from "@/lib/quiz.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
