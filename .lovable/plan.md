@@ -1,116 +1,107 @@
-# Quiz Module — Phase 2 (finish the full module)
+# Chunk 2 — Authoring Depth
 
-Phase 1 (build + play loop, admin CRUD, AI assist, leaderboard, timezone scheduling, mobile shell) is done. This phase closes everything originally listed as "out of scope" plus the user-facing surfaces still missing so the module is feature-complete.
+Add richer question types, question images, and CSV import/export to the Quiz Module.
 
-## What's still missing
+## Scope
 
-1. **More question types** — only `single` / `multi` MCQ exist. No `true_false`, `fill_blank`, `ordering`.
-2. **Per-attempt review screen** — after submit users see score but can't review each question with their answer vs correct answer + explanation.
-3. **My attempts / history page** — `listMyAttempts` server fn exists, no UI.
-4. **Bookmarks page** — `listBookmarks` exists, no route.
-5. **Profile quiz stats** — points, level, streak, badges are stored but never shown.
-6. **Tournaments** — scheduled multi-round events with combined leaderboard.
-7. **Result sharing** — share card (image/text) for social.
-8. **Notifications** — "Quiz starts in 1 hour" reminders for scheduled quizzes (in-app + optional email).
-9. **Question media** — optional image per question, image uploads via Storage.
-10. **Anti-cheat polish** — tab-blur warning, paste blocker, randomized option order per attempt.
-11. **CSV import/export** for questions (admin power-user).
-12. add a count down timer on each question and add a circle style count down timer.
+1. **New question types** beyond `single` / `multiple`:
+   - `true_false` — two fixed options, single correct
+   - `fill_blank` — free-text answer, case-insensitive match against accepted answers
+   - `ordering` — user drags options into the correct sequence
 
-## Plan
+2. **Question media** — optional image per question (uploaded to a new `quiz-media` storage bucket).
 
-### A. Question types (DB + editor + player)
+3. **CSV import/export** for questions in the admin editor.
 
-- Migration: extend `quiz_questions.type` check to include `true_false`, `fill_blank`, `ordering`; add `correct_text` (text[]) for fill-blank, reuse `correct_indices` for ordering.
-- `submit_quiz_attempt` RPC: branch grading by type (case-insensitive trim for fill-blank, exact sequence for ordering, boolean for T/F).
-- Editor (`admin.quiz.$quizId.tsx`): conditional UI per type.
-- Player (`question-player.tsx`): renderers per type.
+## Database changes (one migration)
 
-### B. Review screen
+Extend `quiz_questions`:
+- `correct_text text[]` — accepted answers for `fill_blank` (lowercased on compare)
+- `correct_order int[]` — canonical order for `ordering`
+- `image_url text` — optional question image
+- `hint_en text`, `hint_bn text` — optional per-question hint (currently only explanation exists)
 
-- New route `/quiz/review/$attemptId`.
-- Server fn `getAttemptReview(attemptId)` returns user answers + correct answers + explanations (own attempts only or staff).
-- Link from result summary + my-attempts list.
+Storage:
+- New public bucket `quiz-media` with RLS: read = public; insert/update/delete = staff (admin/scholar).
 
-### C. User pages
+Update `submit_quiz_attempt` SQL function to grade by `type`:
+- `single` / `multiple` — existing `correct_indices` compare
+- `true_false` — same as `single` with 2 options
+- `fill_blank` — normalize (trim+lowercase) submitted string, check membership in `correct_text`
+- `ordering` — compare submitted index array equality with `correct_order`
 
-- `/quiz/my-attempts` — table from `listMyAttempts`, link to review.
-- `/quiz/bookmarks` — grid of bookmarked quizzes.
-- Profile route: add "Quiz stats" panel (points, level, streak, badge wall).
+Answer payload shape per question id:
+- single/multiple/true_false: `number[]`
+- fill_blank: `string`
+- ordering: `number[]` (current order of option indices)
 
-### E. Tournaments
+## Server functions (`src/lib/quiz.functions.ts` + `quiz.schemas.ts`)
 
-- Migration: `quiz_tournaments(id, title_en/bn, starts_at, ends_at, timezone)`, `quiz_tournament_quizzes(tournament_id, quiz_id, order)`.
-- Admin CRUD page `/admin/quiz/tournaments`.
-- User page `/quiz/tournaments` + detail page with round list and combined leaderboard (sum of points across quizzes).
+- Extend question Zod schema with new fields and a discriminated union by `type`.
+- `upsertQuestion` accepts new fields.
+- `uploadQuestionImage` server fn → uses `supabaseAdmin` (after `requireSupabaseAuth` + role check) to upload to `quiz-media` and return public URL. Or do client-side upload with the user-scoped client and bucket RLS.
+- `importQuestionsCsv({ quizId, rows })` — bulk insert validated rows.
+- `exportQuestionsCsv({ quizId })` — return CSV string.
 
-### F. Sharing
+CSV columns: `type,text_en,text_bn,options_en,options_bn,correct,explanation_en,explanation_bn,hint_en,hint_bn,points,image_url`
+- `options_*` = `|`-separated
+- `correct` = `|`-separated indices for single/multiple/true_false/ordering, or `|`-separated accepted answers for fill_blank
 
-- `result-summary.tsx`: "Share result" button → copy text + open Web Share API.
-- Optional: server-side OG image route `/api/public/quiz/og/$attemptId.png` using `@vercel/og`-compatible edge renderer.
+## Admin editor (`src/routes/_authenticated/admin.quiz.$quizId.tsx` + new components)
 
-### G. Notifications
+- New `QuestionEditor` component with a `type` select that swaps the editor body:
+  - `single` / `multiple` — existing options + correct checkboxes
+  - `true_false` — fixed True/False rows, radio for correct
+  - `fill_blank` — list of accepted answers (add/remove rows), no options
+  - `ordering` — option rows with drag handles; "correct order" = current row order
+- Image upload row (preview + remove) on every question.
+- Hint fields (en/bn).
+- Toolbar buttons: **Import CSV**, **Export CSV**, **Download template**.
 
-- Migration: `quiz_reminders(user_id, quiz_id, remind_at, sent_at)`.
-- "Remind me" button on `QuizCard` for scheduled quizzes (writes a row 1h before `starts_at`).
-- Cron route `/api/public/cron/send-reminders` every 5 min — writes in-app notification rows (table `notifications` if exists, else create) and optionally calls Lovable Email.
+## Player (`src/components/quiz/question-player.tsx`)
 
-### H. Question media
+Render a sub-component per `type`:
+- `TrueFalseInput` — two big buttons
+- `FillBlankInput` — single text input
+- `OrderingInput` — list with up/down buttons (keep DnD optional; arrows guarantee mobile + a11y)
+- Existing single/multiple unchanged
 
-- Migration: `quiz_questions.image_url text`.
-- Storage bucket `quiz-media` (admin-write, public-read).
-- Editor: image upload + preview.
-- Player: render image above question text.
+Local answer state must serialize to the shape the grader expects.
 
-### I. Anti-cheat polish
+## Review screen
 
-- Player: detect `visibilitychange` → toast warning + count blurs (store in attempt `meta jsonb`).
-- Disable paste on fill-blank inputs.
-- Per-attempt option shuffle (deterministic per attempt id, decoded back on submit).
+Update `quiz.review.$attemptId.tsx` to render correct answers per type (text list for fill_blank, ordered list for ordering, T/F label for true_false).
 
-### J. CSV import/export
+## i18n
 
-- Editor: "Export CSV" downloads current questions; "Import CSV" parses and calls `bulkImportQuestions`.
+Add keys for: question type labels, "Add answer", "Accepted answers", "Correct order", "Drag to reorder", "Upload image", "Import CSV", "Export CSV", "Download template", "Hint", in `en.json` + `bn.json`.
 
-## Suggested order
+## Out of scope (deferred to Chunk 3)
 
-I recommend shipping in 3 PR-sized chunks so each one is testable end-to-end:
+Daily quiz, tournaments, reminders, notifications.
 
-1. **Chunk 1 — User-facing depth** (B, C, F, I)  Review screen, my-attempts, bookmarks, profile stats, share, anti-cheat. Highest user value, no new infra.
-2. **Chunk 2 — Authoring depth** (A, H, J) New question types, image uploads, CSV. Unlocks richer quizzes.
-3. **Chunk 3 — Engagement engine** (D, E, G) Daily quiz, tournaments, reminders. Needs cron + notifications wiring.
+## Files
 
-## Files (per chunk, high level)
+**New**
+- `src/components/quiz/question-editor.tsx`
+- `src/components/quiz/inputs/true-false-input.tsx`
+- `src/components/quiz/inputs/fill-blank-input.tsx`
+- `src/components/quiz/inputs/ordering-input.tsx`
+- `src/lib/quiz.csv.ts`
+- `supabase/migrations/<ts>_quiz_question_types.sql`
 
-```text
-Chunk 1
-  NEW   src/routes/quiz.review.$attemptId.tsx
-  NEW   src/routes/quiz.my-attempts.tsx
-  NEW   src/routes/quiz.bookmarks.tsx
-  EDIT  src/routes/_authenticated/profile.tsx        (quiz stats panel)
-  EDIT  src/components/quiz/question-player.tsx      (blur tracking, paste block)
-  EDIT  src/components/quiz/result-summary.tsx       (share + review link)
-  EDIT  src/lib/quiz.functions.ts                    (getAttemptReview)
+**Edited**
+- `src/lib/quiz.functions.ts`, `src/lib/quiz.schemas.ts`
+- `src/components/quiz/question-player.tsx`
+- `src/routes/_authenticated/admin.quiz.$quizId.tsx`
+- `src/routes/quiz.review.$attemptId.tsx`
+- `src/integrations/supabase/types.ts` (auto)
+- `src/locales/en.json`, `src/locales/bn.json`
 
-Chunk 2
-  MIG   extend quiz_questions (type enum, correct_text, image_url) + grading RPC
-  NEW   storage bucket quiz-media + policies
-  EDIT  admin.quiz.$quizId.tsx                       (per-type UI, image upload, CSV)
-  EDIT  src/lib/quiz.schemas.ts                      (new fields)
+## Open questions
 
-Chunk 3
-  MIG   daily_quizzes, quiz_tournaments(_quizzes), quiz_reminders, notifications
-  NEW   src/routes/api/public/cron/daily-quiz.ts
-  NEW   src/routes/api/public/cron/send-reminders.ts
-  NEW   src/routes/_authenticated/admin.quiz.tournaments.tsx
-  NEW   src/routes/quiz.tournaments.tsx + tournaments.$id.tsx
-  EDIT  QuizCard (remind me), quiz home (today's quiz card)
-```
+1. **Ordering UX**: arrows only (simpler, mobile-friendly, a11y-safe) or full drag-and-drop with `@dnd-kit`? I'll default to **arrows** unless you say otherwise.
+2. **Fill-blank matching**: case-insensitive + trim only, or also strip diacritics / allow regex? Default: **case-insensitive + trim**.
+3. **CSV**: ship with a downloadable template button? Default: **yes**.
 
-## Decisions I need from you
-
-1. **Start with Chunk 1?** (recommended — biggest UX gain, low risk)
-2. **Notifications channel:** in-app only, or also email via Lovable Email?
-3. **Tournaments scope:** full bracket-style, or simple "set of quizzes with combined leaderboard"? (I'd default to the simple version.)
-
-Reply **"go chunk 1"** (or specify a different chunk / answers) and I'll execute.
+Reply "go" to proceed with the defaults, or override any of the three.
