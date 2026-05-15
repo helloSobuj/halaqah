@@ -116,12 +116,18 @@ export const getQuizForPlay = createServerFn({ method: "POST" })
 
     const { data: questions, error: qErr } = await supabaseAdmin
       .from("quiz_questions")
-      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index")
+      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, explanation_en, explanation_bn")
       .eq("quiz_id", data.quizId)
       .order("order_index", { ascending: true });
     if (qErr) throw new Error(qErr.message);
 
-    return { quiz, questions: questions ?? [] };
+    // Only expose correct answers + explanations when instant feedback is enabled
+    const cleaned = (questions ?? []).map((q) =>
+      quiz.instant_feedback
+        ? q
+        : { ...q, correct_indices: [] as number[], explanation_en: null, explanation_bn: null },
+    );
+    return { quiz, questions: cleaned };
   });
 
 export const attemptsLeft = createServerFn({ method: "POST" })
@@ -132,12 +138,12 @@ export const attemptsLeft = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ip = getClientIp();
     const { data: rpc, error } = await supabaseAdmin.rpc("attempts_left", {
+      _user_id: context.userId,
       _quiz_id: data.quizId,
       _ip: (ip ?? "") as string,
       _fingerprint: (data.fingerprint ?? "") as string,
     });
     if (error) throw new Error(error.message);
-    void context;
     return { left: rpc as number };
   });
 
