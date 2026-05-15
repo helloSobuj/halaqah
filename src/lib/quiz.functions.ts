@@ -61,7 +61,7 @@ export const listQuizzes = createServerFn({ method: "POST" })
     let q = supabaseAdmin
       .from("quizzes")
       .select(
-        "id, category_id, title_en, title_bn, description_en, description_bn, difficulty, time_limit_seconds, pass_mark, max_attempts, starts_at, ends_at, published, updated_at, quiz_categories(slug, name_en, name_bn, color, icon)",
+        "id, category_id, title_en, title_bn, description_en, description_bn, difficulty, time_limit_seconds, pass_mark, max_attempts, starts_at, ends_at, timezone, published, updated_at, quiz_categories(slug, name_en, name_bn, color, icon)",
       )
       .order("updated_at", { ascending: false });
     if (data.publishedOnly) q = q.eq("published", true);
