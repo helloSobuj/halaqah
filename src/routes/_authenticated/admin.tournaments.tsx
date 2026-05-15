@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, Trophy, Trash2, Play, ArrowLeft } from "lucide-react";
 
-import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -90,7 +89,7 @@ function AdminTournaments() {
   });
 
   return (
-    <AppShell>
+    <>
       <div className="max-w-6xl mx-auto px-4 lg:px-8 py-6 space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
@@ -183,6 +182,6 @@ function AdminTournaments() {
           </div>
         </Card>
       </div>
-    </AppShell>
+    </>
   );
 }
