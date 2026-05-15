@@ -50,7 +50,7 @@ function AttemptsAdmin() {
       }),
   });
 
-  const rows = (attempts.data ?? []) as AttemptRow[];
+  const rows = ((attempts.data ?? []) as unknown) as AttemptRow[];
 
   return (
     <div className="space-y-4">
