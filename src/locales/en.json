@@ -16,8 +16,39 @@
     "admin": "Admin",
     "more": "More",
     "learn": "Learn",
-    "community": "Community"
+    "community": "Community",
+    "tournaments": "Tournaments"
   },
+  "tournaments": {
+    "title": "Tournaments",
+    "desc": "Single-quiz bracket competitions. Outscore your opponent to advance.",
+    "empty": "No tournaments scheduled yet.",
+    "join": "Register",
+    "leave": "Withdraw",
+    "joined": "Registered!",
+    "left": "Withdrawn",
+    "starts": "Starts",
+    "regCloses": "Registration closes",
+    "participants": "Participants",
+    "bracket": "player bracket",
+    "bracketTitle": "Bracket",
+    "round": "Round",
+    "final": "Final",
+    "bye": "Bye",
+    "champion": "is the champion",
+    "playMatch": "Play your match"
+  },
+  "reminders": {
+    "title": "Reminders",
+    "empty": "No reminders yet.",
+    "remindMe": "Remind me",
+    "on": "Reminder on",
+    "set": "Remind me",
+    "cancel": "Cancel reminder",
+    "cancelled": "Reminder cancelled",
+    "setWithPush": "Reminder set with browser push",
+    "setInApp": "Reminder set (in-app only)",
+    "dueNow": "Starting now"
   "auth": {
     "signIn": "Sign in",
     "signUp": "Sign up",

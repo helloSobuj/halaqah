@@ -5,6 +5,7 @@ import { Bookmark, BookmarkCheck, Clock, ListChecks, CalendarClock } from "lucid
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ReminderButton } from "@/components/quiz/reminder-button";
 import { formatInTz } from "@/lib/timezone";
 
 type Quiz = {
@@ -121,6 +122,9 @@ export function QuizCard({
             <div className="mt-1 text-rose-600 font-semibold">
               {t("quiz.ended", { defaultValue: "Ended" })}
             </div>
+          )}
+          {isFutureStart && (
+            <div className="mt-2"><ReminderButton quizId={quiz.id} /></div>
           )}
         </div>
       )}
