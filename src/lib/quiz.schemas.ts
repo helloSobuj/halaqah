@@ -27,6 +27,7 @@ export const quizSchema = z.object({
   max_attempts: z.number().int().min(0).max(100),
   starts_at: z.string().nullable().optional(),
   ends_at: z.string().nullable().optional(),
+  timezone: z.string().min(1).max(64).default("UTC"),
   published: z.boolean(),
 });
 
