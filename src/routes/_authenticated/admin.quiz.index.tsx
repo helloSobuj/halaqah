@@ -61,6 +61,7 @@ type QuizForm = {
   max_attempts: number;
   starts_at: string | null;
   ends_at: string | null;
+  timezone: string;
   published: boolean;
 };
 
@@ -77,6 +78,7 @@ const EMPTY: QuizForm = {
   max_attempts: 1,
   starts_at: null,
   ends_at: null,
+  timezone: "UTC",
   published: false,
 };
 
