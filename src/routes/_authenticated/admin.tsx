@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, redirect, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard, Users, Bell, Calendar, PenSquare, HelpCircle, BookOpen, Library, Video, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Users, Bell, Calendar, PenSquare, HelpCircle, BookOpen, Trophy, Library, Video, ArrowLeft } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { supabase } from "@/integrations/supabase/client";
