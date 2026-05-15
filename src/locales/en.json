@@ -106,6 +106,43 @@
       "moderator": "Moderator",
       "scholar": "Scholar",
       "user": "User"
+    },
+    "quiz": {
+      "title": "Quizzes",
+      "new": "New Quiz",
+      "edit": "Edit Quiz",
+      "empty": "No quizzes yet. Create your first one.",
+      "published": "Published",
+      "draft": "Draft",
+      "editQuestions": "Edit questions",
+      "addQuestion": "Add question",
+      "noQuestions": "No questions yet.",
+      "question": "Question",
+      "aiAssist": "AI Assist",
+      "aiTopic": "Topic",
+      "difficulty": "Difficulty",
+      "generate": "Generate",
+      "categories": "Categories",
+      "attempts": "Attempts",
+      "confirmDelete": "Delete this quiz and all its questions?"
+    },
+    "categories": {
+      "title": "Quiz Categories",
+      "new": "New Category",
+      "edit": "Edit Category",
+      "empty": "No categories yet."
+    },
+    "attempts": {
+      "title": "Quiz Attempts",
+      "filterByQuiz": "Filter by quiz",
+      "all": "All quizzes",
+      "user": "User",
+      "quiz": "Quiz",
+      "score": "Score",
+      "points": "Points",
+      "time": "Time",
+      "when": "When",
+      "empty": "No attempts yet."
     }
   }
 }
