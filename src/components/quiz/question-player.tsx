@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Check, X, Clock } from "lucide-react";
+import { Check, X, Clock, Info } from "lucide-react";
 
 export type PlayQuestion = {
   id: string;
@@ -13,19 +13,20 @@ export type PlayQuestion = {
   text_bn: string;
   options_en: string[];
   options_bn: string[];
+  correct_indices?: number[];
+  explanation_en?: string | null;
+  explanation_bn?: string | null;
 };
 
 export function QuestionPlayer({
   questions,
   timeLimit,
   instantFeedback,
-  correctMap, // { [qId]: number[] } only present if instantFeedback
   onSubmit,
 }: {
   questions: PlayQuestion[];
   timeLimit: number;
   instantFeedback: boolean;
-  correctMap?: Record<string, number[]>;
   onSubmit: (answers: Record<string, number[]>, secs: number) => void;
 }) {
   const { t, i18n } = useTranslation();
@@ -33,28 +34,59 @@ export function QuestionPlayer({
   const [idx, setIdx] = React.useState(0);
   const [answers, setAnswers] = React.useState<Record<string, number[]>>({});
   const [revealed, setRevealed] = React.useState<Record<string, boolean>>({});
-  const [secs, setSecs] = React.useState(0);
   const startedAt = React.useRef(Date.now());
+  const [elapsed, setElapsed] = React.useState(0);
+
+  // Per-question budget
+  const perQ = questions.length > 0 ? Math.max(5, Math.floor(timeLimit / questions.length)) : timeLimit;
+  const [qStart, setQStart] = React.useState(() => Date.now());
+  const [qElapsed, setQElapsed] = React.useState(0);
+
+  // submitted-ref to avoid double-submit
+  const submittedRef = React.useRef(false);
+  const answersRef = React.useRef(answers);
+  React.useEffect(() => { answersRef.current = answers; }, [answers]);
 
   React.useEffect(() => {
-    const id = setInterval(() => setSecs(Math.floor((Date.now() - startedAt.current) / 1000)), 1000);
+    const id = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startedAt.current) / 1000));
+      setQElapsed(Math.floor((Date.now() - qStart) / 1000));
+    }, 250);
     return () => clearInterval(id);
-  }, []);
+  }, [qStart]);
 
-  const remaining = Math.max(0, timeLimit - secs);
+  const submit = React.useCallback((secs: number) => {
+    if (submittedRef.current) return;
+    submittedRef.current = true;
+    onSubmit(answersRef.current, secs);
+  }, [onSubmit]);
+
+  // Auto-advance / auto-submit when per-question time elapses
   React.useEffect(() => {
-    if (timeLimit > 0 && secs >= timeLimit) {
-      onSubmit(answers, secs);
+    if (qElapsed < perQ) return;
+    const q = questions[idx];
+    if (!q) return;
+    if (instantFeedback && !revealed[q.id]) {
+      setRevealed((prev) => ({ ...prev, [q.id]: true }));
+      return;
     }
-  }, [secs, timeLimit, answers, onSubmit]);
+    if (idx < questions.length - 1) {
+      setIdx(idx + 1);
+      setQStart(Date.now());
+      setQElapsed(0);
+    } else {
+      submit(elapsed);
+    }
+  }, [qElapsed, perQ, idx, questions, instantFeedback, revealed, elapsed, submit]);
 
   if (questions.length === 0) return <Card className="p-8 text-center">{t("quiz.noQuestions")}</Card>;
 
   const q = questions[idx];
   const options = isBn ? q.options_bn : q.options_en;
   const sel = answers[q.id] ?? [];
-  const reveal = revealed[q.id];
-  const correct = correctMap?.[q.id] ?? [];
+  const reveal = !!revealed[q.id];
+  const correct = q.correct_indices ?? [];
+  const explanation = isBn ? q.explanation_bn : q.explanation_en;
 
   const toggle = (i: number) => {
     if (reveal) return;
@@ -72,10 +104,16 @@ export function QuestionPlayer({
       setRevealed({ ...revealed, [q.id]: true });
       return;
     }
-    if (idx < questions.length - 1) setIdx(idx + 1);
-    else onSubmit(answers, secs);
+    if (idx < questions.length - 1) {
+      setIdx(idx + 1);
+      setQStart(Date.now());
+      setQElapsed(0);
+    } else {
+      submit(elapsed);
+    }
   };
 
+  const remaining = Math.max(0, perQ - qElapsed);
   const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
   const ss = String(remaining % 60).padStart(2, "0");
 
@@ -85,7 +123,12 @@ export function QuestionPlayer({
         <div className="text-sm text-muted-foreground">
           {t("quiz.questionN", { n: idx + 1, total: questions.length })}
         </div>
-        <div className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground">
+        <div
+          className={cn(
+            "inline-flex items-center gap-1.5 text-sm font-medium",
+            remaining <= 5 ? "text-rose-600" : "text-foreground",
+          )}
+        >
           <Clock className="h-4 w-4 text-primary" />
           {mm}:{ss}
         </div>
@@ -107,7 +150,7 @@ export function QuestionPlayer({
               disabled={reveal}
               className={cn(
                 "w-full text-left rounded-xl border-2 px-4 py-3 transition-all flex items-center gap-3",
-                isSel ? "border-primary bg-primary/5" : "border-border hover:border-primary/40",
+                isSel && !reveal ? "border-primary bg-primary/5" : "border-border hover:border-primary/40",
                 isCorrect && "border-emerald-500 bg-emerald-500/10",
                 isWrongPick && "border-rose-500 bg-rose-500/10",
               )}
@@ -115,7 +158,7 @@ export function QuestionPlayer({
               <span
                 className={cn(
                   "h-7 w-7 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0",
-                  isSel ? "border-primary text-primary" : "border-border text-muted-foreground",
+                  isSel && !reveal ? "border-primary text-primary" : "border-border text-muted-foreground",
                   isCorrect && "border-emerald-500 text-emerald-600 bg-emerald-500/10",
                   isWrongPick && "border-rose-500 text-rose-600 bg-rose-500/10",
                 )}
@@ -130,11 +173,21 @@ export function QuestionPlayer({
         })}
       </div>
 
+      {reveal && explanation && (
+        <div className="mt-4 rounded-lg bg-primary/5 border border-primary/20 p-3 text-sm text-foreground flex gap-2">
+          <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+          <div>
+            <div className="font-medium text-primary mb-0.5">{t("quiz.explanation", { defaultValue: "Explanation" })}</div>
+            {explanation}
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mt-6">
         <span className="text-xs text-muted-foreground">
           {q.type === "multi" ? t("quiz.multiHint") : t("quiz.singleHint")}
         </span>
-        <Button onClick={next} disabled={sel.length === 0}>
+        <Button onClick={next} disabled={sel.length === 0 && !reveal}>
           {idx === questions.length - 1 && (reveal || !instantFeedback) ? t("quiz.finish") : t("quiz.next")}
         </Button>
       </div>
