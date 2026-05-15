@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Trophy, Sparkles, BookOpen } from "lucide-react";
+import { Trophy, Sparkles, BookOpen, Bookmark, History } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
@@ -38,11 +38,24 @@ function QuizHome() {
   return (
     <AppShell>
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-10 space-y-8">
-        <div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
-            {t("modules.quiz.title")}
-          </h1>
-          <p className="text-muted-foreground mt-2 max-w-2xl">{t("modules.quiz.desc")}</p>
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
+              {t("modules.quiz.title")}
+            </h1>
+            <p className="text-muted-foreground mt-2 max-w-2xl">{t("modules.quiz.desc")}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/quiz/my-attempts"><History className="h-4 w-4 mr-1.5" />{t("quiz.myAttempts", { defaultValue: "My attempts" })}</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/quiz/bookmarks"><Bookmark className="h-4 w-4 mr-1.5" />{t("quiz.bookmarks", { defaultValue: "Bookmarks" })}</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/quiz/leaderboard"><Trophy className="h-4 w-4 mr-1.5" />{t("quiz.leaderboard")}</Link>
+            </Button>
+          </div>
         </div>
 
         {featured && (

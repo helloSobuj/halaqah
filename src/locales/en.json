@@ -102,7 +102,19 @@
     "pts": "pts",
     "marks": "marks",
     "rank": "Rank",
-    "rankScore": "Rank score (higher is better)"
+    "rankScore": "Rank score (higher is better)",
+    "myAttempts": "My attempts",
+    "bookmarks": "Bookmarks",
+    "noAttempts": "You haven't taken any quizzes yet.",
+    "noBookmarks": "You haven't bookmarked any quizzes yet.",
+    "review": "Review answers",
+    "share": "Share",
+    "shareText": "I scored {{score}}/{{total}} ({{pct}}%) on a Halaqah quiz!",
+    "copied": "Copied to clipboard",
+    "score": "Score",
+    "time": "Time",
+    "blurWarning": "Tab switching detected ({{n}}). Stay on this tab to keep your attempt valid.",
+    "explanation": "Explanation"
   },
   "admin": {
     "title": "Admin Panel",
