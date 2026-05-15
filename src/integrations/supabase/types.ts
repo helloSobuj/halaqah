@@ -347,10 +347,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      attempts_left: {
-        Args: { _fingerprint: string; _ip: string; _quiz_id: string }
-        Returns: number
-      }
+      attempts_left:
+        | {
+            Args: { _fingerprint: string; _ip: string; _quiz_id: string }
+            Returns: number
+          }
+        | {
+            Args: {
+              _fingerprint: string
+              _ip: string
+              _quiz_id: string
+              _user_id: string
+            }
+            Returns: number
+          }
       get_quiz_leaderboard: {
         Args: { _category_id?: string; _period?: string; _quiz_id?: string }
         Returns: {
