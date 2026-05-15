@@ -131,7 +131,7 @@ function PlayPage() {
     );
   }
 
-  const handleSubmit = async (answers: Record<string, number[]>, secs: number) => {
+  const handleSubmit = async (answers: Record<string, number[] | string>, secs: number) => {
     try {
       const res = await submitFn({ data: { quizId, answers, timeTaken: secs, fingerprint } });
       setResult(res.result as SubmitResult);

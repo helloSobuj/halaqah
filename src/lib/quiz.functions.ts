@@ -554,3 +554,35 @@ export const generateQuestionsAI = createServerFn({ method: "POST" })
     );
     return itemsSchema.parse(parsed);
   });
+
+// ---------------- IMAGE UPLOAD ----------------
+
+export const uploadQuestionImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        // base64 data URL ("data:image/png;base64,....") under ~3MB
+        dataUrl: z.string().min(20).max(4_500_000),
+        filename: z.string().min(1).max(120),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const m = data.dataUrl.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
+    if (!m) throw new Error("Invalid image data");
+    const mime = m[1];
+    const ext = mime.split("/")[1].split("+")[0].replace(/[^a-z0-9]/gi, "") || "bin";
+    const bytes = Buffer.from(m[2], "base64");
+    if (bytes.length > 3_000_000) throw new Error("Image too large (max 3 MB)");
+    const safe = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 60);
+    const path = `questions/${context.userId}/${Date.now()}-${safe}.${ext}`;
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("quiz-media")
+      .upload(path, bytes, { contentType: mime, upsert: false });
+    if (upErr) throw new Error(upErr.message);
+    const { data: pub } = supabaseAdmin.storage.from("quiz-media").getPublicUrl(path);
+    return { url: pub.publicUrl };
+  });
+
