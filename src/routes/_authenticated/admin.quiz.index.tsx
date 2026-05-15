@@ -179,7 +179,8 @@ function AdminQuizList() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() =>
+                onClick={() => {
+                  const tz = (q as { timezone?: string | null }).timezone || getBrowserTz();
                   setEditing({
                     id: q.id,
                     category_id: q.category_id,
@@ -192,11 +193,12 @@ function AdminQuizList() {
                     pass_mark: q.pass_mark,
                     instant_feedback: q.instant_feedback,
                     max_attempts: q.max_attempts,
-                    starts_at: q.starts_at ?? null,
-                    ends_at: q.ends_at ?? null,
+                    starts_at: q.starts_at ? utcToLocalInput(q.starts_at, tz) : null,
+                    ends_at: q.ends_at ? utcToLocalInput(q.ends_at, tz) : null,
+                    timezone: tz,
                     published: q.published,
-                  })
-                }
+                  });
+                }}
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
