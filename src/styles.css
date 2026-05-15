@@ -13,8 +13,9 @@
  */
 
 @theme inline {
-  --font-sans: "Inter", "Hind Siliguri", "Noto Sans Bengali", system-ui, sans-serif;
-  --font-display: "Inter", "Hind Siliguri", "Noto Sans Bengali", system-ui, sans-serif;
+  --font-sans: "Inter", "Noto Serif Bengali", system-ui, sans-serif;
+  --font-display: "Inter", "Noto Serif Bengali", system-ui, sans-serif;
+  --font-bangla: "Noto Serif Bengali", serif;
   --font-arabic: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
 
   --radius-sm: calc(var(--radius) - 4px);
