@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   categorySchema,
   questionSchema,
+  questionImportSchema,
   quizSchema,
 } from "@/lib/quiz.schemas";
 
