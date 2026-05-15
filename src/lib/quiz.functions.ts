@@ -154,7 +154,10 @@ export const submitAttempt = createServerFn({ method: "POST" })
     z
       .object({
         quizId: z.string().uuid(),
-        answers: z.record(z.string().uuid(), z.array(z.number().int().min(0).max(7))),
+        answers: z.record(
+          z.string().uuid(),
+          z.union([z.array(z.number().int().min(0).max(7)), z.string().max(300)]),
+        ),
         timeTaken: z.number().int().min(0).max(7200),
         fingerprint: z.string().max(120).nullable(),
       })
