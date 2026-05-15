@@ -287,13 +287,30 @@ function AdminQuizList() {
                 <Input type="number" min={0} value={editing.max_attempts} onChange={(e) => setEditing({ ...editing, max_attempts: +e.target.value })} />
                 <p className="text-[11px] text-muted-foreground mt-1">{t("admin.quiz.maxAttemptsHint")}</p>
               </div>
-              <div>
-                <Label>{t("admin.quiz.startsAt")}</Label>
-                <Input type="datetime-local" value={editing.starts_at?.slice(0, 16) ?? ""} onChange={(e) => setEditing({ ...editing, starts_at: e.target.value || null })} />
+              <div className="sm:col-span-2">
+                <Label>{t("admin.quiz.timezone", { defaultValue: "Timezone" })}</Label>
+                <Select
+                  value={editing.timezone}
+                  onValueChange={(v) => setEditing({ ...editing, timezone: v })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {COMMON_TIMEZONES.map((tz) => (
+                      <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  {t("admin.quiz.timezoneHint", { defaultValue: "Start/end times are interpreted in this timezone." })}
+                </p>
               </div>
               <div>
-                <Label>{t("admin.quiz.endsAt")}</Label>
-                <Input type="datetime-local" value={editing.ends_at?.slice(0, 16) ?? ""} onChange={(e) => setEditing({ ...editing, ends_at: e.target.value || null })} />
+                <Label>{t("admin.quiz.startsAt")} ({editing.timezone})</Label>
+                <Input type="datetime-local" value={editing.starts_at ?? ""} onChange={(e) => setEditing({ ...editing, starts_at: e.target.value || null })} />
+              </div>
+              <div>
+                <Label>{t("admin.quiz.endsAt")} ({editing.timezone})</Label>
+                <Input type="datetime-local" value={editing.ends_at ?? ""} onChange={(e) => setEditing({ ...editing, ends_at: e.target.value || null })} />
               </div>
               <div className="flex items-center gap-2 pt-5">
                 <Switch checked={editing.instant_feedback} onCheckedChange={(v) => setEditing({ ...editing, instant_feedback: v })} />
