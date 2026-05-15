@@ -2,7 +2,8 @@ import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity } from "lucide-react";
+import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, History } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
@@ -122,16 +123,22 @@ function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="saved">
-            <Card className="p-10 text-center">
-              <Bookmark className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">{t("profile.savedEmpty")}</p>
+            <Card className="p-6 text-center space-y-3">
+              <Bookmark className="h-8 w-8 text-muted-foreground mx-auto" />
+              <p className="text-sm text-muted-foreground">{t("profile.bookmarksDesc", { defaultValue: "Your bookmarked quizzes." })}</p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/quiz/bookmarks">{t("quiz.bookmarks", { defaultValue: "Open bookmarks" })}</Link>
+              </Button>
             </Card>
           </TabsContent>
 
           <TabsContent value="activity">
-            <Card className="p-10 text-center">
-              <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">{t("profile.activityEmpty")}</p>
+            <Card className="p-6 text-center space-y-3">
+              <Activity className="h-8 w-8 text-muted-foreground mx-auto" />
+              <p className="text-sm text-muted-foreground">{t("profile.activityDesc", { defaultValue: "Your quiz attempts and scores." })}</p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/quiz/my-attempts"><History className="h-4 w-4 mr-1.5" />{t("quiz.myAttempts", { defaultValue: "My attempts" })}</Link>
+              </Button>
             </Card>
           </TabsContent>
         </Tabs>

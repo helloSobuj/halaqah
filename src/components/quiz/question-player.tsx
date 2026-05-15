@@ -36,6 +36,20 @@ export function QuestionPlayer({
   const [revealed, setRevealed] = React.useState<Record<string, boolean>>({});
   const startedAt = React.useRef(Date.now());
   const [elapsed, setElapsed] = React.useState(0);
+  const [blurCount, setBlurCount] = React.useState(0);
+
+  // Warn the user (and count) when they switch tabs / windows during a quiz.
+  React.useEffect(() => {
+    const onVis = () => {
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        setBlurCount((c) => c + 1);
+      }
+    };
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", onVis);
+      return () => document.removeEventListener("visibilitychange", onVis);
+    }
+  }, []);
 
   // Per-question budget
   const perQ = questions.length > 0 ? Math.max(5, Math.floor(timeLimit / questions.length)) : timeLimit;
@@ -134,6 +148,12 @@ export function QuestionPlayer({
         </div>
       </div>
       <Progress value={((idx + 1) / questions.length) * 100} className="mb-5 h-1.5" />
+
+      {blurCount > 0 && (
+        <div className="mb-3 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-300 px-3 py-2 text-xs">
+          {t("quiz.blurWarning", { defaultValue: "Tab switching detected ({{n}}). Stay on this tab to keep your attempt valid.", n: blurCount })}
+        </div>
+      )}
 
       <h2 className="text-lg font-semibold text-foreground mb-4">{isBn ? q.text_bn : q.text_en}</h2>
 

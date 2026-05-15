@@ -210,7 +210,7 @@ export const listBookmarks = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("quiz_bookmarks")
-      .select("quiz_id, created_at, quizzes(id, title_en, title_bn, difficulty, category_id, quiz_categories(slug, name_en, name_bn, color))")
+      .select("quiz_id, created_at, quizzes(id, title_en, title_bn, description_en, description_bn, difficulty, time_limit_seconds, starts_at, ends_at, timezone, category_id, quiz_categories(slug, name_en, name_bn, color))")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
@@ -246,6 +246,37 @@ export const getLeaderboard = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     return rows ?? [];
+  });
+
+export const getAttemptReview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ attemptId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: attempt, error } = await supabaseAdmin
+      .from("quiz_attempts")
+      .select("*")
+      .eq("id", data.attemptId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!attempt) throw new Error("Attempt not found");
+
+    const roles = await getRoles(context.userId);
+    const isStaff = roles.some((r) => ["admin", "moderator", "scholar"].includes(r));
+    if (attempt.user_id !== context.userId && !isStaff) throw new Error("Forbidden");
+
+    const { data: quiz } = await supabaseAdmin
+      .from("quizzes")
+      .select("id, title_en, title_bn, time_limit_seconds, pass_mark, instant_feedback, quiz_categories(slug, name_en, name_bn)")
+      .eq("id", attempt.quiz_id)
+      .maybeSingle();
+
+    const { data: questions } = await supabaseAdmin
+      .from("quiz_questions")
+      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, explanation_en, explanation_bn")
+      .eq("quiz_id", attempt.quiz_id)
+      .order("order_index", { ascending: true });
+
+    return { attempt, quiz, questions: questions ?? [] };
   });
 
 // ---------------- ADMIN ----------------
