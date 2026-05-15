@@ -168,6 +168,12 @@ function AdminQuizList() {
               </div>
               <div className="text-xs text-muted-foreground mt-1">
                 {q.question_count} {t("quiz.questions")} • {Math.round(q.time_limit_seconds / 60)}m
+                {q.starts_at && (
+                  <>
+                    {" "}• {t("admin.quiz.startsAt")}:{" "}
+                    {formatInTz(q.starts_at, (q as { timezone?: string | null }).timezone || "UTC")}
+                  </>
+                )}
               </div>
             </div>
             <div className="flex gap-2">
