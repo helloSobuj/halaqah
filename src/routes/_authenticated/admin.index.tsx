@@ -14,7 +14,7 @@ const CARDS = [
   { to: "/admin/events", titleKey: "nav.events", descKey: "modules.events.desc", icon: Calendar, soon: true },
   { to: "/admin/blog", titleKey: "nav.blog", descKey: "modules.blog.desc", icon: PenSquare, soon: true },
   { to: "/admin/qa", titleKey: "nav.qa", descKey: "modules.qa.desc", icon: HelpCircle, soon: true },
-  { to: "/admin/quiz", titleKey: "nav.quiz", descKey: "modules.quiz.desc", icon: BookOpen, soon: true },
+  { to: "/admin/quiz", titleKey: "nav.quiz", descKey: "modules.quiz.desc", icon: BookOpen },
   { to: "/admin/library", titleKey: "nav.library", descKey: "modules.library.desc", icon: Library, soon: true },
   { to: "/admin/videos", titleKey: "nav.videos", descKey: "modules.videos.desc", icon: Video, soon: true },
 ] as const;
