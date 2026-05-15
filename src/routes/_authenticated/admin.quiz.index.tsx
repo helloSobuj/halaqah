@@ -142,7 +142,7 @@ function AdminQuizList() {
           <Button variant="outline" asChild>
             <Link to="/admin/quiz/attempts">{t("admin.quiz.attempts")}</Link>
           </Button>
-          <Button onClick={() => setEditing({ ...EMPTY })}>
+          <Button onClick={() => setEditing({ ...EMPTY, timezone: getBrowserTz() })}>
             <Plus className="h-4 w-4 mr-1" /> {t("admin.quiz.new")}
           </Button>
         </div>
