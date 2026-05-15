@@ -1,5 +1,3 @@
-import * as React from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Construction } from "lucide-react";
 
@@ -24,14 +22,3 @@ export function ComingSoonPage({ titleKey, descKey }: { titleKey: string; descKe
     </AppShell>
   );
 }
-
-// Stub route — keeps nav alive until Phase 3 builds out the real module.
-function makeStub(titleKey: string, descKey: string) {
-  return () => <ComingSoonPage titleKey={titleKey} descKey={descKey} />;
-}
-
-export { makeStub };
-
-export const Route = createFileRoute("/_coming-soon-helper")({
-  component: () => null,
-});
