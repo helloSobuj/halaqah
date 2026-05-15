@@ -32,6 +32,7 @@ const SECTIONS = [
   { to: "/admin/blog", labelKey: "nav.blog", icon: PenSquare, soon: true },
   { to: "/admin/qa", labelKey: "nav.qa", icon: HelpCircle, soon: true },
   { to: "/admin/quiz", labelKey: "nav.quiz", icon: BookOpen },
+  { to: "/admin/tournaments", labelKey: "nav.tournaments", icon: Trophy },
   { to: "/admin/library", labelKey: "nav.library", icon: Library, soon: true },
   { to: "/admin/videos", labelKey: "nav.videos", icon: Video, soon: true },
 ] as const;
