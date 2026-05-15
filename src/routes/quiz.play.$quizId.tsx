@@ -56,7 +56,6 @@ function PlayPage() {
 
   const [started, setStarted] = React.useState(false);
   const [result, setResult] = React.useState<SubmitResult | null>(null);
-  const [correctMap, setCorrectMap] = React.useState<Record<string, number[]>>({});
 
   if (!user) return null;
 
