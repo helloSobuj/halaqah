@@ -276,7 +276,7 @@ export const getAttemptReview = createServerFn({ method: "POST" })
 
     const { data: questions } = await supabaseAdmin
       .from("quiz_questions")
-      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, explanation_en, explanation_bn")
+      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, correct_text, correct_order, image_url, hint_en, hint_bn, explanation_en, explanation_bn")
       .eq("quiz_id", attempt.quiz_id)
       .order("order_index", { ascending: true });
 
