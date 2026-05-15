@@ -136,13 +136,7 @@ function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="activity">
-            <Card className="p-6 text-center space-y-3">
-              <Activity className="h-8 w-8 text-muted-foreground mx-auto" />
-              <p className="text-sm text-muted-foreground">{t("profile.activityDesc", { defaultValue: "Your quiz attempts and scores." })}</p>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/quiz/my-attempts"><History className="h-4 w-4 mr-1.5" />{t("quiz.myAttempts", { defaultValue: "My attempts" })}</Link>
-              </Button>
-            </Card>
+            <ActivityList />
           </TabsContent>
         </Tabs>
       </div>
