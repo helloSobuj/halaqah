@@ -114,9 +114,12 @@ export const getQuizForPlay = createServerFn({ method: "POST" })
         throw new Error("Quiz has ended");
     }
 
+    const cols = quiz.instant_feedback
+      ? "id, type, text_en, text_bn, options_en, options_bn, points, order_index, correct_indices, explanation_en, explanation_bn"
+      : "id, type, text_en, text_bn, options_en, options_bn, points, order_index";
     const { data: questions, error: qErr } = await supabaseAdmin
       .from("quiz_questions")
-      .select("id, type, text_en, text_bn, options_en, options_bn, points, order_index")
+      .select(cols)
       .eq("quiz_id", data.quizId)
       .order("order_index", { ascending: true });
     if (qErr) throw new Error(qErr.message);
