@@ -18,7 +18,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
+
 import { useAuth } from "@/hooks/use-auth";
 import { useUserRole } from "@/hooks/use-user-role";
 import { Button } from "@/components/ui/button";
@@ -282,11 +282,15 @@ function MobileBottomTabs() {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const isMobile = useIsMobile();
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
-      {isMobile ? <MobileTopBar /> : <DesktopTopBar />}
-      <main className={cn("flex-1", isMobile && "pb-20")}>{children}</main>
+      <div className="md:hidden contents">
+        <MobileTopBar />
+      </div>
+      <div className="hidden md:contents">
+        <DesktopTopBar />
+      </div>
+      <main className="flex-1 pb-20 md:pb-0">{children}</main>
       <MobileBottomTabs />
     </div>
   );

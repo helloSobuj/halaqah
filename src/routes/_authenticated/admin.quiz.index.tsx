@@ -35,6 +35,13 @@ import {
   listCategories,
 } from "@/lib/quiz.functions";
 import { useUserRole } from "@/hooks/use-user-role";
+import {
+  COMMON_TIMEZONES,
+  getBrowserTz,
+  localInputToUtc,
+  utcToLocalInput,
+  formatInTz,
+} from "@/lib/timezone";
 
 export const Route = createFileRoute("/_authenticated/admin/quiz/")({
   component: AdminQuizList,
@@ -54,6 +61,7 @@ type QuizForm = {
   max_attempts: number;
   starts_at: string | null;
   ends_at: string | null;
+  timezone: string;
   published: boolean;
 };
 
@@ -70,6 +78,7 @@ const EMPTY: QuizForm = {
   max_attempts: 1,
   starts_at: null,
   ends_at: null,
+  timezone: "UTC",
   published: false,
 };
 
@@ -90,16 +99,21 @@ function AdminQuizList() {
   const [editing, setEditing] = React.useState<QuizForm | null>(null);
 
   const upsertM = useMutation({
-    mutationFn: (data: QuizForm) =>
-      upsertFn({
+    mutationFn: (data: QuizForm) => {
+      const tz = data.timezone || "UTC";
+      const startsUtc = data.starts_at ? localInputToUtc(data.starts_at, tz) : null;
+      const endsUtc = data.ends_at ? localInputToUtc(data.ends_at, tz) : null;
+      return upsertFn({
         data: {
           ...data,
           description_en: data.description_en || null,
           description_bn: data.description_bn || null,
-          starts_at: data.starts_at || null,
-          ends_at: data.ends_at || null,
+          starts_at: startsUtc,
+          ends_at: endsUtc,
+          timezone: tz,
         },
-      }),
+      });
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-quizzes"] });
       toast.success(t("common.save"));
@@ -128,7 +142,7 @@ function AdminQuizList() {
           <Button variant="outline" asChild>
             <Link to="/admin/quiz/attempts">{t("admin.quiz.attempts")}</Link>
           </Button>
-          <Button onClick={() => setEditing({ ...EMPTY })}>
+          <Button onClick={() => setEditing({ ...EMPTY, timezone: getBrowserTz() })}>
             <Plus className="h-4 w-4 mr-1" /> {t("admin.quiz.new")}
           </Button>
         </div>
@@ -154,6 +168,12 @@ function AdminQuizList() {
               </div>
               <div className="text-xs text-muted-foreground mt-1">
                 {q.question_count} {t("quiz.questions")} • {Math.round(q.time_limit_seconds / 60)}m
+                {q.starts_at && (
+                  <>
+                    {" "}• {t("admin.quiz.startsAt")}:{" "}
+                    {formatInTz(q.starts_at, (q as { timezone?: string | null }).timezone || "UTC")}
+                  </>
+                )}
               </div>
             </div>
             <div className="flex gap-2">
@@ -165,7 +185,8 @@ function AdminQuizList() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() =>
+                onClick={() => {
+                  const tz = (q as { timezone?: string | null }).timezone || getBrowserTz();
                   setEditing({
                     id: q.id,
                     category_id: q.category_id,
@@ -178,11 +199,12 @@ function AdminQuizList() {
                     pass_mark: q.pass_mark,
                     instant_feedback: q.instant_feedback,
                     max_attempts: q.max_attempts,
-                    starts_at: q.starts_at ?? null,
-                    ends_at: q.ends_at ?? null,
+                    starts_at: q.starts_at ? utcToLocalInput(q.starts_at, tz) : null,
+                    ends_at: q.ends_at ? utcToLocalInput(q.ends_at, tz) : null,
+                    timezone: tz,
                     published: q.published,
-                  })
-                }
+                  });
+                }}
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
@@ -265,13 +287,30 @@ function AdminQuizList() {
                 <Input type="number" min={0} value={editing.max_attempts} onChange={(e) => setEditing({ ...editing, max_attempts: +e.target.value })} />
                 <p className="text-[11px] text-muted-foreground mt-1">{t("admin.quiz.maxAttemptsHint")}</p>
               </div>
-              <div>
-                <Label>{t("admin.quiz.startsAt")}</Label>
-                <Input type="datetime-local" value={editing.starts_at?.slice(0, 16) ?? ""} onChange={(e) => setEditing({ ...editing, starts_at: e.target.value || null })} />
+              <div className="sm:col-span-2">
+                <Label>{t("admin.quiz.timezone", { defaultValue: "Timezone" })}</Label>
+                <Select
+                  value={editing.timezone}
+                  onValueChange={(v) => setEditing({ ...editing, timezone: v })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {COMMON_TIMEZONES.map((tz) => (
+                      <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  {t("admin.quiz.timezoneHint", { defaultValue: "Start/end times are interpreted in this timezone." })}
+                </p>
               </div>
               <div>
-                <Label>{t("admin.quiz.endsAt")}</Label>
-                <Input type="datetime-local" value={editing.ends_at?.slice(0, 16) ?? ""} onChange={(e) => setEditing({ ...editing, ends_at: e.target.value || null })} />
+                <Label>{t("admin.quiz.startsAt")} ({editing.timezone})</Label>
+                <Input type="datetime-local" value={editing.starts_at ?? ""} onChange={(e) => setEditing({ ...editing, starts_at: e.target.value || null })} />
+              </div>
+              <div>
+                <Label>{t("admin.quiz.endsAt")} ({editing.timezone})</Label>
+                <Input type="datetime-local" value={editing.ends_at ?? ""} onChange={(e) => setEditing({ ...editing, ends_at: e.target.value || null })} />
               </div>
               <div className="flex items-center gap-2 pt-5">
                 <Switch checked={editing.instant_feedback} onCheckedChange={(v) => setEditing({ ...editing, instant_feedback: v })} />
