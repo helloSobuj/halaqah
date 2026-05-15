@@ -119,11 +119,19 @@ function AdminQuizList() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-xl font-semibold text-foreground">{t("admin.quiz.title")}</h2>
-        <Button onClick={() => setEditing({ ...EMPTY })}>
-          <Plus className="h-4 w-4 mr-1" /> {t("admin.quiz.new")}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/admin/quiz/categories">{t("admin.quiz.categories")}</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/admin/quiz/attempts">{t("admin.quiz.attempts")}</Link>
+          </Button>
+          <Button onClick={() => setEditing({ ...EMPTY })}>
+            <Plus className="h-4 w-4 mr-1" /> {t("admin.quiz.new")}
+          </Button>
+        </div>
       </div>
 
       <Card className="divide-y divide-border">

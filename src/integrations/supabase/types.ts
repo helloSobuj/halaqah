@@ -116,6 +116,13 @@ export type Database = {
             referencedRelation: "quizzes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "quiz_attempts_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       quiz_bookmarks: {
@@ -143,6 +150,13 @@ export type Database = {
             columns: ["quiz_id"]
             isOneToOne: false
             referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_bookmarks_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

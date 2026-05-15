@@ -417,14 +417,31 @@ export const adminListAttempts = createServerFn({ method: "POST" })
     await assertStaff(context.userId);
     let q = supabaseAdmin
       .from("quiz_attempts")
-      .select("id, user_id, quiz_id, score, total, points_awarded, time_taken_seconds, completed_at, ip_address, profiles(display_name, avatar_url), quizzes(title_en, title_bn)")
+      .select("id, user_id, quiz_id, score, total, points_awarded, time_taken_seconds, completed_at, ip_address")
       .order("completed_at", { ascending: false })
       .limit(data.limit);
     if (data.quizId) q = q.eq("quiz_id", data.quizId);
     if (data.userId) q = q.eq("user_id", data.userId);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const list = rows ?? [];
+    const userIds = Array.from(new Set(list.map((r) => r.user_id)));
+    const quizIds = Array.from(new Set(list.map((r) => r.quiz_id)));
+    const [{ data: profs }, { data: quizzes }] = await Promise.all([
+      userIds.length
+        ? supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", userIds)
+        : Promise.resolve({ data: [] as { id: string; display_name: string | null; avatar_url: string | null }[] }),
+      quizIds.length
+        ? supabaseAdmin.from("quizzes").select("id, title_en, title_bn").in("id", quizIds)
+        : Promise.resolve({ data: [] as { id: string; title_en: string; title_bn: string }[] }),
+    ]);
+    const pMap = new Map((profs ?? []).map((p) => [p.id, p]));
+    const qMap = new Map((quizzes ?? []).map((q) => [q.id, q]));
+    return list.map((r) => ({
+      ...r,
+      profiles: pMap.get(r.user_id) ?? null,
+      quizzes: qMap.get(r.quiz_id) ?? null,
+    }));
   });
 
 // ---------------- AI ASSIST (OpenRouter) ----------------

@@ -28,6 +28,8 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminQuizIndexRouteImport } from './routes/_authenticated/admin.quiz.index'
+import { Route as AuthenticatedAdminQuizCategoriesRouteImport } from './routes/_authenticated/admin.quiz.categories'
+import { Route as AuthenticatedAdminQuizAttemptsRouteImport } from './routes/_authenticated/admin.quiz.attempts'
 import { Route as AuthenticatedAdminQuizQuizIdRouteImport } from './routes/_authenticated/admin.quiz.$quizId'
 
 const VideosRoute = VideosRouteImport.update({
@@ -125,6 +127,18 @@ const AuthenticatedAdminQuizIndexRoute =
     path: '/quiz/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminQuizCategoriesRoute =
+  AuthenticatedAdminQuizCategoriesRouteImport.update({
+    id: '/quiz/categories',
+    path: '/quiz/categories',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminQuizAttemptsRoute =
+  AuthenticatedAdminQuizAttemptsRouteImport.update({
+    id: '/quiz/attempts',
+    path: '/quiz/attempts',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminQuizQuizIdRoute =
   AuthenticatedAdminQuizQuizIdRouteImport.update({
     id: '/quiz/$quizId',
@@ -151,6 +165,8 @@ export interface FileRoutesByFullPath {
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
+  '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
+  '/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
   '/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRoutesByTo {
@@ -171,6 +187,8 @@ export interface FileRoutesByTo {
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
+  '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
+  '/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
   '/admin/quiz': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRoutesById {
@@ -194,6 +212,8 @@ export interface FileRoutesById {
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
+  '/_authenticated/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
+  '/_authenticated/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
   '/_authenticated/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRouteTypes {
@@ -217,6 +237,8 @@ export interface FileRouteTypes {
     | '/quiz/play/$quizId'
     | '/admin/'
     | '/admin/quiz/$quizId'
+    | '/admin/quiz/attempts'
+    | '/admin/quiz/categories'
     | '/admin/quiz/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -237,6 +259,8 @@ export interface FileRouteTypes {
     | '/quiz/play/$quizId'
     | '/admin'
     | '/admin/quiz/$quizId'
+    | '/admin/quiz/attempts'
+    | '/admin/quiz/categories'
     | '/admin/quiz'
   id:
     | '__root__'
@@ -259,6 +283,8 @@ export interface FileRouteTypes {
     | '/quiz/play/$quizId'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/quiz/$quizId'
+    | '/_authenticated/admin/quiz/attempts'
+    | '/_authenticated/admin/quiz/categories'
     | '/_authenticated/admin/quiz/'
   fileRoutesById: FileRoutesById
 }
@@ -414,6 +440,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminQuizIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/quiz/categories': {
+      id: '/_authenticated/admin/quiz/categories'
+      path: '/quiz/categories'
+      fullPath: '/admin/quiz/categories'
+      preLoaderRoute: typeof AuthenticatedAdminQuizCategoriesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/quiz/attempts': {
+      id: '/_authenticated/admin/quiz/attempts'
+      path: '/quiz/attempts'
+      fullPath: '/admin/quiz/attempts'
+      preLoaderRoute: typeof AuthenticatedAdminQuizAttemptsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/quiz/$quizId': {
       id: '/_authenticated/admin/quiz/$quizId'
       path: '/quiz/$quizId'
@@ -428,6 +468,8 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminQuizQuizIdRoute: typeof AuthenticatedAdminQuizQuizIdRoute
+  AuthenticatedAdminQuizAttemptsRoute: typeof AuthenticatedAdminQuizAttemptsRoute
+  AuthenticatedAdminQuizCategoriesRoute: typeof AuthenticatedAdminQuizCategoriesRoute
   AuthenticatedAdminQuizIndexRoute: typeof AuthenticatedAdminQuizIndexRoute
 }
 
@@ -435,6 +477,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminQuizQuizIdRoute: AuthenticatedAdminQuizQuizIdRoute,
+  AuthenticatedAdminQuizAttemptsRoute: AuthenticatedAdminQuizAttemptsRoute,
+  AuthenticatedAdminQuizCategoriesRoute: AuthenticatedAdminQuizCategoriesRoute,
   AuthenticatedAdminQuizIndexRoute: AuthenticatedAdminQuizIndexRoute,
 }
 

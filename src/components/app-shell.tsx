@@ -60,14 +60,20 @@ const ALL_NAV = [...TOP_NAV, ...MORE_NAV];
 
 function Logo() {
   const { t } = useTranslation();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
   return (
     <Link to="/" className="flex items-center gap-2.5">
       <div className="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center shadow-soft">
         <span className="text-primary-foreground font-bold text-lg leading-none">ﺡ</span>
       </div>
-      <div className="flex flex-col leading-tight">
-        <span className="font-bold text-base tracking-tight text-foreground">{t("app.name")}</span>
-        <span className="text-[11px] text-muted-foreground">{t("app.tagline")}</span>
+      <div className="flex flex-col leading-tight" suppressHydrationWarning>
+        <span className="font-bold text-base tracking-tight text-foreground" suppressHydrationWarning>
+          {mounted ? t("app.name") : "Halaqah"}
+        </span>
+        <span className="text-[11px] text-muted-foreground" suppressHydrationWarning>
+          {mounted ? t("app.tagline") : ""}
+        </span>
       </div>
     </Link>
   );
