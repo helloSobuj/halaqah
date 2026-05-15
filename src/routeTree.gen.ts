@@ -80,19 +80,19 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuizIndexRoute = QuizIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => QuizRoute,
+  id: '/quiz/',
+  path: '/quiz/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QuizLeaderboardRoute = QuizLeaderboardRouteImport.update({
-  id: '/leaderboard',
-  path: '/leaderboard',
-  getParentRoute: () => QuizRoute,
+  id: '/quiz/leaderboard',
+  path: '/quiz/leaderboard',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QuizCategoryRoute = QuizCategoryRouteImport.update({
-  id: '/$category',
-  path: '/$category',
-  getParentRoute: () => QuizRoute,
+  id: '/quiz/$category',
+  path: '/quiz/$category',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
@@ -110,9 +110,9 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const QuizPlayQuizIdRoute = QuizPlayQuizIdRouteImport.update({
-  id: '/play/$quizId',
-  path: '/play/$quizId',
-  getParentRoute: () => QuizRoute,
+  id: '/quiz/play/$quizId',
+  path: '/quiz/play/$quizId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
@@ -273,6 +273,10 @@ export interface RootRouteChildren {
   QaRoute: typeof QaRoute
   SignupRoute: typeof SignupRoute
   VideosRoute: typeof VideosRoute
+  QuizCategoryRoute: typeof QuizCategoryRoute
+  QuizLeaderboardRoute: typeof QuizLeaderboardRoute
+  QuizIndexRoute: typeof QuizIndexRoute
+  QuizPlayQuizIdRoute: typeof QuizPlayQuizIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -349,24 +353,24 @@ declare module '@tanstack/react-router' {
     }
     '/quiz/': {
       id: '/quiz/'
-      path: '/'
+      path: '/quiz'
       fullPath: '/quiz/'
       preLoaderRoute: typeof QuizIndexRouteImport
-      parentRoute: typeof QuizRoute
+      parentRoute: typeof rootRouteImport
     }
     '/quiz/leaderboard': {
       id: '/quiz/leaderboard'
-      path: '/leaderboard'
+      path: '/quiz/leaderboard'
       fullPath: '/quiz/leaderboard'
       preLoaderRoute: typeof QuizLeaderboardRouteImport
-      parentRoute: typeof QuizRoute
+      parentRoute: typeof rootRouteImport
     }
     '/quiz/$category': {
       id: '/quiz/$category'
-      path: '/$category'
+      path: '/quiz/$category'
       fullPath: '/quiz/$category'
       preLoaderRoute: typeof QuizCategoryRouteImport
-      parentRoute: typeof QuizRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
@@ -391,10 +395,10 @@ declare module '@tanstack/react-router' {
     }
     '/quiz/play/$quizId': {
       id: '/quiz/play/$quizId'
-      path: '/play/$quizId'
+      path: '/quiz/play/$quizId'
       fullPath: '/quiz/play/$quizId'
       preLoaderRoute: typeof QuizPlayQuizIdRouteImport
-      parentRoute: typeof QuizRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
@@ -462,17 +466,11 @@ const rootRouteChildren: RootRouteChildren = {
   QaRoute: QaRoute,
   SignupRoute: SignupRoute,
   VideosRoute: VideosRoute,
+  QuizCategoryRoute: QuizCategoryRoute,
+  QuizLeaderboardRoute: QuizLeaderboardRoute,
+  QuizIndexRoute: QuizIndexRoute,
+  QuizPlayQuizIdRoute: QuizPlayQuizIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
