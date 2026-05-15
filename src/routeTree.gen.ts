@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as QaRouteImport } from './routes/qa'
 import { Route as NoticesRouteImport } from './routes/notices'
 import { Route as LoginRouteImport } from './routes/login'
@@ -28,6 +27,8 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminQuizIndexRouteImport } from './routes/_authenticated/admin.quiz.index'
+import { Route as AuthenticatedAdminQuizQuizIdRouteImport } from './routes/_authenticated/admin.quiz.$quizId'
 
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
@@ -37,11 +38,6 @@ const VideosRoute = VideosRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaRoute = QaRouteImport.update({
@@ -123,6 +119,18 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminQuizIndexRoute =
+  AuthenticatedAdminQuizIndexRouteImport.update({
+    id: '/quiz/',
+    path: '/quiz/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminQuizQuizIdRoute =
+  AuthenticatedAdminQuizQuizIdRouteImport.update({
+    id: '/quiz/$quizId',
+    path: '/quiz/$quizId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -132,7 +140,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/qa': typeof QaRoute
-  '/quiz': typeof QuizRouteWithChildren
   '/signup': typeof SignupRoute
   '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -143,6 +150,8 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
+  '/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -161,6 +170,8 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
+  '/admin/quiz': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -172,7 +183,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/qa': typeof QaRoute
-  '/quiz': typeof QuizRouteWithChildren
   '/signup': typeof SignupRoute
   '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -183,6 +193,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
+  '/_authenticated/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -194,7 +206,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/notices'
     | '/qa'
-    | '/quiz'
     | '/signup'
     | '/videos'
     | '/admin'
@@ -205,6 +216,8 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/quiz/play/$quizId'
     | '/admin/'
+    | '/admin/quiz/$quizId'
+    | '/admin/quiz/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -223,6 +236,8 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/quiz/play/$quizId'
     | '/admin'
+    | '/admin/quiz/$quizId'
+    | '/admin/quiz'
   id:
     | '__root__'
     | '/'
@@ -233,7 +248,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/notices'
     | '/qa'
-    | '/quiz'
     | '/signup'
     | '/videos'
     | '/_authenticated/admin'
@@ -244,6 +258,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/quiz/play/$quizId'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/quiz/$quizId'
+    | '/_authenticated/admin/quiz/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -255,7 +271,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   NoticesRoute: typeof NoticesRoute
   QaRoute: typeof QaRoute
-  QuizRoute: typeof QuizRouteWithChildren
   SignupRoute: typeof SignupRoute
   VideosRoute: typeof VideosRoute
 }
@@ -274,13 +289,6 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa': {
@@ -395,17 +403,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/quiz/': {
+      id: '/_authenticated/admin/quiz/'
+      path: '/quiz'
+      fullPath: '/admin/quiz/'
+      preLoaderRoute: typeof AuthenticatedAdminQuizIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/quiz/$quizId': {
+      id: '/_authenticated/admin/quiz/$quizId'
+      path: '/quiz/$quizId'
+      fullPath: '/admin/quiz/$quizId'
+      preLoaderRoute: typeof AuthenticatedAdminQuizQuizIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminQuizQuizIdRoute: typeof AuthenticatedAdminQuizQuizIdRoute
+  AuthenticatedAdminQuizIndexRoute: typeof AuthenticatedAdminQuizIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminQuizQuizIdRoute: AuthenticatedAdminQuizQuizIdRoute,
+  AuthenticatedAdminQuizIndexRoute: AuthenticatedAdminQuizIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -425,22 +451,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface QuizRouteChildren {
-  QuizCategoryRoute: typeof QuizCategoryRoute
-  QuizLeaderboardRoute: typeof QuizLeaderboardRoute
-  QuizIndexRoute: typeof QuizIndexRoute
-  QuizPlayQuizIdRoute: typeof QuizPlayQuizIdRoute
-}
-
-const QuizRouteChildren: QuizRouteChildren = {
-  QuizCategoryRoute: QuizCategoryRoute,
-  QuizLeaderboardRoute: QuizLeaderboardRoute,
-  QuizIndexRoute: QuizIndexRoute,
-  QuizPlayQuizIdRoute: QuizPlayQuizIdRoute,
-}
-
-const QuizRouteWithChildren = QuizRoute._addFileChildren(QuizRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -450,7 +460,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NoticesRoute: NoticesRoute,
   QaRoute: QaRoute,
-  QuizRoute: QuizRouteWithChildren,
   SignupRoute: SignupRoute,
   VideosRoute: VideosRoute,
 }
