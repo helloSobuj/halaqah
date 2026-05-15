@@ -20,11 +20,14 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as QuizIndexRouteImport } from './routes/quiz.index'
+import { Route as QuizMyAttemptsRouteImport } from './routes/quiz.my-attempts'
 import { Route as QuizLeaderboardRouteImport } from './routes/quiz.leaderboard'
+import { Route as QuizBookmarksRouteImport } from './routes/quiz.bookmarks'
 import { Route as QuizCategoryRouteImport } from './routes/quiz.$category'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as QuizReviewAttemptIdRouteImport } from './routes/quiz.review.$attemptId'
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminQuizIndexRouteImport } from './routes/_authenticated/admin.quiz.index'
@@ -86,9 +89,19 @@ const QuizIndexRoute = QuizIndexRouteImport.update({
   path: '/quiz/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizMyAttemptsRoute = QuizMyAttemptsRouteImport.update({
+  id: '/quiz/my-attempts',
+  path: '/quiz/my-attempts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuizLeaderboardRoute = QuizLeaderboardRouteImport.update({
   id: '/quiz/leaderboard',
   path: '/quiz/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizBookmarksRoute = QuizBookmarksRouteImport.update({
+  id: '/quiz/bookmarks',
+  path: '/quiz/bookmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuizCategoryRoute = QuizCategoryRouteImport.update({
@@ -110,6 +123,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const QuizReviewAttemptIdRoute = QuizReviewAttemptIdRouteImport.update({
+  id: '/quiz/review/$attemptId',
+  path: '/quiz/review/$attemptId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QuizPlayQuizIdRoute = QuizPlayQuizIdRouteImport.update({
   id: '/quiz/play/$quizId',
@@ -159,10 +177,13 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/quiz/$category': typeof QuizCategoryRoute
+  '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
+  '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/quiz/': typeof QuizIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
+  '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
@@ -181,10 +202,13 @@ export interface FileRoutesByTo {
   '/videos': typeof VideosRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/quiz/$category': typeof QuizCategoryRoute
+  '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
+  '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/quiz': typeof QuizIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
+  '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
@@ -206,10 +230,13 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/quiz/$category': typeof QuizCategoryRoute
+  '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
+  '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/quiz/': typeof QuizIndexRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
+  '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/_authenticated/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
@@ -231,10 +258,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/profile'
     | '/quiz/$category'
+    | '/quiz/bookmarks'
     | '/quiz/leaderboard'
+    | '/quiz/my-attempts'
     | '/quiz/'
     | '/admin/users'
     | '/quiz/play/$quizId'
+    | '/quiz/review/$attemptId'
     | '/admin/'
     | '/admin/quiz/$quizId'
     | '/admin/quiz/attempts'
@@ -253,10 +283,13 @@ export interface FileRouteTypes {
     | '/videos'
     | '/profile'
     | '/quiz/$category'
+    | '/quiz/bookmarks'
     | '/quiz/leaderboard'
+    | '/quiz/my-attempts'
     | '/quiz'
     | '/admin/users'
     | '/quiz/play/$quizId'
+    | '/quiz/review/$attemptId'
     | '/admin'
     | '/admin/quiz/$quizId'
     | '/admin/quiz/attempts'
@@ -277,10 +310,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/profile'
     | '/quiz/$category'
+    | '/quiz/bookmarks'
     | '/quiz/leaderboard'
+    | '/quiz/my-attempts'
     | '/quiz/'
     | '/_authenticated/admin/users'
     | '/quiz/play/$quizId'
+    | '/quiz/review/$attemptId'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/quiz/$quizId'
     | '/_authenticated/admin/quiz/attempts'
@@ -300,9 +336,12 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   VideosRoute: typeof VideosRoute
   QuizCategoryRoute: typeof QuizCategoryRoute
+  QuizBookmarksRoute: typeof QuizBookmarksRoute
   QuizLeaderboardRoute: typeof QuizLeaderboardRoute
+  QuizMyAttemptsRoute: typeof QuizMyAttemptsRoute
   QuizIndexRoute: typeof QuizIndexRoute
   QuizPlayQuizIdRoute: typeof QuizPlayQuizIdRoute
+  QuizReviewAttemptIdRoute: typeof QuizReviewAttemptIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -384,11 +423,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quiz/my-attempts': {
+      id: '/quiz/my-attempts'
+      path: '/quiz/my-attempts'
+      fullPath: '/quiz/my-attempts'
+      preLoaderRoute: typeof QuizMyAttemptsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quiz/leaderboard': {
       id: '/quiz/leaderboard'
       path: '/quiz/leaderboard'
       fullPath: '/quiz/leaderboard'
       preLoaderRoute: typeof QuizLeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz/bookmarks': {
+      id: '/quiz/bookmarks'
+      path: '/quiz/bookmarks'
+      fullPath: '/quiz/bookmarks'
+      preLoaderRoute: typeof QuizBookmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quiz/$category': {
@@ -418,6 +471,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/quiz/review/$attemptId': {
+      id: '/quiz/review/$attemptId'
+      path: '/quiz/review/$attemptId'
+      fullPath: '/quiz/review/$attemptId'
+      preLoaderRoute: typeof QuizReviewAttemptIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/quiz/play/$quizId': {
       id: '/quiz/play/$quizId'
@@ -511,9 +571,12 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   VideosRoute: VideosRoute,
   QuizCategoryRoute: QuizCategoryRoute,
+  QuizBookmarksRoute: QuizBookmarksRoute,
   QuizLeaderboardRoute: QuizLeaderboardRoute,
+  QuizMyAttemptsRoute: QuizMyAttemptsRoute,
   QuizIndexRoute: QuizIndexRoute,
   QuizPlayQuizIdRoute: QuizPlayQuizIdRoute,
+  QuizReviewAttemptIdRoute: QuizReviewAttemptIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

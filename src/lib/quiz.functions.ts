@@ -210,7 +210,7 @@ export const listBookmarks = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("quiz_bookmarks")
-      .select("quiz_id, created_at, quizzes(id, title_en, title_bn, difficulty, category_id, quiz_categories(slug, name_en, name_bn, color))")
+      .select("quiz_id, created_at, quizzes(id, title_en, title_bn, description_en, description_bn, difficulty, time_limit_seconds, starts_at, ends_at, timezone, category_id, quiz_categories(slug, name_en, name_bn, color))")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
