@@ -90,6 +90,20 @@
       "activity": "Activity"
     }
   },
+  "quiz": {
+    "leaderboard": "Leaderboard",
+    "leaderboardDesc": "Top performers ranked by correct answers and fastest time.",
+    "leaderboardEmpty": "No entries yet. Be the first!",
+    "allTime": "All time",
+    "thisMonth": "This month",
+    "thisWeek": "This week",
+    "allCategories": "All categories",
+    "attempts": "attempts",
+    "pts": "pts",
+    "marks": "marks",
+    "rank": "Rank",
+    "rankScore": "Rank score (higher is better)"
+  },
   "admin": {
     "title": "Admin Panel",
     "subtitle": "Manage users, content, and community settings.",
