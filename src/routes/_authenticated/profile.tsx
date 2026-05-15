@@ -345,3 +345,55 @@ function IdentityForm({ profile, userId }: { profile: ProfileRow; userId: string
     </Card>
   );
 }
+
+function ActivityList() {
+  const { t, i18n } = useTranslation();
+  const isBn = i18n.language === "bn";
+  const fn = useServerFn(listMyAttempts);
+  const q = useQuery({ queryKey: ["my-attempts"], queryFn: () => fn() });
+
+  if (q.isLoading) return <Skeleton className="h-40 w-full" />;
+  if (!q.data || q.data.length === 0) {
+    return (
+      <Card className="p-8 text-center space-y-3">
+        <Activity className="h-8 w-8 text-muted-foreground mx-auto" />
+        <p className="text-sm text-muted-foreground">
+          {t("quiz.noAttempts", { defaultValue: "You haven't taken any quizzes yet." })}
+        </p>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/quiz">{t("quiz.moreQuizzes", { defaultValue: "Browse quizzes" })}</Link>
+        </Button>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {q.data.map((a) => {
+        const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
+        const quiz = (a as { quizzes?: { title_en: string; title_bn: string } }).quizzes;
+        return (
+          <Card key={a.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-foreground truncate">
+                {isBn ? quiz?.title_bn : quiz?.title_en}
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {pct}% • {a.score}/{a.total} • +{a.points_awarded} pts •{" "}
+                {Math.floor(a.time_taken_seconds / 60)}m {a.time_taken_seconds % 60}s
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                {new Date(a.completed_at).toLocaleString(isBn ? "bn-BD" : "en-US")}
+              </div>
+            </div>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/quiz/review/$attemptId" params={{ attemptId: a.id }}>
+                <Eye className="h-3.5 w-3.5 mr-1" /> {t("quiz.review", { defaultValue: "Review" })}
+              </Link>
+            </Button>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
