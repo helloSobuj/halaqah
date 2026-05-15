@@ -49,6 +49,7 @@
     "setWithPush": "Reminder set with browser push",
     "setInApp": "Reminder set (in-app only)",
     "dueNow": "Starting now"
+  },
   "auth": {
     "signIn": "Sign in",
     "signUp": "Sign up",
