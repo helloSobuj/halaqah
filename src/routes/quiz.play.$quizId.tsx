@@ -134,11 +134,6 @@ function PlayPage() {
   const handleSubmit = async (answers: Record<string, number[]>, secs: number) => {
     try {
       const res = await submitFn({ data: { quizId, answers, timeTaken: secs, fingerprint } });
-      const map: Record<string, number[]> = {};
-      for (const x of res.questions as { id: string; correct_indices: number[] }[]) {
-        map[x.id] = x.correct_indices;
-      }
-      setCorrectMap(map);
       setResult(res.result as SubmitResult);
     } catch (e) {
       toast.error((e as Error).message);
@@ -152,7 +147,6 @@ function PlayPage() {
           questions={questions}
           timeLimit={q.time_limit_seconds}
           instantFeedback={q.instant_feedback}
-          correctMap={Object.keys(correctMap).length ? correctMap : undefined}
           onSubmit={handleSubmit}
         />
       </div>
