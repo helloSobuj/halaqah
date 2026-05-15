@@ -51,34 +51,13 @@
     "modules": "Modules"
   },
   "modules": {
-    "quiz": {
-      "title": "Quiz",
-      "desc": "Test and grow your Islamic knowledge"
-    },
-    "qa": {
-      "title": "Q&A",
-      "desc": "Ask questions, get answers from scholars"
-    },
-    "notices": {
-      "title": "Notice Board",
-      "desc": "Community announcements and updates"
-    },
-    "events": {
-      "title": "Events",
-      "desc": "Join community events and gatherings"
-    },
-    "library": {
-      "title": "Library",
-      "desc": "Search and read Islamic books"
-    },
-    "videos": {
-      "title": "Videos",
-      "desc": "Curated Islamic lectures and talks"
-    },
-    "blog": {
-      "title": "Blog",
-      "desc": "Articles, reflections, and stories"
-    }
+    "quiz": { "title": "Quiz", "desc": "Test and grow your Islamic knowledge" },
+    "qa": { "title": "Q&A", "desc": "Ask questions, get answers from scholars" },
+    "notices": { "title": "Notice Board", "desc": "Community announcements and updates" },
+    "events": { "title": "Events", "desc": "Join community events and gatherings" },
+    "library": { "title": "Library", "desc": "Search and read Islamic books" },
+    "videos": { "title": "Videos", "desc": "Curated Islamic lectures and talks" },
+    "blog": { "title": "Blog", "desc": "Articles, reflections, and stories" }
   },
   "common": {
     "loading": "Loading...",
@@ -96,6 +75,37 @@
     "points": "Points",
     "streak": "Streak",
     "level": "Level",
-    "badges": "Badges"
+    "badges": "Badges",
+    "bio": "Bio",
+    "location": "Location",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "saved": "Profile saved",
+    "savedEmpty": "You haven't saved any content yet.",
+    "activityEmpty": "Your recent activity will appear here.",
+    "tabs": {
+      "identity": "Identity",
+      "saved": "Saved",
+      "activity": "Activity"
+    }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "Manage users, content, and community settings.",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "usersDesc": "View members and manage roles.",
+    "backToApp": "Back to app",
+    "searchUsers": "Search users by name…",
+    "noUsers": "No users match your search.",
+    "noRoles": "No roles",
+    "roleUpdated": "Role updated",
+    "role": {
+      "admin": "Admin",
+      "moderator": "Moderator",
+      "scholar": "Scholar",
+      "user": "User"
+    }
   }
 }

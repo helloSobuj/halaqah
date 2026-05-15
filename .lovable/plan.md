@@ -1,92 +1,66 @@
-# Islamic Community Web App — Build Plan
+# Phase 2 — Profile, Roles & Admin Shell
 
-A bilingual (Bangla/English), light/dark themed community platform inspired by duaruqyah.com — clean cards, generous spacing, soft greens/teals, Bangla-first typography. Built on TanStack Start + Lovable Cloud (Postgres, auth, storage). Desktop uses a sidebar+content shell; mobile uses a native-feel bottom-tab layout with stacked screens.  
-app name: Halaqah | হালাকাহ
+Building on the Phase 1 foundation (auth, i18n, theme, top-bar layout). This phase makes the user profile fully editable, wires the role system end-to-end, and creates the admin panel shell so Phase 3 modules can plug into it.
 
-## Phased delivery
+## What ships
 
-I'll break this into shippable phases so we can iterate. Each phase ends with a working preview.
+### 1. Profile page (editable)
+Replace the read-only `/profile` view with a tabbed page:
+- **Identity tab** — avatar upload, display name, bio, location, gender, language preference, theme preference (synced to profile).
+- **Stats tab** — points, current level, streak, badges (read-only, populated by future modules).
+- **Saved tab** — bookmarked content placeholder (filled by Phase 3 modules: blog posts, Q&A, books, videos).
+- **Activity tab** — recent quiz attempts, comments, answers (placeholder until Phase 3).
 
-### Phase 1 — Foundation
+Avatar upload uses a new `avatars` storage bucket (public, user-scoped folder).
 
-- Lovable Cloud (auth, database, storage)
-- Email/password auth, profile auto-creation, session handling
-- i18n setup (BN/EN) with language switcher persisted to profile
-- Theme system (light/dark) with semantic tokens matching duaruqyah's aesthetic
-- Responsive shell: desktop sidebar + topbar; mobile bottom tabs + stacked navigation
-- Home/dashboard skeleton
+### 2. Roles wiring
+- New `useUserRole()` hook returns the highest role the current user holds (`admin > moderator > scholar > user`).
+- New `<RoleGate role="admin">…</RoleGate>` component for conditional UI.
+- "Admin" item appears in the top-bar **More** dropdown only for admin/moderator/scholar.
 
-### Phase 2 — Profile & Roles
+### 3. Admin panel shell
+- New layout route `src/routes/_authenticated/_admin.tsx` — gates the subtree on `has_role(user, 'admin' | 'moderator' | 'scholar')`. Non-privileged users get redirected to `/`.
+- New `/admin` dashboard with cards for each future admin section (Notices, Events, Blog, Q&A, Quiz, Library, Videos, Users) — placeholders until each Phase 3 module ships.
+- New `/admin/users` — admins can search users and assign/revoke roles. Backed by a `listUsers` + `setUserRole` server function (admin-only via `requireSupabaseAuth` + `has_role` check).
+- Side rail navigation inside `/admin/*` (desktop) and a back-to-app button on mobile.
 
-- User profile: name, avatar, bio, location, gender, language, theme prefs
-- Gamification fields: points, streaks, badges, level
-- Saved/bookmarked content (books, videos, Q&A, blog)
-- Save Quiz Results
-- Roles: `user`, `moderator`, `scholar`, `admin` (separate `user_roles` table, `has_role` security-definer function)
-- Admin panel shell (role-gated `/admin`)
+## Database changes
 
-### Phase 3 — Content modules (built in order, each ships independently)
+One migration:
+- `avatars` storage bucket (public) + RLS policies (anyone can read; users can write only into their own `{user_id}/...` folder).
+- New SQL function `get_user_highest_role(_user_id uuid)` returning the strongest `app_role` for a user (used by the admin user-list view).
 
-1. **Notice Board** — pinned/dated announcements, admin CRUD
-2. **Events** — listing, detail page, RSVP/registration, capacity, calendar export, admin CRUD
-3. **Blog** — posts with categories, cover image, comments, upvotes, moderator publish flow
-4. **Islamic Q&A** (StackOverflow/Reddit style) — questions, tags, answers, upvotes/downvotes, accepted answer, scholar-verified badge, comments, search
-5. **Quiz module** — categories, timed quizzes, MCQ, scoring, streaks, badges, **leaderboard** (Per Quizz, weekly + all-time), admin question bank
-6. **Online Library** — books with category/author/title search, external URL link, cover image, admin CRUD
-7. **Video Library** — YouTube embeds with categories, search, admin CRUD
+No new tables — `profiles` and `user_roles` from Phase 1 already cover this phase.
 
-### Phase 4 — Daily Islamic widgets (home dashboard)
+## Server functions
 
-- Hijri calendar date
-- Daily dua + daily hadith rotating cards 
-- Tasbih counter (digital dhikr, persists per-user)
+In `src/lib/admin.functions.ts` (admin-gated via middleware):
+- `listUsers({ search, page })` — joins `profiles` + `user_roles`, paginated.
+- `setUserRole({ userId, role })` — admin-only insert/delete on `user_roles`.
 
-### Phase 5 — Engagement
+In `src/lib/profile.functions.ts`:
+- `updateProfile(input)` — validated with Zod, writes to `profiles` for the current user.
+- `uploadAvatar(file)` — uploads to the `avatars` bucket and updates `profiles.avatar_url`.
 
-- In-app notifications (event registration, Q&A replies, blog comments, notices)
-- Comments + upvotes wired across blog & Q&A
-- Profile activity feed
+## Files to create / edit
 
-## Technical design
-
-**Stack**: TanStack Start (React 19, Vite 7), Tailwind v4 with semantic tokens in `src/styles.css`, shadcn/ui, Lovable Cloud (Supabase under the hood). Server logic via `createServerFn` (no edge functions).
-
-**Routing** (file-based, separate routes for SEO):
-
-```
-/                  home + widgets
-/notices /events /events/$id
-/blog /blog/$slug
-/qa /qa/$id /qa/ask
-/quiz /quiz/$id /quiz/leaderboard
-/library /library/$id
-/videos /videos/$id
-/profile /profile/settings
-/login /signup
-/_authenticated/*  (gated subtree)
-/_authenticated/_admin/*  (admin/mod/scholar gated)
+```text
+NEW   src/hooks/use-user-role.tsx
+NEW   src/components/role-gate.tsx
+NEW   src/lib/profile.functions.ts
+NEW   src/lib/admin.functions.ts
+NEW   src/routes/_authenticated/_admin.tsx        (gated layout)
+NEW   src/routes/_authenticated/_admin/index.tsx  (dashboard)
+NEW   src/routes/_authenticated/_admin/users.tsx
+EDIT  src/routes/_authenticated/profile.tsx      (tabs + edit form)
+EDIT  src/components/app-shell.tsx               (More menu shows Admin for privileged roles)
+EDIT  src/locales/en.json, src/locales/bn.json   (new strings)
 ```
 
-**i18n**: `react-i18next` with `bn` and `en` JSON resources; language stored on profile, fallback to browser. Bangla font (e.g., Noto Sans Bengali / Hind Siliguri) loaded for `lang=bn`.
+## Out of scope (saved for later)
+- Bookmarked/Activity content — depends on Phase 3 modules.
+- Badge awarding logic — added per-module in Phase 3 (e.g., quiz badges).
+- Full CRUD inside admin sections — added as each module ships.
 
-**Theme**: CSS variables in `src/styles.css` (oklch). Greens/teals primary, warm cream surfaces in light, deep charcoal in dark. `.dark` class toggled and persisted.
-
-**Layouts**:
-
-- Desktop (≥1024px): collapsible sidebar nav + content area + right rail for widgets on home
-- Mobile: top app bar + scrollable content + fixed bottom tab bar (Home, Learn, Community, Profile); secondary screens push as full-screen routes for native feel
-- Single component tree with `useIsMobile()` to swap shell
-
-**Database (high level)**:
-`profiles`, `user_roles`, `notices`, `events`, `event_registrations`, `blog_posts`, `blog_comments`, `blog_votes`, `qa_questions`, `qa_answers`, `qa_votes`, `qa_comments`, `quiz_categories`, `quiz_questions`, `quiz_attempts`, `quiz_leaderboard` (view), `books`, `videos`, `bookmarks`, `tasbih_counts`, `notifications`, `daily_content` (dua/hadith).
-RLS on all tables; admin/mod/scholar checks via `has_role()`.
-
-**Storage buckets**: `avatars` (public), `event-covers` (public), `blog-covers` (public), `book-covers` (public).
-
-## Out of scope for v1 (can add later)
-
-Prayer times, phone auth, push notifications, Quran reader.
-
-## What I need from you to start
-
-Confirm the plan and I'll begin with **Phase 1 (Foundation)**. After it's working in preview, we'll move to Phase 2, then tackle modules one-by-one in Phase 3 so you can review each before the next.
+## Confirm to proceed
+Reply "go" and I'll start with the migration + profile editing, then admin shell, then user management.
