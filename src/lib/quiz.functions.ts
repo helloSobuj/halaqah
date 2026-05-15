@@ -131,8 +131,8 @@ export const attemptsLeft = createServerFn({ method: "POST" })
     const ip = getClientIp();
     const { data: rpc, error } = await supabaseAdmin.rpc("attempts_left", {
       _quiz_id: data.quizId,
-      _ip: ip,
-      _fingerprint: data.fingerprint,
+      _ip: (ip ?? "") as string,
+      _fingerprint: (data.fingerprint ?? "") as string,
     });
     if (error) throw new Error(error.message);
     void context;
@@ -160,9 +160,9 @@ export const submitAttempt = createServerFn({ method: "POST" })
       _quiz_id: data.quizId,
       _answers: data.answers,
       _time_taken: data.timeTaken,
-      _ip: ip,
-      _fingerprint: data.fingerprint,
-      _ua: ua,
+      _ip: (ip ?? "") as string,
+      _fingerprint: (data.fingerprint ?? "") as string,
+      _ua: (ua ?? "") as string,
     });
     if (error) throw new Error(error.message);
 
@@ -232,8 +232,8 @@ export const getLeaderboard = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { data: rows, error } = await supabaseAdmin.rpc("get_quiz_leaderboard", {
-      _quiz_id: data.quizId ?? null,
-      _category_id: data.categoryId ?? null,
+      _quiz_id: (data.quizId ?? undefined) as string | undefined,
+      _category_id: (data.categoryId ?? undefined) as string | undefined,
       _period: data.period,
     });
     if (error) throw new Error(error.message);
