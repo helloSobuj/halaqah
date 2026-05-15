@@ -138,12 +138,12 @@ export const attemptsLeft = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ip = getClientIp();
     const { data: rpc, error } = await supabaseAdmin.rpc("attempts_left", {
+      _user_id: context.userId,
       _quiz_id: data.quizId,
       _ip: (ip ?? "") as string,
       _fingerprint: (data.fingerprint ?? "") as string,
     });
     if (error) throw new Error(error.message);
-    void context;
     return { left: rpc as number };
   });
 
