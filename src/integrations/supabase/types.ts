@@ -65,6 +65,248 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_attempts: {
+        Row: {
+          answers: Json
+          completed_at: string
+          fingerprint: string | null
+          id: string
+          ip_address: string | null
+          points_awarded: number
+          quiz_id: string
+          score: number
+          time_taken_seconds: number
+          total: number
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          completed_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          points_awarded?: number
+          quiz_id: string
+          score?: number
+          time_taken_seconds?: number
+          total?: number
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          points_awarded?: number
+          quiz_id?: string
+          score?: number
+          time_taken_seconds?: number
+          total?: number
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          quiz_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quiz_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quiz_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_bookmarks_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quiz_questions: {
+        Row: {
+          correct_indices: number[]
+          created_at: string
+          explanation_bn: string | null
+          explanation_en: string | null
+          id: string
+          options_bn: Json
+          options_en: Json
+          order_index: number
+          points: number
+          quiz_id: string
+          text_bn: string
+          text_en: string
+          type: string
+        }
+        Insert: {
+          correct_indices?: number[]
+          created_at?: string
+          explanation_bn?: string | null
+          explanation_en?: string | null
+          id?: string
+          options_bn?: Json
+          options_en?: Json
+          order_index?: number
+          points?: number
+          quiz_id: string
+          text_bn: string
+          text_en: string
+          type?: string
+        }
+        Update: {
+          correct_indices?: number[]
+          created_at?: string
+          explanation_bn?: string | null
+          explanation_en?: string | null
+          id?: string
+          options_bn?: Json
+          options_en?: Json
+          order_index?: number
+          points?: number
+          quiz_id?: string
+          text_bn?: string
+          text_en?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          created_by: string | null
+          description_bn: string | null
+          description_en: string | null
+          difficulty: string
+          ends_at: string | null
+          id: string
+          instant_feedback: boolean
+          max_attempts: number
+          pass_mark: number
+          published: boolean
+          starts_at: string | null
+          time_limit_seconds: number
+          title_bn: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_bn?: string | null
+          description_en?: string | null
+          difficulty?: string
+          ends_at?: string | null
+          id?: string
+          instant_feedback?: boolean
+          max_attempts?: number
+          pass_mark?: number
+          published?: boolean
+          starts_at?: string | null
+          time_limit_seconds?: number
+          title_bn: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_bn?: string | null
+          description_en?: string | null
+          difficulty?: string
+          ends_at?: string | null
+          id?: string
+          instant_feedback?: boolean
+          max_attempts?: number
+          pass_mark?: number
+          published?: boolean
+          starts_at?: string | null
+          time_limit_seconds?: number
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -91,6 +333,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      attempts_left: {
+        Args: { _fingerprint: string; _ip: string; _quiz_id: string }
+        Returns: number
+      }
+      get_quiz_leaderboard: {
+        Args: { _category_id?: string; _period?: string; _quiz_id?: string }
+        Returns: {
+          attempts: number
+          avatar_url: string
+          best_time: number
+          display_name: string
+          total_points: number
+          total_score: number
+          user_id: string
+        }[]
+      }
       get_user_highest_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -101,6 +359,17 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      submit_quiz_attempt: {
+        Args: {
+          _answers: Json
+          _fingerprint: string
+          _ip: string
+          _quiz_id: string
+          _time_taken: number
+          _ua: string
+        }
+        Returns: Json
       }
     }
     Enums: {
