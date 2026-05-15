@@ -1,66 +1,124 @@
-# Phase 2 — Profile, Roles & Admin Shell
+# Phase 3 — Quiz Module (Full-featured)
 
-Building on the Phase 1 foundation (auth, i18n, theme, top-bar layout). This phase makes the user profile fully editable, wires the role system end-to-end, and creates the admin panel shell so Phase 3 modules can plug into it.
+A complete quiz experience: users browse categories, take timed quizzes, earn points/badges, climb a leaderboard, and bookmark favorites. Admins/Scholars manage the question bank.
 
 ## What ships
 
-### 1. Profile page (editable)
-Replace the read-only `/profile` view with a tabbed page:
-- **Identity tab** — avatar upload, display name, bio, location, gender, language preference, theme preference (synced to profile).
-- **Stats tab** — points, current level, streak, badges (read-only, populated by future modules).
-- **Saved tab** — bookmarked content placeholder (filled by Phase 3 modules: blog posts, Q&A, books, videos).
-- **Activity tab** — recent quiz attempts, comments, answers (placeholder until Phase 3).
+### User-facing (`/quiz`)
 
-Avatar upload uses a new `avatars` storage bucket (public, user-scoped folder).
+- **Quiz home** — featured quiz of the day, category cards (Quran, Hadith, Fiqh, Seerah, etc.), "Continue" if an attempt is in progress, personal stats strip (best streak, total points, rank).
+- **Category page** `/quiz/$category` — list of quizzes with difficulty badge, question count, average score, bookmark toggle.
+- **Quiz player** `/quiz/play/$quizId` — one question at a time, per-question timer, progress bar, MCQ (single + multi-correct), instant feedback toggle (admin setting), keyboard shortcuts.
+- **Result screen** — score, time taken, points awarded, correct/incorrect breakdown with explanations, share button, leaderboard position.
+- **Leaderboard** `/quiz/leaderboard` —per quiz-based, global + per-category, weekly + all-time tabs.
+- **My quizzes** (inside Profile › Activity) — past attempts with score history.
+- **Saved tab on Profile** — bookmarked quizzes now populated.
+- Profile badge: Each time the user rank 1st 2nd, or 3rd in a quiz, the user should get a badge (1st,2nd,3rd) as an award and that should show on the profile. 
 
-### 2. Roles wiring
-- New `useUserRole()` hook returns the highest role the current user holds (`admin > moderator > scholar > user`).
-- New `<RoleGate role="admin">…</RoleGate>` component for conditional UI.
-- "Admin" item appears in the top-bar **More** dropdown only for admin/moderator/scholar.
+### Quiz Rules:  
 
-### 3. Admin panel shell
-- New layout route `src/routes/_authenticated/_admin.tsx` — gates the subtree on `has_role(user, 'admin' | 'moderator' | 'scholar')`. Non-privileged users get redirected to `/`.
-- New `/admin` dashboard with cards for each future admin section (Notices, Events, Blog, Q&A, Quiz, Library, Videos, Users) — placeholders until each Phase 3 module ships.
-- New `/admin/users` — admins can search users and assign/revoke roles. Backed by a `listUsers` + `setUserRole` server function (admin-only via `requireSupabaseAuth` + `has_role` check).
-- Side rail navigation inside `/admin/*` (desktop) and a back-to-app button on mobile.
 
-## Database changes
+1. Admin can control "How many attempts an individual user can take (one or {Attempt Number}).
+2. If the admin set the attept number to 1 than the user should now allowed to take attempt more than once. and the system should track user IP address MAC address and session to prevent to take multiple attempts
+  &nbsp;
 
-One migration:
-- `avatars` storage bucket (public) + RLS policies (anyone can read; users can write only into their own `{user_id}/...` folder).
-- New SQL function `get_user_highest_role(_user_id uuid)` returning the strongest `app_role` for a user (used by the admin user-list view).
+### Gamification
 
-No new tables — `profiles` and `user_roles` from Phase 1 already cover this phase.
+- Points: base per correct answer + speed bonus + perfect-score bonus.
+- Streak: consecutive days with at least one completed quiz (updates `profiles.streak`).
+- Level: derived from points (1 level per 500 pts, capped server-side).
+- Badges (auto-awarded, server-side): `first_quiz`, `perfect_score`, `streak_7`, `streak_30`, `category_master_<cat>` (10 perfects in a category), `top_10_weekly`. Stored in `profiles.badges` JSONB.
 
-## Server functions
+### Admin (`/admin/quiz`)
 
-In `src/lib/admin.functions.ts` (admin-gated via middleware):
-- `listUsers({ search, page })` — joins `profiles` + `user_roles`, paginated.
-- `setUserRole({ userId, role })` — admin-only insert/delete on `user_roles`.
+- Categories CRUD (name_en, name_bn, slug, icon, color, sort_order).
+- Quizzes CRUD (title, description, category, difficulty, time limit, pass mark, instant_feedback flag, published flag, both languages).
+- The admin can set the quiz starting time and quiz end time.
+- Questions CRUD inside a quiz (text, type=single|multi, options array, correct indices, explanation, points, order). Inline editor with reorder.
+- there should be a AI Assistent to help the admin to make the questions and options, use open router API for the AI (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)
+- Bulk import questions via JSON paste (validated with Zod).
+- Attempts viewer (read-only, filter by user/quiz, see score & timestamps).
+- Scholar role can edit questions/quizzes; Moderator can unpublish; Admin can delete and manage categories.
+- admin can see quiz result and leaderboard for each quiz and each profile.
 
-In `src/lib/profile.functions.ts`:
-- `updateProfile(input)` — validated with Zod, writes to `profiles` for the current user.
-- `uploadAvatar(file)` — uploads to the `avatars` bucket and updates `profiles.avatar_url`.
+### i18n
 
-## Files to create / edit
+All quiz content is bilingual: every category, quiz, question, option, and explanation has `_en` and `_bn` columns. UI strings added to `en.json`/`bn.json`.
+
+## Database
+
+One migration adds:
 
 ```text
-NEW   src/hooks/use-user-role.tsx
-NEW   src/components/role-gate.tsx
-NEW   src/lib/profile.functions.ts
-NEW   src/lib/admin.functions.ts
-NEW   src/routes/_authenticated/_admin.tsx        (gated layout)
-NEW   src/routes/_authenticated/_admin/index.tsx  (dashboard)
-NEW   src/routes/_authenticated/_admin/users.tsx
-EDIT  src/routes/_authenticated/profile.tsx      (tabs + edit form)
-EDIT  src/components/app-shell.tsx               (More menu shows Admin for privileged roles)
-EDIT  src/locales/en.json, src/locales/bn.json   (new strings)
+quiz_categories     (id, slug, name_en, name_bn, icon, color, sort_order)
+quizzes             (id, category_id, title_en, title_bn, description_en, description_bn,
+                     difficulty, time_limit_seconds, pass_mark, instant_feedback,
+                     published, created_by, created_at, updated_at)
+quiz_questions      (id, quiz_id, type, text_en, text_bn, options_en jsonb, options_bn jsonb,
+                     correct_indices int[], explanation_en, explanation_bn, points, order_index)
+quiz_attempts       (id, user_id, quiz_id, score, total, time_taken_seconds, points_awarded,
+                     answers jsonb, completed_at)
+quiz_bookmarks      (id, user_id, quiz_id, created_at, UNIQUE(user_id, quiz_id))
 ```
 
-## Out of scope (saved for later)
-- Bookmarked/Activity content — depends on Phase 3 modules.
-- Badge awarding logic — added per-module in Phase 3 (e.g., quiz badges).
-- Full CRUD inside admin sections — added as each module ships.
+RLS:
+
+- Categories/quizzes/questions: public SELECT when `published=true`; staff SELECT all; INSERT/UPDATE/DELETE gated by `has_role(admin|scholar)` (delete admin-only).
+- Attempts: user reads/writes own; admins read all.
+- Bookmarks: user reads/writes own.
+
+SQL helpers:
+
+- `submit_quiz_attempt(quiz_id, answers jsonb, time_taken int)` — SECURITY DEFINER, computes score server-side, inserts attempt, updates `profiles.points/streak/level`, evaluates badges, returns result row. Prevents client-side score tampering.
+- `get_leaderboard(category_id uuid default null, period text default 'all')` — returns top 50 with display_name, avatar_url, total points.
+
+Indexes on `quiz_questions(quiz_id, order_index)`, `quiz_attempts(user_id, completed_at desc)`, `quiz_attempts(quiz_id, score desc)`.
+
+## Server functions (`src/lib/quiz.functions.ts`)
+
+User-scoped (`requireSupabaseAuth`):
+
+- `listCategories()`, `listQuizzes({ categorySlug })`, `getQuizForPlay(quizId)` — strips `correct_indices` from payload.
+- `submitAttempt({ quizId, answers, timeTaken })` — calls `submit_quiz_attempt` RPC.
+- `toggleBookmark({ quizId })`, `listBookmarks()`, `listMyAttempts()`.
+- `getLeaderboard({ categoryId?, period })`.
+
+Staff-scoped (extra `has_role` check inside handler):
+
+- `upsertCategory`, `deleteCategory`, `upsertQuiz`, `togglePublish`, `upsertQuestion`, `reorderQuestions`, `deleteQuestion`, `bulkImportQuestions`.
+
+All inputs validated with Zod (length limits, enum checks, array bounds).
+
+## Files
+
+```text
+NEW   supabase migration (tables + RLS + RPCs)
+NEW   src/lib/quiz.functions.ts
+NEW   src/lib/quiz.schemas.ts             (shared Zod schemas)
+NEW   src/components/quiz/quiz-card.tsx
+NEW   src/components/quiz/question-player.tsx
+NEW   src/components/quiz/result-summary.tsx
+NEW   src/components/quiz/leaderboard-table.tsx
+EDIT  src/routes/quiz.tsx                 (replace coming-soon → home)
+NEW   src/routes/quiz.$category.tsx
+NEW   src/routes/quiz.play.$quizId.tsx
+NEW   src/routes/quiz.leaderboard.tsx
+NEW   src/routes/_authenticated/admin.quiz.tsx           (layout + list)
+NEW   src/routes/_authenticated/admin.quiz.$quizId.tsx   (question editor)
+EDIT  src/routes/_authenticated/admin.index.tsx         (link Quiz card)
+EDIT  src/routes/_authenticated/profile.tsx             (wire Saved + Activity tabs)
+EDIT  src/locales/en.json, src/locales/bn.json
+```
+
+## Out of scope (later phases)
+
+- Tournaments / multiplayer head-to-head.
+
+- Daily-quiz auto-rotation cron.
+- True/false, fill-in-blank, image questions.
+- Group Tournaments
+- AI-generated questions.
 
 ## Confirm to proceed
-Reply "go" and I'll start with the migration + profile editing, then admin shell, then user management.
+
+Reply **"go"** and I'll run the migration, then build server functions, then user UI, then admin UI.
