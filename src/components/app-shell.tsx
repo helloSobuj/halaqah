@@ -18,7 +18,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
+
 import { useAuth } from "@/hooks/use-auth";
 import { useUserRole } from "@/hooks/use-user-role";
 import { Button } from "@/components/ui/button";
