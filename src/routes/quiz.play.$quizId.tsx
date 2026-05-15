@@ -43,12 +43,14 @@ function PlayPage() {
   const quiz = useQuery({
     queryKey: ["quiz-play", quizId],
     enabled: !!user,
+    retry: false,
     queryFn: () => fetchQuiz({ data: { quizId } }),
   });
 
   const left = useQuery({
     queryKey: ["quiz-attempts-left", quizId, fingerprint],
     enabled: !!user && fingerprint !== null,
+    retry: false,
     queryFn: () => attemptsFn({ data: { quizId, fingerprint } }),
   });
 

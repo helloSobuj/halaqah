@@ -107,10 +107,12 @@ export const getQuizForPlay = createServerFn({ method: "POST" })
     if (!quiz.published && !isStaff) throw new Error("Quiz not available");
 
     const now = Date.now();
-    if (quiz.starts_at && new Date(quiz.starts_at).getTime() > now)
-      throw new Error("Quiz has not started yet");
-    if (quiz.ends_at && new Date(quiz.ends_at).getTime() < now)
-      throw new Error("Quiz has ended");
+    if (!isStaff) {
+      if (quiz.starts_at && new Date(quiz.starts_at).getTime() > now)
+        throw new Error("Quiz has not started yet");
+      if (quiz.ends_at && new Date(quiz.ends_at).getTime() < now)
+        throw new Error("Quiz has ended");
+    }
 
     const { data: questions, error: qErr } = await supabaseAdmin
       .from("quiz_questions")
