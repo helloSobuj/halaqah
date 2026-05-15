@@ -1,0 +1,101 @@
+{
+  "app": {
+    "name": "Halaqah",
+    "tagline": "Learn, connect, and grow as a Muslim"
+  },
+  "nav": {
+    "home": "Home",
+    "quiz": "Quiz",
+    "qa": "Q&A",
+    "notices": "Notices",
+    "events": "Events",
+    "library": "Library",
+    "videos": "Videos",
+    "blog": "Blog",
+    "profile": "Profile",
+    "admin": "Admin",
+    "more": "More",
+    "learn": "Learn",
+    "community": "Community"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "displayName": "Display name",
+    "confirmPassword": "Confirm password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "createAccount": "Create your account",
+    "welcomeBack": "Welcome back",
+    "signInDesc": "Continue your journey of learning",
+    "signUpDesc": "Join the community to learn and grow",
+    "emailPlaceholder": "you@example.com",
+    "namePlaceholder": "Your name",
+    "passwordHelp": "At least 8 characters",
+    "checking": "Checking...",
+    "signingIn": "Signing in...",
+    "signingUp": "Creating account...",
+    "errorSignIn": "Invalid email or password",
+    "errorSignUp": "Could not create account",
+    "passwordMismatch": "Passwords don't match",
+    "loggedOut": "You have been signed out"
+  },
+  "home": {
+    "hero": "Assalamu alaikum",
+    "heroSub": "Your daily companion for Islamic learning, community, and growth.",
+    "explore": "Explore modules",
+    "getStarted": "Get started",
+    "modules": "Modules"
+  },
+  "modules": {
+    "quiz": {
+      "title": "Quiz",
+      "desc": "Test and grow your Islamic knowledge"
+    },
+    "qa": {
+      "title": "Q&A",
+      "desc": "Ask questions, get answers from scholars"
+    },
+    "notices": {
+      "title": "Notice Board",
+      "desc": "Community announcements and updates"
+    },
+    "events": {
+      "title": "Events",
+      "desc": "Join community events and gatherings"
+    },
+    "library": {
+      "title": "Library",
+      "desc": "Search and read Islamic books"
+    },
+    "videos": {
+      "title": "Videos",
+      "desc": "Curated Islamic lectures and talks"
+    },
+    "blog": {
+      "title": "Blog",
+      "desc": "Articles, reflections, and stories"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "save": "Save",
+    "cancel": "Cancel",
+    "comingSoon": "Coming soon",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "profile": {
+    "title": "Profile",
+    "points": "Points",
+    "streak": "Streak",
+    "level": "Level",
+    "badges": "Badges"
+  }
+}
