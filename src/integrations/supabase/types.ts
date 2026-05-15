@@ -269,6 +269,7 @@ export type Database = {
           published: boolean
           starts_at: string | null
           time_limit_seconds: number
+          timezone: string
           title_bn: string
           title_en: string
           updated_at: string
@@ -288,6 +289,7 @@ export type Database = {
           published?: boolean
           starts_at?: string | null
           time_limit_seconds?: number
+          timezone?: string
           title_bn: string
           title_en: string
           updated_at?: string
@@ -307,6 +309,7 @@ export type Database = {
           published?: boolean
           starts_at?: string | null
           time_limit_seconds?: number
+          timezone?: string
           title_bn?: string
           title_en?: string
           updated_at?: string
