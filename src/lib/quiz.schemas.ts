@@ -52,7 +52,12 @@ export const questionBaseSchema = z.object({
     order_index: z.number().int().min(0).max(9999).default(0),
   });
 
-const refineQuestion = (d: z.infer<typeof questionBaseSchema>, ctx: z.RefinementCtx) => {
+type QuestionRefineInput = Pick<
+  z.infer<typeof questionBaseSchema>,
+  "type" | "options_en" | "options_bn" | "correct_indices" | "correct_text" | "correct_order"
+>;
+
+const refineQuestion = (d: QuestionRefineInput, ctx: z.RefinementCtx) => {
   const needsOpts = ["single", "multi", "true_false", "ordering"].includes(d.type);
   if (needsOpts) {
     if (d.options_en.length < 2 || d.options_bn.length < 2) {
