@@ -232,11 +232,11 @@ function VideoDialog({
           </div>
           <div>
             <Label>Description (English)</Label>
-            <Textarea rows={3} value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} />
+            <MarkdownEditor value={form.description_en} onChange={(v) => setForm({ ...form, description_en: v })} rows={6} />
           </div>
           <div>
             <Label>Description (Bangla)</Label>
-            <Textarea rows={3} value={form.description_bn} onChange={(e) => setForm({ ...form, description_bn: e.target.value })} />
+            <MarkdownEditor value={form.description_bn} onChange={(v) => setForm({ ...form, description_bn: v })} rows={6} />
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
