@@ -257,7 +257,7 @@ function AdminLibraryPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={!!rejectId} onOpenChange={(o) => !o && (setRejectId(null), setRejectReason(""))}>
+      <Dialog open={!!rejectId} onOpenChange={(o) => { if (!o) { setRejectId(null); setRejectReason(""); } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject submission</DialogTitle>
