@@ -43,7 +43,16 @@ export function ShareMenu({ event, variant = "button" }: Props) {
   const qrTarget = `${originUrl()}/api/public/events/${event.slug}/qr`;
   const title = event.title_en;
 
-  const log = (channel: Parameters<typeof recordFn>[0]["data"]["channel"]) =>
+  type ShareChannel =
+    | "link"
+    | "image"
+    | "whatsapp"
+    | "facebook"
+    | "x"
+    | "telegram"
+    | "native"
+    | "qr_scan";
+  const log = (channel: ShareChannel) =>
     recordFn({ data: { eventId: event.id, channel } }).catch(() => {});
 
   const copyLink = async () => {

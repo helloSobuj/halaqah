@@ -27,22 +27,22 @@ type EventCardProps = {
 };
 
 export function EventCard({ event }: EventCardProps) {
-  const { language } = useLanguage();
-  const title = language === "bn" && event.title_bn ? event.title_bn : event.title_en;
+  const { lang } = useLanguage();
+  const title = lang === "bn" && event.title_bn ? event.title_bn : event.title_en;
   const catName = event.category
-    ? language === "bn"
+    ? lang === "bn"
       ? event.category.name_bn
       : event.category.name_en
     : null;
 
   const date = new Date(event.starts_at);
-  const day = date.toLocaleDateString(language === "bn" ? "bn-BD" : "en-US", {
+  const day = date.toLocaleDateString(lang === "bn" ? "bn-BD" : "en-US", {
     day: "numeric",
   });
-  const month = date.toLocaleDateString(language === "bn" ? "bn-BD" : "en-US", {
+  const month = date.toLocaleDateString(lang === "bn" ? "bn-BD" : "en-US", {
     month: "short",
   });
-  const time = date.toLocaleTimeString(language === "bn" ? "bn-BD" : "en-US", {
+  const time = date.toLocaleTimeString(lang === "bn" ? "bn-BD" : "en-US", {
     hour: "numeric",
     minute: "2-digit",
   });
