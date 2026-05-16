@@ -118,7 +118,13 @@
     "going": "যাচ্ছেন",
     "interested": "আগ্রহী",
     "capacity": "ধারণক্ষমতা",
-    "full": "ইভেন্ট পূর্ণ"
+    "full": "ইভেন্ট পূর্ণ",
+    "backToEvents": "ইভেন্টে ফিরে যান",
+    "onlineEvent": "অনলাইন ইভেন্ট",
+    "joinLink": "যোগ দেওয়ার লিংক",
+    "onlineJoinLink": "অনলাইন যোগদান লিংক",
+    "venueTba": "স্থান শীঘ্রই জানানো হবে",
+    "mode": { "online": "অনলাইন", "offline": "সরাসরি", "hybrid": "হাইব্রিড" }
   },
   "common": {
     "loading": "লোড হচ্ছে...",
