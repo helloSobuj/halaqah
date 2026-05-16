@@ -149,7 +149,7 @@ function BookDetailPage() {
               {b.pages && <span>{b.pages} pages</span>}
               {b.published_year && <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {b.published_year}</span>}
             </div>
-            {b.description && <Markdown source={b.description} />}
+            
 
             <div className="flex flex-wrap gap-2 pt-2">
               <Button onClick={handleOpen} size="lg">
@@ -180,6 +180,15 @@ function BookDetailPage() {
             )}
           </div>
         </div>
+
+        {b.description && (
+          <Card className="p-5">
+            <h2 className="font-semibold mb-3">Description</h2>
+            <div className="prose prose-sm dark:prose-invert max-w-none">
+              <Markdown source={b.description} />
+            </div>
+          </Card>
+        )}
 
         <Card className="p-5">
           <h2 className="font-semibold mb-3">Comments</h2>
