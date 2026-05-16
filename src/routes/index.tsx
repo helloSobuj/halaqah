@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   BookOpen,
   HelpCircle,
@@ -16,6 +18,8 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
+import { listPosts } from "@/lib/blog.functions";
+import { PostCard, type BlogPostCardData } from "@/components/blog/post-card";
 
 export const Route = createFileRoute("/")({
   head: () => ({
