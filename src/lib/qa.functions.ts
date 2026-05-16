@@ -467,6 +467,7 @@ export const getDailyQuests = createServerFn({ method: "GET" })
       answered: data?.answered ?? 0,
       upvoted: data?.upvoted ?? 0,
       asked: data?.asked ?? 0,
+      bonusClaimed: data?.bonus_claimed ?? false,
       goals: { answer: 1, upvote: 3, ask: 1 },
     };
   });
