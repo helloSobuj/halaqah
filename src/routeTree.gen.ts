@@ -29,6 +29,7 @@ import { Route as QuizCategoryRouteImport } from './routes/quiz.$category'
 import { Route as QaLeaderboardRouteImport } from './routes/qa.leaderboard'
 import { Route as QaAskRouteImport } from './routes/qa.ask'
 import { Route as QaQuestionIdRouteImport } from './routes/qa.$questionId'
+import { Route as LibrarySubmitRouteImport } from './routes/library.submit'
 import { Route as LibraryBookIdRouteImport } from './routes/library.$bookId'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -146,6 +147,11 @@ const QaQuestionIdRoute = QaQuestionIdRouteImport.update({
   path: '/qa/$questionId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibrarySubmitRoute = LibrarySubmitRouteImport.update({
+  id: '/library/submit',
+  path: '/library/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryBookIdRoute = LibraryBookIdRouteImport.update({
   id: '/library/$bookId',
   path: '/library/$bookId',
@@ -250,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/library/$bookId': typeof LibraryBookIdRoute
+  '/library/submit': typeof LibrarySubmitRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/library/$bookId': typeof LibraryBookIdRoute
+  '/library/submit': typeof LibrarySubmitRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -327,6 +335,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/library/$bookId': typeof LibraryBookIdRoute
+  '/library/submit': typeof LibrarySubmitRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/events/$slug'
     | '/library/$bookId'
+    | '/library/submit'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/events/$slug'
     | '/library/$bookId'
+    | '/library/submit'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/events/$slug'
     | '/library/$bookId'
+    | '/library/submit'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -481,6 +493,7 @@ export interface RootRouteChildren {
   VideosRoute: typeof VideosRoute
   EventsSlugRoute: typeof EventsSlugRoute
   LibraryBookIdRoute: typeof LibraryBookIdRoute
+  LibrarySubmitRoute: typeof LibrarySubmitRoute
   QaQuestionIdRoute: typeof QaQuestionIdRoute
   QaAskRoute: typeof QaAskRoute
   QaLeaderboardRoute: typeof QaLeaderboardRoute
@@ -640,6 +653,13 @@ declare module '@tanstack/react-router' {
       path: '/qa/$questionId'
       fullPath: '/qa/$questionId'
       preLoaderRoute: typeof QaQuestionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/submit': {
+      id: '/library/submit'
+      path: '/library/submit'
+      fullPath: '/library/submit'
+      preLoaderRoute: typeof LibrarySubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/$bookId': {
@@ -815,6 +835,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideosRoute: VideosRoute,
   EventsSlugRoute: EventsSlugRoute,
   LibraryBookIdRoute: LibraryBookIdRoute,
+  LibrarySubmitRoute: LibrarySubmitRoute,
   QaQuestionIdRoute: QaQuestionIdRoute,
   QaAskRoute: QaAskRoute,
   QaLeaderboardRoute: QaLeaderboardRoute,
