@@ -748,6 +748,77 @@ export type Database = {
           },
         ]
       }
+      notice_reads: {
+        Row: {
+          notice_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          notice_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          notice_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notice_reads_notice_id_fkey"
+            columns: ["notice_id"]
+            isOneToOne: false
+            referencedRelation: "notices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notices: {
+        Row: {
+          body_md_bn: string
+          body_md_en: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_pinned: boolean
+          is_published: boolean
+          priority: string
+          published_at: string | null
+          title_bn: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          body_md_bn?: string
+          body_md_en?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_pinned?: boolean
+          is_published?: boolean
+          priority?: string
+          published_at?: string | null
+          title_bn?: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          body_md_bn?: string
+          body_md_en?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_pinned?: boolean
+          is_published?: boolean
+          priority?: string
+          published_at?: string | null
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
