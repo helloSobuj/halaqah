@@ -35,6 +35,8 @@ function QAFeed() {
   const listFn = useServerFn(listQuestions);
   const catsFn = useServerFn(listQACategories);
   const questsFn = useServerFn(getDailyQuests);
+  const claimFn = useServerFn(claimDailyBonus);
+  const qc = useQueryClient();
 
   const cats = useQuery({ queryKey: ["qa-cats"], queryFn: () => catsFn() });
   const list = useQuery({
@@ -45,6 +47,15 @@ function QAFeed() {
     queryKey: ["qa-daily-quests"],
     queryFn: () => questsFn(),
     enabled: !!user,
+  });
+
+  const claimMut = useMutation({
+    mutationFn: () => claimFn(),
+    onSuccess: (r) => {
+      toast.success(`+${r.rep_awarded} reputation claimed!`);
+      qc.invalidateQueries({ queryKey: ["qa-daily-quests"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
