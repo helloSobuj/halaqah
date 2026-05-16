@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, MapPin, Globe, Users, Clock, ExternalLink } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Markdown } from "@/components/qa/markdown";
 import { RsvpButton } from "@/components/events/rsvp-button";
 import { ShareMenu } from "@/components/events/share-menu";
 import { getEventBySlug } from "@/lib/events.functions";
+import { useLanguage } from "@/hooks/use-language";
 
 export const Route = createFileRoute("/events/$slug")({
   loader: async ({ params }) => {
