@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
+import { Markdown } from "@/components/qa/markdown";
 import { StarRating } from "@/components/library/star-rating";
 import { BookShareMenu } from "@/components/library/book-share-menu";
 import { useAuth } from "@/hooks/use-auth";
