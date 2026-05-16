@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index'
 import { Route as QuizIndexRouteImport } from './routes/quiz.index'
 import { Route as QaIndexRouteImport } from './routes/qa.index'
+import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as QuizMyAttemptsRouteImport } from './routes/quiz.my-attempts'
 import { Route as QuizLeaderboardRouteImport } from './routes/quiz.leaderboard'
@@ -104,6 +105,11 @@ const QaIndexRoute = QaIndexRouteImport.update({
   id: '/qa/',
   path: '/qa/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsRoute,
 } as any)
 const TournamentsIdRoute = TournamentsIdRouteImport.update({
   id: '/tournaments/$id',
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/events/': typeof EventsIndexRoute
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
@@ -273,7 +280,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
-  '/events': typeof EventsRouteWithChildren
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
@@ -289,6 +295,7 @@ export interface FileRoutesByTo {
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/events': typeof EventsIndexRoute
   '/qa': typeof QaIndexRoute
   '/quiz': typeof QuizIndexRoute
   '/tournaments': typeof TournamentsIndexRoute
@@ -328,6 +335,7 @@ export interface FileRoutesById {
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/events/': typeof EventsIndexRoute
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
@@ -367,6 +375,7 @@ export interface FileRouteTypes {
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
+    | '/events/'
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
@@ -387,7 +396,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/blog'
-    | '/events'
     | '/library'
     | '/login'
     | '/notices'
@@ -403,6 +411,7 @@ export interface FileRouteTypes {
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
+    | '/events'
     | '/qa'
     | '/quiz'
     | '/tournaments'
@@ -441,6 +450,7 @@ export interface FileRouteTypes {
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
+    | '/events/'
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
@@ -571,6 +581,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/qa/'
       preLoaderRoute: typeof QaIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/events/': {
+      id: '/events/'
+      path: '/'
+      fullPath: '/events/'
+      preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/tournaments/$id': {
       id: '/tournaments/$id'
@@ -786,10 +803,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface EventsRouteChildren {
   EventsSlugRoute: typeof EventsSlugRoute
+  EventsIndexRoute: typeof EventsIndexRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
   EventsSlugRoute: EventsSlugRoute,
+  EventsIndexRoute: EventsIndexRoute,
 }
 
 const EventsRouteWithChildren =
@@ -824,13 +843,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
