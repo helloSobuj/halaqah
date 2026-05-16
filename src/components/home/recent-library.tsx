@@ -5,6 +5,13 @@ import { Library, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookCard } from "@/components/library/book-card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { listBooks } from "@/lib/library.functions";
 import { useLanguage } from "@/hooks/use-language";
 
@@ -13,7 +20,7 @@ export function RecentLibrary() {
   const fn = useServerFn(listBooks);
   const { data, isLoading } = useQuery({
     queryKey: ["home-library"],
-    queryFn: () => fn({ data: { sort: "newest", limit: 2 } }) as unknown as Promise<any[]>,
+    queryFn: () => fn({ data: { sort: "newest", limit: 4 } }) as unknown as Promise<any[]>,
     staleTime: 5 * 60_000,
   });
   const books = data ?? [];
@@ -29,13 +36,23 @@ export function RecentLibrary() {
         </Link>
       </div>
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-2"><Skeleton className="aspect-[3/4]" /><Skeleton className="aspect-[3/4]" /></div>
+        <Skeleton className="aspect-[3/4] w-full max-w-[200px] mx-auto" />
       ) : !books.length ? (
         <p className="text-sm text-muted-foreground text-center py-6">{isBn ? "কোনো বই নেই।" : "No books yet."}</p>
       ) : (
-        <div className="grid grid-cols-2 gap-2 flex-1">
-          {books.map((b: any) => <BookCard key={b.id} book={b} />)}
-        </div>
+        <Carousel opts={{ loop: true, align: "center" }} className="flex-1 px-6">
+          <CarouselContent>
+            {books.map((b: any) => (
+              <CarouselItem key={b.id} className="basis-full">
+                <div className="max-w-[200px] mx-auto">
+                  <BookCard book={b} />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-0 h-7 w-7" />
+          <CarouselNext className="right-0 h-7 w-7" />
+        </Carousel>
       )}
     </Card>
   );
