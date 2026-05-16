@@ -46,24 +46,15 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <nav className="grid grid-cols-3 gap-6 text-sm">
-            {[
-              { heading: isBn ? "শেখা" : "Learn", items: COL_LEARN },
-              { heading: isBn ? "কমিউনিটি" : "Community", items: COL_COMMUNITY },
-              { heading: isBn ? "মিডিয়া" : "Media", items: COL_MEDIA },
-            ].map((col) => (
-              <div key={col.heading} className="flex flex-col gap-2">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground/80">{col.heading}</h4>
-                {col.items.map((l) => (
-                  <Link
-                    key={l.to}
-                    to={l.to}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t(l.labelKey)}
-                  </Link>
-                ))}
-              </div>
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+            {[...COL_LEARN, ...COL_COMMUNITY, ...COL_MEDIA].map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className="text-muted-foreground hover:text-primary transition-colors whitespace-nowrap"
+              >
+                {t(l.labelKey)}
+              </Link>
             ))}
           </nav>
         </div>
