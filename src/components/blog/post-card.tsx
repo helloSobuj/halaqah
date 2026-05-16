@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Headphones, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/hooks/use-language";
 
 export type BlogPostCardData = {
   id: string;
@@ -9,14 +10,19 @@ export type BlogPostCardData = {
   title_en: string;
   title_bn?: string | null;
   excerpt_en?: string | null;
+  excerpt_bn?: string | null;
   cover_image_url?: string | null;
   audio_url?: string | null;
   reading_minutes?: number | null;
   published_at?: string | null;
-  category?: { name_en: string; slug: string; color?: string | null } | null;
+  category?: { name_en: string; name_bn?: string | null; slug: string; color?: string | null } | null;
 };
 
 export function PostCard({ post }: { post: BlogPostCardData }) {
+  const isBn = useLanguage().lang === "bn";
+  const title = isBn && post.title_bn ? post.title_bn : post.title_en;
+  const excerpt = isBn && post.excerpt_bn ? post.excerpt_bn : post.excerpt_en;
+  const catName = post.category ? (isBn && post.category.name_bn ? post.category.name_bn : post.category.name_en) : null;
   return (
     <Link to="/blog/$slug" params={{ slug: post.slug }} className="group block">
       <Card className="overflow-hidden h-full hover:shadow-elegant transition-shadow">
@@ -30,8 +36,8 @@ export function PostCard({ post }: { post: BlogPostCardData }) {
         )}
         <div className="p-4 space-y-2">
           <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
-            {post.category && (
-              <Badge variant="secondary" className="text-[10px]">{post.category.name_en}</Badge>
+            {catName && (
+              <Badge variant="secondary" className="text-[10px]">{catName}</Badge>
             )}
             {post.reading_minutes ? (
               <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{post.reading_minutes} min</span>
@@ -41,10 +47,10 @@ export function PostCard({ post }: { post: BlogPostCardData }) {
             )}
           </div>
           <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-            {post.title_en}
+            {title}
           </h3>
-          {post.excerpt_en && (
-            <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt_en}</p>
+          {excerpt && (
+            <p className="text-sm text-muted-foreground line-clamp-2">{excerpt}</p>
           )}
         </div>
       </Card>
