@@ -341,12 +341,11 @@ function AnswerForm({ questionId, onPosted }: { questionId: string; onPosted: ()
   return (
     <Card className="p-5 space-y-3">
       <h3 className="font-semibold">Your answer</h3>
-      <Textarea
-        rows={6}
+      <MarkdownEditor
         value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder="Write a clear, sourced answer. Markdown supported."
-        maxLength={20000}
+        onChange={setBody}
+        rows={8}
+        placeholder="Write a clear, sourced answer. Markdown and images supported."
       />
       <div className="flex justify-end">
         <Button onClick={() => mut.mutate()} disabled={body.trim().length < 20 || mut.isPending}>
