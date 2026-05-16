@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as QuizReviewAttemptIdRouteImport } from './routes/quiz.review.$attemptId'
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
+import { Route as LibraryEditBookIdRouteImport } from './routes/library.edit.$bookId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTournamentsRouteImport } from './routes/_authenticated/admin.tournaments'
 import { Route as AuthenticatedAdminQaRouteImport } from './routes/_authenticated/admin.qa'
@@ -195,6 +196,11 @@ const QuizPlayQuizIdRoute = QuizPlayQuizIdRouteImport.update({
   path: '/quiz/play/$quizId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryEditBookIdRoute = LibraryEditBookIdRouteImport.update({
+  id: '/library/edit/$bookId',
+  path: '/library/edit/$bookId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -296,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -381,6 +389,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/qa': typeof AuthenticatedAdminQaRoute
   '/_authenticated/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -425,6 +434,7 @@ export interface FileRouteTypes {
     | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
+    | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
     | '/admin/'
@@ -466,6 +476,7 @@ export interface FileRouteTypes {
     | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
+    | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
     | '/admin'
@@ -509,6 +520,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/qa'
     | '/_authenticated/admin/tournaments'
     | '/_authenticated/admin/users'
+    | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
     | '/_authenticated/admin/'
@@ -546,6 +558,7 @@ export interface RootRouteChildren {
   QaIndexRoute: typeof QaIndexRoute
   QuizIndexRoute: typeof QuizIndexRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
+  LibraryEditBookIdRoute: typeof LibraryEditBookIdRoute
   QuizPlayQuizIdRoute: typeof QuizPlayQuizIdRoute
   QuizReviewAttemptIdRoute: typeof QuizReviewAttemptIdRoute
   ApiPublicHooksDispatchRemindersRoute: typeof ApiPublicHooksDispatchRemindersRoute
@@ -757,6 +770,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizPlayQuizIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library/edit/$bookId': {
+      id: '/library/edit/$bookId'
+      path: '/library/edit/$bookId'
+      fullPath: '/library/edit/$bookId'
+      preLoaderRoute: typeof LibraryEditBookIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -927,6 +947,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaIndexRoute: QaIndexRoute,
   QuizIndexRoute: QuizIndexRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,
+  LibraryEditBookIdRoute: LibraryEditBookIdRoute,
   QuizPlayQuizIdRoute: QuizPlayQuizIdRoute,
   QuizReviewAttemptIdRoute: QuizReviewAttemptIdRoute,
   ApiPublicHooksDispatchRemindersRoute: ApiPublicHooksDispatchRemindersRoute,
