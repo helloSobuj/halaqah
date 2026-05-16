@@ -132,7 +132,7 @@ export const adminUpsertNotice = createServerFn({ method: "POST" })
     } else if (data.is_published) {
       published_at = new Date().toISOString();
     }
-    const payload: Record<string, unknown> = { ...rest };
+    const payload: any = { ...rest };
     if (published_at !== undefined) payload.published_at = published_at;
     if (!id) payload.created_by = context.userId;
 
