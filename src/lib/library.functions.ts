@@ -375,6 +375,7 @@ export const updateMyBookSubmission = createServerFn({ method: "POST" })
     return row;
   });
 
+export const myBookmarks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await supabaseAdmin
