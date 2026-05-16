@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Heart } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
+import halaqahLogo from "@/assets/halaqah-logo.png";
 
 const COL_LEARN = [
   { to: "/quiz", labelKey: "nav.quiz" },
