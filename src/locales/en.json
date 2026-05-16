@@ -91,6 +91,25 @@
     "videos": { "title": "Videos", "desc": "Curated Islamic lectures and talks" },
     "blog": { "title": "Blog", "desc": "Articles, reflections, and stories" }
   },
+  "library": {
+    "title": "Library",
+    "subtitle": "Browse and download Islamic books. Submit your favorites for everyone.",
+    "searchPlaceholder": "Search books…",
+    "submit": "Submit a book",
+    "mySubmissions": "My submissions",
+    "mySubmissionsDesc": "Track the status of books you've submitted.",
+    "noSubmissionsYet": "You haven't submitted any books yet.",
+    "signInToView": "Sign in to view your submissions.",
+    "backToLibrary": "Back to library",
+    "viewBook": "View book",
+    "externalLink": "External link",
+    "rejectionReason": "Reason",
+    "status": {
+      "pending": "Pending review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
   "events": {
     "title": "Events",
     "subtitle": "Lectures, workshops, and community gatherings. RSVP and share with friends.",
