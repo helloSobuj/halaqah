@@ -1,51 +1,97 @@
-## Q&A Phase B — Plan
+## Events Module — Plan
 
-Phase A shipped the core Q&A (ask, answer, vote, accept, endorse, leaderboard, daily quests). This phase closes the loop on moderation, user identity, i18n, and the gamification surfaces that were scoped but not yet built.
+Replaces the current "Coming soon" `/events` placeholder with a full event module: discovery feed, event detail page, admin CRUD, RSVPs, reminders, and one-click social sharing (link + auto-generated share image with a QR code that resolves to the event URL).
 
-### 1. Admin moderation panel — `/admin/qa`
-- New route `src/routes/_authenticated/admin.qa.tsx` (admin/moderator only).
-- Tabs: **Flags**, **Questions**, **Answers**, **Categories**, **Tags**.
-- Flags tab: list `qa_flags` where `status='open'`, with target preview, reporter, reason; actions: dismiss / delete target / lock question.
-- Questions/Answers tabs: search + filter (deleted, locked, needs-scholar-review), bulk soft-delete, lock/unlock, mark `scholar_review_required`.
-- Categories tab: CRUD on `qa_categories` (name_en/bn, slug, color, icon, sort_order).
-- Tags tab: rename/merge tags (admin only), edit label, see usage_count.
-- Server fns added to `src/lib/qa.functions.ts`: `listFlags`, `resolveFlag`, `adminListQuestions`, `adminListAnswers`, `adminUpsertCategory`, `adminMergeTags`, `adminToggleLock`.
-- Migration: add `is_locked boolean default false` to `qa_questions`; add `qa_flag` RLS already permits staff update.
+### 1. Routes
 
-### 2. Q&A activity tab in user profile
-- Edit `src/routes/_authenticated/profile.tsx`: add a new tab **Q&A** alongside existing Quiz History.
-- Sections:
-  - Reputation header: `qa_reputation`, weekly delta from `qa_reputation_events`, answer streak.
-  - Recent questions asked (title, vote, answer count, accepted indicator).
-  - Recent answers (question title link, vote, accepted/endorsed badges).
-  - Reputation ledger (last 20 events with reason chips).
-- New server fn `getMyQAActivity` returning `{ stats, questions, answers, events }`.
-- Public profile route `/u/$userId` gets the same Q&A panel (read-only, omits ledger).
+- `/events` — public list (upcoming, past tabs, category + search filter)
+- `/events/$eventId` — public detail page (cover image, title, when/where, description (markdown), RSVP button, share, attendees count, related events)
+- `/admin/events` — staff list with create / edit / delete / publish
+- `/admin/events/new` and `/admin/events/$eventId/edit` — form (title en/bn, slug, cover image upload, starts_at, ends_at, timezone, location (online/offline), venue, address, online_url, category, description_md en/bn, capacity, is_published, is_featured)
+- `/api/public/events/$slug/share-image.png` — server route that renders the PNG share card with QR code (cached, regenerated when event updates)
+- `/api/public/events/$slug/qr` — short redirect endpoint that the QR points at (gives us scan analytics + ability to swap target later); 302s to `/events/$eventId`
 
-### 3. Translations (en/bn)
-- Add namespaces to existing i18n setup for Q&A:
-  - `qa.feed.*`, `qa.ask.*`, `qa.question.*`, `qa.leaderboard.*`, `qa.profile.*`, `qa.admin.*`, `qa.quests.*`, `qa.rep.*`.
-- Replace hard-coded strings in: `qa.index.tsx`, `qa.ask.tsx`, `qa.$questionId.tsx`, `qa.leaderboard.tsx`, `qa-shared.tsx`, new admin + profile pieces.
-- Category & tag display already uses `name_en`/`name_bn`; wire to current `language` from i18n.
-- This also fixes the current hydration error on `/qa` (SSR rendered English, client switched to Bengali) by reading the persisted language before first render in the i18n init.
+### 2. Database (migration)
 
-### 4. Gamification polish (no new core mechanics)
-- **Badges**: add `qa_badges` table + awarding triggers for: Curious (first question), Helpful (first accepted answer), Teacher (10 accepted), Scholar's Pick (first endorsement), Streak Sage (7-day answer streak), Top Contributor (top 3 monthly leaderboard).
-- Show earned badges on profile + small badge row on question/answer author chip.
-- **Privilege ladder hint**: tooltip on disabled vote-down / flag buttons explaining the rep threshold (15 to downvote already enforced).
-- **Daily quest claim**: wire `claimDailyBonus` button on `/qa` when all three quests done → +10 rep, sets `bonus_claimed=true`.
+- `event_categories` — `id, slug, name_en, name_bn, color, icon, sort_order, timestamps`
+- `events` — `id, slug (unique), category_id, title_en, title_bn, description_md_en, description_md_bn, cover_image_url, starts_at, ends_at, timezone, mode ('online'|'offline'|'hybrid'), venue, address, online_url, capacity, is_published, is_featured, created_by, view_count, share_count, created_at, updated_at`
+- `event_rsvps` — `event_id, user_id, status ('going'|'interested'|'cancelled'), created_at` (PK on event_id + user_id)
+- `event_shares` — `id, event_id, channel ('link'|'image'|'whatsapp'|'facebook'|'x'|'telegram'|'qr_scan'), user_id (nullable), created_at` (analytics)
+- Storage bucket `event-images` (public) for cover images + cached share PNGs
+- RLS:
+  - public read on published events, categories, rsvp counts
+  - staff (admin/moderator) full write on events + categories
+  - users insert/update/delete their own rsvp; counts via SECURITY DEFINER `event_attendance(_event_id)` returning `{going, interested}`
+  - `event_shares` insert open to anyone (anon ok), select staff-only
 
-### 5. Deferred (not in this phase)
-- AI polish for question titles, AI translate answers, citation picker UI, bounty system, anonymous-question moderator reveal flow.
+### 3. Server functions (`src/lib/events.functions.ts`)
 
-### Technical notes
-- All new server fns use `requireSupabaseAuth`; admin fns additionally check `has_role(userId, 'admin'|'moderator')` server-side.
-- All new tables get RLS: badges readable by all, insertable only via SECURITY DEFINER trigger.
-- Realtime not added in this phase; lists refetch on mutation via TanStack Query invalidation.
+- `listEvents({ filter: 'upcoming'|'past'|'featured', categoryId?, q?, limit, cursor })`
+- `getEventBySlug(slug)` — joins category, rsvp counts, my_rsvp
+- `setMyRsvp({ eventId, status })` (auth)
+- `adminUpsertEvent(input)` / `adminDeleteEvent(id)` / `adminUpsertCategory` (admin/moderator)
+- `recordShare({ eventId, channel })` (anon-safe, debounced client-side)
 
-### Files
-- New: `src/routes/_authenticated/admin.qa.tsx`, `src/routes/u.$userId.tsx`, `src/components/qa/qa-profile-panel.tsx`, `src/components/qa/qa-badges.tsx`, `src/components/qa/daily-quest-card.tsx`.
-- Edited: `src/lib/qa.functions.ts`, `src/routes/_authenticated/profile.tsx`, `src/routes/qa.index.tsx`, `src/routes/qa.$questionId.tsx`, `src/routes/qa.ask.tsx`, `src/routes/qa.leaderboard.tsx`, `src/components/qa/qa-shared.tsx`, i18n locale files.
-- Migration: `is_locked` on questions, `qa_badges` table + award triggers.
+### 4. Share image generation
 
-Approve and I'll implement in this order: migration → admin panel → profile tab → translations → badges/quest claim.
+Server route `/api/public/events/$slug/share-image.png`:
+
+- Use `@resvg/resvg-wasm` + `satori` to render JSX → SVG → PNG (1200×630 OG size). Both work in the Cloudflare Worker runtime (WASM, no native deps).
+- Layout: cover image background (dimmed), title, date/time in event timezone, venue line, app logo, QR code in bottom-right with a white rounded panel + "Scan to RSVP" caption.
+- QR generated with `qrcode` (pure JS, Worker-safe) as a data URL pointing to `https://halaqah.lovable.app/api/public/events/{slug}/qr`.
+- Response cached: store the rendered PNG in the `event-images` bucket at `share-cards/{eventId}-{updated_at_ts}.png`; the route redirects to the public storage URL after first render. Re-renders automatically when event is edited (cache key changes).
+- `Cache-Control: public, max-age=86400, immutable` on the storage URL.
+
+QR redirect route `/api/public/events/$slug/qr`:
+
+- Looks up event, increments `event_shares` with channel `qr_scan`, then 302 to `/events/$eventId`. Idempotent and cheap.
+
+### 5. Share UI (`src/components/events/share-menu.tsx`)
+
+Dropdown on the event detail page and on each event card:
+
+- **Copy link** — copies `https://halaqah.lovable.app/events/{slug}`, toast "Link copied"
+- **Download image** — fetches the share-image PNG and triggers download
+- **WhatsApp / Facebook / X / Telegram** — `share-image.png` URL is set as `og:image` on the detail page so previews look good; menu items open `https://wa.me/?text=...`, `https://www.facebook.com/sharer/sharer.php?u=...`, `https://twitter.com/intent/tweet?...`, `https://t.me/share/url?...`
+- **Native share** — uses `navigator.share({ title, text, url, files: [pngFile] })` when available (mobile)
+- Each action calls `recordShare(channel)`
+
+Each event detail route's `head()` sets `og:image`, `twitter:image`, `twitter:card=summary_large_image` to the share-image URL.
+
+### 6. UI components
+
+- `src/components/events/event-card.tsx` — cover, date chip, title, venue, RSVP count, share button
+- `src/components/events/event-form.tsx` — admin form with cover-image upload (storage), datetime + timezone pickers, markdown editor (reuse existing `MarkdownEditor`), mode toggle
+- `src/components/events/rsvp-button.tsx` — going / interested / cancel, optimistic
+- `src/components/events/share-menu.tsx` — see above
+- `src/components/events/event-hero.tsx` — detail page hero with cover, countdown, RSVP, share
+
+### 7. i18n
+
+New `events.*` namespace in `src/locales/en.json` and `bn.json` covering: list, filters, detail, rsvp states, share menu labels, admin form.
+
+### 8. Wiring
+
+- Replace `src/routes/events.tsx` with the real list route
+- Unmark `events` as `soon` in `src/routes/_authenticated/admin.tsx` SECTIONS
+- Add Events tile already exists on home grid
+
+### 9. Out of scope (deferred)
+
+- Ticketing / payments
+- Recurring events
+- Calendar (.ics) export — can be a small follow-up; trivial once events exist
+- Comments on events
+- Email/push reminders for RSVP'd users (will reuse `quiz_reminders` pattern later)
+
+### Implementation order
+
+1. Migration (tables, RLS, storage bucket) + helper SQL functions
+2. Server functions (`events.functions.ts`)
+3. Public list + detail routes with RSVP
+4. Share menu (link + social deep links, native share)
+5. Share-image server route + QR redirect route
+6. Admin CRUD pages
+7. i18n strings, polish, replace placeholder `/events`
+
+Approve and I'll execute in this order.
