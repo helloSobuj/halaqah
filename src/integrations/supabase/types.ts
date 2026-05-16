@@ -293,6 +293,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_hadith: {
+        Row: {
+          arabic: string
+          bn: string
+          created_at: string
+          date: string
+          en: string
+          source: string
+        }
+        Insert: {
+          arabic: string
+          bn: string
+          created_at?: string
+          date: string
+          en: string
+          source: string
+        }
+        Update: {
+          arabic?: string
+          bn?: string
+          created_at?: string
+          date?: string
+          en?: string
+          source?: string
+        }
+        Relationships: []
+      }
       event_categories: {
         Row: {
           color: string | null
