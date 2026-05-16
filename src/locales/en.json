@@ -118,7 +118,13 @@
     "going": "going",
     "interested": "interested",
     "capacity": "Capacity",
-    "full": "Event full"
+    "full": "Event full",
+    "backToEvents": "Back to events",
+    "onlineEvent": "Online event",
+    "joinLink": "Join link",
+    "onlineJoinLink": "Online join link",
+    "venueTba": "Venue TBA",
+    "mode": { "online": "Online", "offline": "In person", "hybrid": "Hybrid" }
   },
   "common": {
     "loading": "Loading...",

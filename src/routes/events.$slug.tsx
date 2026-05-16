@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, MapPin, Globe, Users, Clock, ExternalLink } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Markdown } from "@/components/qa/markdown";
 import { RsvpButton } from "@/components/events/rsvp-button";
 import { ShareMenu } from "@/components/events/share-menu";
 import { getEventBySlug } from "@/lib/events.functions";
+import { useLanguage } from "@/hooks/use-language";
 
 export const Route = createFileRoute("/events/$slug")({
   loader: async ({ params }) => {
@@ -76,6 +78,8 @@ export const Route = createFileRoute("/events/$slug")({
 function EventDetail() {
   const initial = Route.useLoaderData();
   const params = Route.useParams();
+  const { t } = useTranslation();
+  const { lang } = useLanguage();
   const getFn = useServerFn(getEventBySlug);
   const { data } = useQuery({
     queryKey: ["event-detail", params.slug],
@@ -85,11 +89,16 @@ function EventDetail() {
   if (!data) return null;
   const { category, counts } = data;
   const e = { ...data.event, mode: data.event.mode as "online" | "offline" | "hybrid" };
+  const isBn = lang === "bn";
+  const title = isBn && e.title_bn ? e.title_bn : e.title_en;
+  const altTitle = isBn ? e.title_en : e.title_bn;
+  const description = isBn && e.description_md_bn ? e.description_md_bn : e.description_md_en;
+  const categoryName = category ? (isBn ? category.name_bn : category.name_en) : null;
 
   const startDate = new Date(e.starts_at);
   const endDate = e.ends_at ? new Date(e.ends_at) : null;
   const fmt = (d: Date) =>
-    d.toLocaleString("en-US", {
+    d.toLocaleString(isBn ? "bn-BD" : "en-US", {
       weekday: "long",
       month: "long",
       day: "numeric",
@@ -106,14 +115,14 @@ function EventDetail() {
           to="/events"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to events
+          <ArrowLeft className="h-4 w-4" /> {t("events.backToEvents", "Back to events")}
         </Link>
 
         {e.cover_image_url && (
           <div className="aspect-[16/8] rounded-2xl overflow-hidden bg-muted">
             <img
               src={e.cover_image_url}
-              alt={e.title_en}
+              alt={title}
               className="h-full w-full object-cover"
             />
           </div>
@@ -122,11 +131,11 @@ function EventDetail() {
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="space-y-2 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              {category && (
+              {categoryName && (
                 <Badge
                   variant="secondary"
                   style={
-                    category.color
+                    category?.color
                       ? {
                           backgroundColor: `${category.color}20`,
                           color: category.color,
@@ -134,17 +143,17 @@ function EventDetail() {
                       : undefined
                   }
                 >
-                  {category.name_en}
+                  {categoryName}
                 </Badge>
               )}
-              {e.is_featured && <Badge>Featured</Badge>}
+              {e.is_featured && <Badge>{t("events.featured", "Featured")}</Badge>}
               <Badge variant="outline" className="capitalize">
-                {e.mode}
+                {String(t(`events.mode.${e.mode}` as never, { defaultValue: e.mode }))}
               </Badge>
             </div>
-            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{e.title_en}</h1>
-            {e.title_bn && e.title_bn !== e.title_en && (
-              <p className="text-lg text-muted-foreground">{e.title_bn}</p>
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{title}</h1>
+            {altTitle && altTitle !== title && (
+              <p className="text-lg text-muted-foreground">{altTitle}</p>
             )}
           </div>
         </div>
@@ -157,7 +166,7 @@ function EventDetail() {
                 <p className="font-medium">{fmt(startDate)}</p>
                 {endDate && (
                   <p className="text-muted-foreground flex items-center gap-1 mt-0.5">
-                    <Clock className="h-3.5 w-3.5" /> Ends {fmt(endDate)}
+                    <Clock className="h-3.5 w-3.5" /> {t("events.ends", "Ends")} {fmt(endDate)}
                   </p>
                 )}
               </div>
@@ -171,7 +180,7 @@ function EventDetail() {
               <div className="min-w-0">
                 {e.mode === "online" ? (
                   <>
-                    <p className="font-medium">Online event</p>
+                    <p className="font-medium">{t("events.onlineEvent", "Online event")}</p>
                     {e.online_url && (
                       <a
                         href={e.online_url}
@@ -179,13 +188,13 @@ function EventDetail() {
                         rel="noopener noreferrer"
                         className="text-primary hover:underline inline-flex items-center gap-1 text-sm mt-0.5"
                       >
-                        Join link <ExternalLink className="h-3 w-3" />
+                        {t("events.joinLink", "Join link")} <ExternalLink className="h-3 w-3" />
                       </a>
                     )}
                   </>
                 ) : (
                   <>
-                    <p className="font-medium">{e.venue || "Venue TBA"}</p>
+                    <p className="font-medium">{e.venue || t("events.venueTba", "Venue TBA")}</p>
                     {e.address && (
                       <p className="text-muted-foreground mt-0.5">{e.address}</p>
                     )}
@@ -196,7 +205,7 @@ function EventDetail() {
                         rel="noopener noreferrer"
                         className="text-primary hover:underline inline-flex items-center gap-1 text-sm mt-0.5"
                       >
-                        Online join link <ExternalLink className="h-3 w-3" />
+                        {t("events.onlineJoinLink", "Online join link")} <ExternalLink className="h-3 w-3" />
                       </a>
                     )}
                   </>
@@ -207,9 +216,9 @@ function EventDetail() {
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
-              <Users className="h-4 w-4" /> {counts.going} going · {counts.interested} interested
+              <Users className="h-4 w-4" /> {counts.going} {t("events.going", "going")} · {counts.interested} {t("events.interested", "interested")}
             </span>
-            {e.capacity ? <span>· Capacity {e.capacity}</span> : null}
+            {e.capacity ? <span>· {t("events.capacity", "Capacity")} {e.capacity}</span> : null}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t">
@@ -218,9 +227,9 @@ function EventDetail() {
           </div>
         </Card>
 
-        {e.description_md_en && (
+        {description && (
           <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
-            <Markdown source={e.description_md_en} />
+            <Markdown source={description} />
           </div>
         )}
       </article>
