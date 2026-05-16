@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as NoticesRouteImport } from './routes/notices'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
@@ -21,6 +20,7 @@ import { Route as QuizIndexRouteImport } from './routes/quiz.index'
 import { Route as QaIndexRouteImport } from './routes/qa.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as QuizMyAttemptsRouteImport } from './routes/quiz.my-attempts'
 import { Route as QuizLeaderboardRouteImport } from './routes/quiz.leaderboard'
@@ -33,6 +33,7 @@ import { Route as LibrarySubmitRouteImport } from './routes/library.submit'
 import { Route as LibraryMySubmissionsRouteImport } from './routes/library.my-submissions'
 import { Route as LibraryBookIdRouteImport } from './routes/library.$bookId'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -42,12 +43,15 @@ import { Route as VideosCategorySlugRouteImport } from './routes/videos.category
 import { Route as QuizReviewAttemptIdRouteImport } from './routes/quiz.review.$attemptId'
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
 import { Route as LibraryEditBookIdRouteImport } from './routes/library.edit.$bookId'
+import { Route as BlogTagSlugRouteImport } from './routes/blog.tag.$slug'
+import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin.videos'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTournamentsRouteImport } from './routes/_authenticated/admin.tournaments'
 import { Route as AuthenticatedAdminQaRouteImport } from './routes/_authenticated/admin.qa'
 import { Route as AuthenticatedAdminLibraryRouteImport } from './routes/_authenticated/admin.library'
 import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin.events'
+import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
 import { Route as AuthenticatedAdminQuizIndexRouteImport } from './routes/_authenticated/admin.quiz.index'
 import { Route as ApiPublicHooksDispatchRemindersRouteImport } from './routes/api/public/hooks/dispatch-reminders'
 import { Route as AuthenticatedAdminQuizCategoriesRouteImport } from './routes/_authenticated/admin.quiz.categories'
@@ -68,11 +72,6 @@ const NoticesRoute = NoticesRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -112,6 +111,11 @@ const LibraryIndexRoute = LibraryIndexRouteImport.update({
 const EventsIndexRoute = EventsIndexRouteImport.update({
   id: '/events/',
   path: '/events/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TournamentsIdRoute = TournamentsIdRouteImport.update({
@@ -174,6 +178,11 @@ const EventsSlugRoute = EventsSlugRouteImport.update({
   path: '/events/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -219,6 +228,16 @@ const LibraryEditBookIdRoute = LibraryEditBookIdRouteImport.update({
   path: '/library/edit/$bookId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogTagSlugRoute = BlogTagSlugRouteImport.update({
+  id: '/blog/tag/$slug',
+  path: '/blog/tag/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogCategorySlugRoute = BlogCategorySlugRouteImport.update({
+  id: '/blog/category/$slug',
+  path: '/blog/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminVideosRoute =
   AuthenticatedAdminVideosRouteImport.update({
     id: '/videos',
@@ -253,6 +272,11 @@ const AuthenticatedAdminEventsRoute =
     path: '/events',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminBlogRoute = AuthenticatedAdminBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminQuizIndexRoute =
   AuthenticatedAdminQuizIndexRouteImport.update({
     id: '/quiz/',
@@ -291,12 +315,12 @@ const ApiPublicEventsSlugQrRoute = ApiPublicEventsSlugQrRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/blog': typeof BlogRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/events/$slug': typeof EventsSlugRoute
   '/library/$bookId': typeof LibraryBookIdRoute
   '/library/my-submissions': typeof LibraryMySubmissionsRoute
@@ -309,18 +333,22 @@ export interface FileRoutesByFullPath {
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/blog/': typeof BlogIndexRoute
   '/events/': typeof EventsIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
   '/videos/': typeof VideosIndexRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/admin/library': typeof AuthenticatedAdminLibraryRoute
   '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -337,11 +365,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/blog': typeof BlogRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/events/$slug': typeof EventsSlugRoute
   '/library/$bookId': typeof LibraryBookIdRoute
   '/library/my-submissions': typeof LibraryMySubmissionsRoute
@@ -354,18 +382,22 @@ export interface FileRoutesByTo {
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/blog': typeof BlogIndexRoute
   '/events': typeof EventsIndexRoute
   '/library': typeof LibraryIndexRoute
   '/qa': typeof QaIndexRoute
   '/quiz': typeof QuizIndexRoute
   '/tournaments': typeof TournamentsIndexRoute
   '/videos': typeof VideosIndexRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/admin/library': typeof AuthenticatedAdminLibraryRoute
   '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -384,12 +416,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/blog': typeof BlogRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/events/$slug': typeof EventsSlugRoute
   '/library/$bookId': typeof LibraryBookIdRoute
   '/library/my-submissions': typeof LibraryMySubmissionsRoute
@@ -402,18 +434,22 @@ export interface FileRoutesById {
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
+  '/blog/': typeof BlogIndexRoute
   '/events/': typeof EventsIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
   '/videos/': typeof VideosIndexRoute
+  '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRoute
   '/_authenticated/admin/library': typeof AuthenticatedAdminLibraryRoute
   '/_authenticated/admin/qa': typeof AuthenticatedAdminQaRoute
   '/_authenticated/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -432,12 +468,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/blog'
     | '/login'
     | '/notices'
     | '/signup'
     | '/admin'
     | '/profile'
+    | '/blog/$slug'
     | '/events/$slug'
     | '/library/$bookId'
     | '/library/my-submissions'
@@ -450,18 +486,22 @@ export interface FileRouteTypes {
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
+    | '/blog/'
     | '/events/'
     | '/library/'
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
     | '/videos/'
+    | '/admin/blog'
     | '/admin/events'
     | '/admin/library'
     | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
     | '/admin/videos'
+    | '/blog/category/$slug'
+    | '/blog/tag/$slug'
     | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -478,11 +518,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/blog'
     | '/login'
     | '/notices'
     | '/signup'
     | '/profile'
+    | '/blog/$slug'
     | '/events/$slug'
     | '/library/$bookId'
     | '/library/my-submissions'
@@ -495,18 +535,22 @@ export interface FileRouteTypes {
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
+    | '/blog'
     | '/events'
     | '/library'
     | '/qa'
     | '/quiz'
     | '/tournaments'
     | '/videos'
+    | '/admin/blog'
     | '/admin/events'
     | '/admin/library'
     | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
     | '/admin/videos'
+    | '/blog/category/$slug'
+    | '/blog/tag/$slug'
     | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -524,12 +568,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/blog'
     | '/login'
     | '/notices'
     | '/signup'
     | '/_authenticated/admin'
     | '/_authenticated/profile'
+    | '/blog/$slug'
     | '/events/$slug'
     | '/library/$bookId'
     | '/library/my-submissions'
@@ -542,18 +586,22 @@ export interface FileRouteTypes {
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
+    | '/blog/'
     | '/events/'
     | '/library/'
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
     | '/videos/'
+    | '/_authenticated/admin/blog'
     | '/_authenticated/admin/events'
     | '/_authenticated/admin/library'
     | '/_authenticated/admin/qa'
     | '/_authenticated/admin/tournaments'
     | '/_authenticated/admin/users'
     | '/_authenticated/admin/videos'
+    | '/blog/category/$slug'
+    | '/blog/tag/$slug'
     | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -572,10 +620,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  BlogRoute: typeof BlogRoute
   LoginRoute: typeof LoginRoute
   NoticesRoute: typeof NoticesRoute
   SignupRoute: typeof SignupRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   EventsSlugRoute: typeof EventsSlugRoute
   LibraryBookIdRoute: typeof LibraryBookIdRoute
   LibraryMySubmissionsRoute: typeof LibraryMySubmissionsRoute
@@ -588,12 +636,15 @@ export interface RootRouteChildren {
   QuizLeaderboardRoute: typeof QuizLeaderboardRoute
   QuizMyAttemptsRoute: typeof QuizMyAttemptsRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   QaIndexRoute: typeof QaIndexRoute
   QuizIndexRoute: typeof QuizIndexRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
+  BlogCategorySlugRoute: typeof BlogCategorySlugRoute
+  BlogTagSlugRoute: typeof BlogTagSlugRoute
   LibraryEditBookIdRoute: typeof LibraryEditBookIdRoute
   QuizPlayQuizIdRoute: typeof QuizPlayQuizIdRoute
   QuizReviewAttemptIdRoute: typeof QuizReviewAttemptIdRoute
@@ -625,13 +676,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -688,6 +732,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events/'
       preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tournaments/$id': {
@@ -774,6 +825,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -837,6 +895,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryEditBookIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/tag/$slug': {
+      id: '/blog/tag/$slug'
+      path: '/blog/tag/$slug'
+      fullPath: '/blog/tag/$slug'
+      preLoaderRoute: typeof BlogTagSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/category/$slug': {
+      id: '/blog/category/$slug'
+      path: '/blog/category/$slug'
+      fullPath: '/blog/category/$slug'
+      preLoaderRoute: typeof BlogCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/videos': {
       id: '/_authenticated/admin/videos'
       path: '/videos'
@@ -877,6 +949,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/admin/events'
       preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/blog': {
+      id: '/_authenticated/admin/blog'
+      path: '/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AuthenticatedAdminBlogRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/quiz/': {
@@ -925,6 +1004,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
   AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRoute
   AuthenticatedAdminLibraryRoute: typeof AuthenticatedAdminLibraryRoute
   AuthenticatedAdminQaRoute: typeof AuthenticatedAdminQaRoute
@@ -939,6 +1019,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
   AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRoute,
   AuthenticatedAdminLibraryRoute: AuthenticatedAdminLibraryRoute,
   AuthenticatedAdminQaRoute: AuthenticatedAdminQaRoute,
@@ -972,10 +1053,10 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  BlogRoute: BlogRoute,
   LoginRoute: LoginRoute,
   NoticesRoute: NoticesRoute,
   SignupRoute: SignupRoute,
+  BlogSlugRoute: BlogSlugRoute,
   EventsSlugRoute: EventsSlugRoute,
   LibraryBookIdRoute: LibraryBookIdRoute,
   LibraryMySubmissionsRoute: LibraryMySubmissionsRoute,
@@ -988,12 +1069,15 @@ const rootRouteChildren: RootRouteChildren = {
   QuizLeaderboardRoute: QuizLeaderboardRoute,
   QuizMyAttemptsRoute: QuizMyAttemptsRoute,
   TournamentsIdRoute: TournamentsIdRoute,
+  BlogIndexRoute: BlogIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   QaIndexRoute: QaIndexRoute,
   QuizIndexRoute: QuizIndexRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
+  BlogCategorySlugRoute: BlogCategorySlugRoute,
+  BlogTagSlugRoute: BlogTagSlugRoute,
   LibraryEditBookIdRoute: LibraryEditBookIdRoute,
   QuizPlayQuizIdRoute: QuizPlayQuizIdRoute,
   QuizReviewAttemptIdRoute: QuizReviewAttemptIdRoute,

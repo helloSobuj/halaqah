@@ -14,6 +14,285 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_bookmarks: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_bookmarks_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blog_comments: {
+        Row: {
+          body_md: string
+          created_at: string
+          id: string
+          is_deleted: boolean
+          parent_id: string | null
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body_md: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          parent_id?: string | null
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body_md?: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          parent_id?: string | null
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "blog_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_likes: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_post_tags: {
+        Row: {
+          post_id: string
+          tag_id: string
+        }
+        Insert: {
+          post_id: string
+          tag_id: string
+        }
+        Update: {
+          post_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_tags_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_post_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "blog_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_posts: {
+        Row: {
+          audio_duration_seconds: number | null
+          audio_url: string | null
+          author_id: string | null
+          category_id: string | null
+          comment_count: number
+          content_md_bn: string
+          content_md_en: string
+          cover_image_url: string | null
+          created_at: string
+          excerpt_bn: string | null
+          excerpt_en: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          language: string
+          like_count: number
+          published_at: string | null
+          reading_minutes: number
+          slug: string
+          title_bn: string
+          title_en: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          audio_duration_seconds?: number | null
+          audio_url?: string | null
+          author_id?: string | null
+          category_id?: string | null
+          comment_count?: number
+          content_md_bn?: string
+          content_md_en?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          language?: string
+          like_count?: number
+          published_at?: string | null
+          reading_minutes?: number
+          slug: string
+          title_bn?: string
+          title_en: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          audio_duration_seconds?: number | null
+          audio_url?: string | null
+          author_id?: string | null
+          category_id?: string | null
+          comment_count?: number
+          content_md_bn?: string
+          content_md_en?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          language?: string
+          like_count?: number
+          published_at?: string | null
+          reading_minutes?: number
+          slug?: string
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_tags: {
+        Row: {
+          created_at: string
+          id: string
+          label_bn: string
+          label_en: string
+          slug: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label_bn?: string
+          label_en: string
+          slug: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label_bn?: string
+          label_en?: string
+          slug?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
       event_categories: {
         Row: {
           color: string | null
@@ -1734,6 +2013,7 @@ export type Database = {
             }
             Returns: number
           }
+      bump_blog_view: { Args: { _post_id: string }; Returns: undefined }
       bump_event_view: { Args: { _event_id: string }; Returns: undefined }
       bump_library_download: { Args: { _book_id: string }; Returns: undefined }
       bump_library_view: { Args: { _book_id: string }; Returns: undefined }
