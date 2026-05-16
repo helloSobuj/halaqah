@@ -8,7 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { MarkdownEditor } from "@/components/qa/markdown-editor";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -95,13 +95,12 @@ function AskPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Question details (markdown supported)</Label>
-            <Textarea
+            <Label>Question details (markdown & images supported)</Label>
+            <MarkdownEditor
+              value={body}
+              onChange={setBody}
               rows={10}
               placeholder="Describe your question with context, what you've already considered, and any references."
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              maxLength={20000}
             />
             <p className="text-xs text-muted-foreground">{body.length} characters — min 20.</p>
           </div>
