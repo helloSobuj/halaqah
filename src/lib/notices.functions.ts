@@ -112,6 +112,7 @@ const NoticeInput = z.object({
   title_bn: z.string().max(200).default(""),
   body_md_en: z.string().max(20000).default(""),
   body_md_bn: z.string().max(20000).default(""),
+  cover_image_url: z.string().url().max(1000).nullable().optional(),
   priority: z.enum(["normal", "important", "urgent"]).default("normal"),
   is_pinned: z.boolean().default(false),
   is_published: z.boolean().default(true),
