@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 
 const CARDS = [
   { to: "/admin/users", titleKey: "admin.users", descKey: "admin.usersDesc", icon: Users },
-  { to: "/admin/notices", titleKey: "nav.notices", descKey: "modules.notices.desc", icon: Bell, soon: true },
+  { to: "/admin/notices", titleKey: "nav.notices", descKey: "modules.notices.desc", icon: Bell },
   { to: "/admin/events", titleKey: "nav.events", descKey: "modules.events.desc", icon: Calendar },
   { to: "/admin/blog", titleKey: "nav.blog", descKey: "modules.blog.desc", icon: PenSquare },
   { to: "/admin/qa", titleKey: "nav.qa", descKey: "modules.qa.desc", icon: HelpCircle, soon: true },
