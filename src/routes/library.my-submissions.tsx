@@ -86,7 +86,7 @@ function MySubmissionsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-medium truncate">{b.title}</h3>
                     <Badge variant={statusVariant(b.status)} className="text-[10px] capitalize">
-                      {t(`library.status.${b.status}`, b.status)}
+                      {String(t(`library.status.${b.status}`, b.status))}
                     </Badge>
                   </div>
                   {b.author && <p className="text-xs text-muted-foreground mt-0.5">{b.author}</p>}
