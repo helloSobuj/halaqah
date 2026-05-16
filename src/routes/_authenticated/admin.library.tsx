@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -21,7 +22,7 @@ import {
 import { BookForm, emptyBook, type BookFormValue } from "@/components/library/book-form";
 import {
   adminListBooks, adminUpsertBook, adminDeleteBook, adminReviewBook,
-  listLibraryCategories,
+  listLibraryCategories, adminUpsertLibraryCategory, adminDeleteLibraryCategory,
 } from "@/lib/library.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/library")({
@@ -54,13 +55,48 @@ type BookRow = {
   category?: { name_en: string; name_bn: string } | null;
 };
 
+type Cat = {
+  id: string;
+  slug: string;
+  name_en: string;
+  name_bn: string;
+  color: string | null;
+  icon: string | null;
+  sort_order: number;
+};
+
 function statusVariant(s: string): "default" | "secondary" | "destructive" {
   if (s === "approved") return "default";
   if (s === "rejected") return "destructive";
   return "secondary";
 }
 
+function slugify(s: string) {
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+}
+
 function AdminLibraryPage() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold">Library</h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage book submissions and browse categories.
+        </p>
+      </div>
+      <Tabs defaultValue="books" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="books"><BookOpen className="h-4 w-4 mr-1.5" />Books</TabsTrigger>
+          <TabsTrigger value="categories"><Tag className="h-4 w-4 mr-1.5" />Categories</TabsTrigger>
+        </TabsList>
+        <TabsContent value="books"><BooksTab /></TabsContent>
+        <TabsContent value="categories"><CategoriesTab /></TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function BooksTab() {
   const qc = useQueryClient();
   const listFn = useServerFn(adminListBooks);
   const catsFn = useServerFn(listLibraryCategories);
@@ -127,40 +163,28 @@ function AdminLibraryPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h2 className="text-xl font-bold">Library</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage book submissions, approve community contributions, and publish books.
-          </p>
+    <div className="space-y-4">
+      <div className="flex gap-2 flex-wrap items-center justify-between">
+        <div className="flex gap-2 flex-wrap">
+          <Input
+            placeholder="Search title or author…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-xs"
+          />
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div className="flex gap-2">
-          <Link to="/admin/library/categories">
-            <Button variant="outline" size="sm"><Tag className="h-4 w-4 mr-1.5" />Categories</Button>
-          </Link>
-          <Button onClick={() => setCreating(true)}>
-            <Plus className="h-4 w-4 mr-1.5" /> New book
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex gap-2 flex-wrap">
-        <Input
-          placeholder="Search title or author…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
-        />
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
+        <Button onClick={() => setCreating(true)}>
+          <Plus className="h-4 w-4 mr-1.5" /> New book
+        </Button>
       </div>
 
       {books.isLoading ? (
@@ -275,6 +299,179 @@ function AdminLibraryPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function CategoriesTab() {
+  const qc = useQueryClient();
+  const listFn = useServerFn(listLibraryCategories);
+  const delFn = useServerFn(adminDeleteLibraryCategory);
+
+  const cats = useQuery({ queryKey: ["library-cats"], queryFn: () => listFn() });
+  const [editing, setEditing] = React.useState<Cat | null>(null);
+  const [creating, setCreating] = React.useState(false);
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
+
+  const delMut = useMutation({
+    mutationFn: (id: string) => delFn({ data: { id } }),
+    onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["library-cats"] }); setDeleteId(null); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-sm text-muted-foreground">
+          Group books into browsable categories (Quran, Hadith, Fiqh, etc.).
+        </p>
+        <Button onClick={() => setCreating(true)}>
+          <Plus className="h-4 w-4 mr-1.5" /> New category
+        </Button>
+      </div>
+
+      {cats.isLoading ? (
+        <Skeleton className="h-40 w-full" />
+      ) : !cats.data?.length ? (
+        <Card className="p-8 text-center text-muted-foreground">
+          <Tag className="h-8 w-8 mx-auto mb-2 opacity-60" />
+          No categories yet.
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {(cats.data as Cat[]).map((c) => (
+            <Card key={c.id} className="p-3 flex items-center gap-3">
+              <div
+                className="h-9 w-9 rounded-lg flex items-center justify-center text-sm font-semibold"
+                style={{ backgroundColor: `${c.color ?? "#6366f1"}20`, color: c.color ?? "#6366f1" }}
+              >
+                {c.icon ?? c.name_en.slice(0, 1)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm">{c.name_en} <span className="text-muted-foreground">· {c.name_bn}</span></p>
+                <p className="text-xs text-muted-foreground">/{c.slug} · order {c.sort_order}</p>
+              </div>
+              <Button size="icon" variant="ghost" onClick={() => setEditing(c)}><Pencil className="h-4 w-4" /></Button>
+              <Button size="icon" variant="ghost" onClick={() => setDeleteId(c.id)}><Trash2 className="h-4 w-4" /></Button>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {(creating || editing) && (
+        <CategoryDialog
+          initial={editing}
+          onClose={() => { setCreating(false); setEditing(null); }}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ["library-cats"] });
+            setCreating(false); setEditing(null);
+          }}
+        />
+      )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Books in this category will become uncategorized. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && delMut.mutate(deleteId)}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+function CategoryDialog({
+  initial, onClose, onSaved,
+}: { initial: Cat | null; onClose: () => void; onSaved: () => void }) {
+  const upsertFn = useServerFn(adminUpsertLibraryCategory);
+  const [form, setForm] = React.useState({
+    slug: initial?.slug ?? "",
+    name_en: initial?.name_en ?? "",
+    name_bn: initial?.name_bn ?? "",
+    color: initial?.color ?? "#6366f1",
+    icon: initial?.icon ?? "",
+    sort_order: initial?.sort_order ?? 0,
+  });
+  const [autoSlug, setAutoSlug] = React.useState(!initial);
+
+  const mut = useMutation({
+    mutationFn: () => upsertFn({
+      data: {
+        id: initial?.id,
+        slug: form.slug || slugify(form.name_en),
+        name_en: form.name_en,
+        name_bn: form.name_bn,
+        color: form.color || undefined,
+        icon: form.icon || undefined,
+        sort_order: Number(form.sort_order) || 0,
+      },
+    }),
+    onSuccess: () => { toast.success(initial ? "Updated" : "Created"); onSaved(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{initial ? "Edit category" : "New category"}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div>
+              <Label>Name (English) *</Label>
+              <Input
+                value={form.name_en}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setForm((f) => ({ ...f, name_en: v, slug: autoSlug ? slugify(v) : f.slug }));
+                }}
+                maxLength={120}
+              />
+            </div>
+            <div>
+              <Label>Name (Bangla) *</Label>
+              <Input value={form.name_bn} onChange={(e) => setForm({ ...form, name_bn: e.target.value })} maxLength={120} />
+            </div>
+          </div>
+          <div>
+            <Label>Slug *</Label>
+            <Input
+              value={form.slug}
+              onChange={(e) => { setAutoSlug(false); setForm({ ...form, slug: slugify(e.target.value) }); }}
+              maxLength={60}
+            />
+          </div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            <div>
+              <Label>Color</Label>
+              <Input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="h-10 p-1" />
+            </div>
+            <div>
+              <Label>Icon (emoji/text)</Label>
+              <Input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} maxLength={4} />
+            </div>
+            <div>
+              <Label>Sort order</Label>
+              <Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} />
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={() => mut.mutate()} disabled={mut.isPending || !form.name_en || !form.name_bn}>
+            {mut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+            {initial ? "Save" : "Create"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
