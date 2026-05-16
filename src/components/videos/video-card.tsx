@@ -29,7 +29,7 @@ function fmtDuration(s?: number | null) {
 }
 
 export function VideoCard({ v }: { v: VideoCardData }) {
-  const { language } = useLanguage();
+  const { lang: language } = useLanguage();
   const title = language === "bn" && v.title_bn ? v.title_bn : v.title_en;
   const thumb = v.thumbnail_url || youtubeThumbnail(v.youtube_video_id, "hq");
   const dur = fmtDuration(v.duration_seconds);
