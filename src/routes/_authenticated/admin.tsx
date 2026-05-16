@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 const SECTIONS = [
   { to: "/admin", labelKey: "admin.dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/users", labelKey: "admin.users", icon: Users },
-  { to: "/admin/notices", labelKey: "nav.notices", icon: Bell, soon: true },
+  { to: "/admin/notices", labelKey: "nav.notices", icon: Bell },
   { to: "/admin/events", labelKey: "nav.events", icon: Calendar, soon: true },
   { to: "/admin/blog", labelKey: "nav.blog", icon: PenSquare },
   { to: "/admin/qa", labelKey: "nav.qa", icon: HelpCircle },
