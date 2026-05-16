@@ -148,7 +148,7 @@ function EventDetail() {
               )}
               {e.is_featured && <Badge>{t("events.featured", "Featured")}</Badge>}
               <Badge variant="outline" className="capitalize">
-                {t(`events.mode.${e.mode}`, e.mode)}
+                {String(t(`events.mode.${e.mode}` as never, { defaultValue: e.mode }))}
               </Badge>
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{title}</h1>
