@@ -42,6 +42,7 @@ import { Route as VideosCategorySlugRouteImport } from './routes/videos.category
 import { Route as QuizReviewAttemptIdRouteImport } from './routes/quiz.review.$attemptId'
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
 import { Route as LibraryEditBookIdRouteImport } from './routes/library.edit.$bookId'
+import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin.videos'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTournamentsRouteImport } from './routes/_authenticated/admin.tournaments'
 import { Route as AuthenticatedAdminQaRouteImport } from './routes/_authenticated/admin.qa'
@@ -218,6 +219,12 @@ const LibraryEditBookIdRoute = LibraryEditBookIdRouteImport.update({
   path: '/library/edit/$bookId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminVideosRoute =
+  AuthenticatedAdminVideosRouteImport.update({
+    id: '/videos',
+    path: '/videos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -313,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -357,6 +365,7 @@ export interface FileRoutesByTo {
   '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -404,6 +413,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/qa': typeof AuthenticatedAdminQaRoute
   '/_authenticated/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/library/edit/$bookId': typeof LibraryEditBookIdRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
@@ -451,6 +461,7 @@ export interface FileRouteTypes {
     | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
+    | '/admin/videos'
     | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
+    | '/admin/videos'
     | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -541,6 +553,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/qa'
     | '/_authenticated/admin/tournaments'
     | '/_authenticated/admin/users'
+    | '/_authenticated/admin/videos'
     | '/library/edit/$bookId'
     | '/quiz/play/$quizId'
     | '/quiz/review/$attemptId'
@@ -824,6 +837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryEditBookIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/videos': {
+      id: '/_authenticated/admin/videos'
+      path: '/videos'
+      fullPath: '/admin/videos'
+      preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -910,6 +930,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminQaRoute: typeof AuthenticatedAdminQaRoute
   AuthenticatedAdminTournamentsRoute: typeof AuthenticatedAdminTournamentsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminVideosRoute: typeof AuthenticatedAdminVideosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminQuizQuizIdRoute: typeof AuthenticatedAdminQuizQuizIdRoute
   AuthenticatedAdminQuizAttemptsRoute: typeof AuthenticatedAdminQuizAttemptsRoute
@@ -923,6 +944,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminQaRoute: AuthenticatedAdminQaRoute,
   AuthenticatedAdminTournamentsRoute: AuthenticatedAdminTournamentsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminVideosRoute: AuthenticatedAdminVideosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminQuizQuizIdRoute: AuthenticatedAdminQuizQuizIdRoute,
   AuthenticatedAdminQuizAttemptsRoute: AuthenticatedAdminQuizAttemptsRoute,
