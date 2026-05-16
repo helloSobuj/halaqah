@@ -95,7 +95,7 @@ function NavLinkPill({ item, active }: { item: NavItem; active: boolean }) {
           : "text-foreground/75 hover:text-foreground hover:bg-accent",
       )}
     >
-      {t(item.labelKey)}
+      <span suppressHydrationWarning>{t(item.labelKey)}</span>
     </Link>
   );
 }
