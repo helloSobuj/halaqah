@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
-  BookOpen, HelpCircle, Bell, Calendar, Library, Video, PenSquare,
+  BookOpen, HelpCircle, Bell, Calendar, Library, Video, PenSquare, Trophy, Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 type Module = {
-  to: "/quiz" | "/qa" | "/notices" | "/events" | "/library" | "/videos" | "/blog";
+  to: "/quiz" | "/qa" | "/notices" | "/events" | "/library" | "/videos" | "/blog" | "/tournaments";
   titleKey: string;
   descKey: string;
   icon: LucideIcon;
@@ -22,6 +22,7 @@ const MODULES: Module[] = [
   { to: "/library", titleKey: "modules.library.title", descKey: "modules.library.desc", icon: Library, color: "from-violet-500/25 to-purple-500/10" },
   { to: "/videos", titleKey: "modules.videos.title", descKey: "modules.videos.desc", icon: Video, color: "from-red-500/25 to-rose-500/10" },
   { to: "/blog", titleKey: "modules.blog.title", descKey: "modules.blog.desc", icon: PenSquare, color: "from-teal-500/25 to-cyan-500/10" },
+  { to: "/tournaments", titleKey: "modules.tournaments.title", descKey: "modules.tournaments.desc", icon: Trophy, color: "from-yellow-500/25 to-amber-500/10" },
 ];
 
 export function ModulesGrid() {
@@ -46,6 +47,19 @@ export function ModulesGrid() {
             </Link>
           );
         })}
+        {/* Coming soon — inactive */}
+        <div className="group cursor-not-allowed" aria-disabled="true">
+          <Card className="p-4 h-full border-dashed border-border/70 bg-muted/30 opacity-70 relative">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-slate-500/20 to-zinc-500/10 flex items-center justify-center mb-3">
+              <Sparkles className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <h3 className="font-semibold text-sm text-muted-foreground leading-tight">{t("modules.upcoming.title")}</h3>
+            <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{t("modules.upcoming.desc")}</p>
+            <span className="absolute top-2 right-2 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-background border border-border text-muted-foreground">
+              soon
+            </span>
+          </Card>
+        </div>
       </div>
     </div>
   );

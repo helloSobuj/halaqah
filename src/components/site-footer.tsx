@@ -3,14 +3,21 @@ import { useTranslation } from "react-i18next";
 import { Heart } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 
-const LINKS = [
+const COL_LEARN = [
   { to: "/quiz", labelKey: "nav.quiz" },
   { to: "/qa", labelKey: "nav.qa" },
+  { to: "/library", labelKey: "nav.library" },
+] as const;
+
+const COL_COMMUNITY = [
   { to: "/notices", labelKey: "nav.notices" },
   { to: "/events", labelKey: "nav.events" },
-  { to: "/library", labelKey: "nav.library" },
-  { to: "/videos", labelKey: "nav.videos" },
   { to: "/blog", labelKey: "nav.blog" },
+] as const;
+
+const COL_MEDIA = [
+  { to: "/videos", labelKey: "nav.videos" },
+  { to: "/tournaments", labelKey: "nav.tournaments" },
 ] as const;
 
 export function SiteFooter() {
@@ -39,15 +46,24 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <nav className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-2 text-sm">
-            {LINKS.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                {t(l.labelKey)}
-              </Link>
+          <nav className="grid grid-cols-3 gap-6 text-sm">
+            {[
+              { heading: isBn ? "শেখা" : "Learn", items: COL_LEARN },
+              { heading: isBn ? "কমিউনিটি" : "Community", items: COL_COMMUNITY },
+              { heading: isBn ? "মিডিয়া" : "Media", items: COL_MEDIA },
+            ].map((col) => (
+              <div key={col.heading} className="flex flex-col gap-2">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground/80">{col.heading}</h4>
+                {col.items.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {t(l.labelKey)}
+                  </Link>
+                ))}
+              </div>
             ))}
           </nav>
         </div>

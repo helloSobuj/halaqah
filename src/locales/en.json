@@ -89,7 +89,9 @@
     "events": { "title": "Events", "desc": "Join community events and gatherings" },
     "library": { "title": "Library", "desc": "Search and read Islamic books" },
     "videos": { "title": "Videos", "desc": "Curated Islamic lectures and talks" },
-    "blog": { "title": "Blog", "desc": "Articles, reflections, and stories" }
+    "blog": { "title": "Blog", "desc": "Articles, reflections, and stories" },
+    "tournaments": { "title": "Tournaments", "desc": "Compete in live quiz tournaments" },
+    "upcoming": { "title": "Coming soon", "desc": "More modules on the way — stay tuned" }
   },
   "library": {
     "title": "Library",
