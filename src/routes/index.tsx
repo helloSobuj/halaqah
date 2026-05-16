@@ -36,33 +36,37 @@ function Index() {
 
       {/* Row 1: Modules (2/3) + Notice board (1/3) */}
       <section id="modules" className="px-4 lg:px-8 pb-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
           <div className="lg:col-span-2">
             <ModulesGrid />
           </div>
-          <div className="lg:col-span-1 space-y-5">
+          <div className="lg:col-span-1">
             <NoticeColumn />
-            <TopContributors />
           </div>
         </div>
       </section>
 
       {/* Row 2: Recent Quiz | Recent Event | Daily Hadith */}
       <section className="px-4 lg:px-8 pb-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
           <RecentQuiz />
           <RecentEvent />
           <DailyHadith />
         </div>
       </section>
 
-      {/* Row 3: Q&A (2) | Library (1) | Videos (1) */}
+      {/* Row 3: Q&A | Library | Videos (3 equal cols) */}
       <section className="px-4 lg:px-8 pb-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="lg:col-span-2"><RecentQA /></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+          <RecentQA />
           <RecentLibrary />
           <RecentVideos />
         </div>
+      </section>
+
+      {/* Top contributors strip */}
+      <section className="px-4 lg:px-8 pb-8 max-w-7xl mx-auto">
+        <TopContributors />
       </section>
 
       {/* Row 4: Blog (4-col) */}
