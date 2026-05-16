@@ -82,7 +82,7 @@ function WatchPage() {
             {desc && (
               <Card className="p-4">
                 <h2 className="font-semibold text-sm mb-2">Description</h2>
-                <p className="text-sm whitespace-pre-wrap text-foreground/85">{desc}</p>
+                <Markdown source={desc} />
               </Card>
             )}
           </div>
