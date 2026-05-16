@@ -144,8 +144,35 @@ function AdminEventsPage() {
                   {new Date(e.starts_at).toLocaleString()} · {e.mode}
                   {e.venue ? ` · ${e.venue}` : ""}
                 </p>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1">
+                    <Users className="h-3 w-3" />
+                    {(e as { counts?: { going: number; interested: number } }).counts?.going ?? 0} going ·{" "}
+                    {(e as { counts?: { going: number; interested: number } }).counts?.interested ?? 0} interested
+                  </span>
+                  {e.capacity ? (
+                    <span>
+                      · {Math.max(0, e.capacity - ((e as { counts?: { going: number } }).counts?.going ?? 0))} of {e.capacity} seats left
+                    </span>
+                  ) : null}
+                </p>
               </div>
               <div className="flex gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  title="View registrations"
+                  onClick={() =>
+                    setRsvpEvent({
+                      id: e.id,
+                      title: e.title_en,
+                      capacity: e.capacity,
+                      counts: (e as { counts?: { going: number; interested: number } }).counts ?? { going: 0, interested: 0 },
+                    })
+                  }
+                >
+                  <Users className="h-4 w-4" />
+                </Button>
                 <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)}>
                   <Pencil className="h-4 w-4" />
                 </Button>
