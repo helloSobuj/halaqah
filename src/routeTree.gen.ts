@@ -127,19 +127,19 @@ const QuizCategoryRoute = QuizCategoryRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaLeaderboardRoute = QaLeaderboardRouteImport.update({
-  id: '/leaderboard',
-  path: '/leaderboard',
-  getParentRoute: () => QaRoute,
+  id: '/qa/leaderboard',
+  path: '/qa/leaderboard',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QaAskRoute = QaAskRouteImport.update({
-  id: '/ask',
-  path: '/ask',
-  getParentRoute: () => QaRoute,
+  id: '/qa/ask',
+  path: '/qa/ask',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QaQuestionIdRoute = QaQuestionIdRouteImport.update({
-  id: '/$questionId',
-  path: '/$questionId',
-  getParentRoute: () => QaRoute,
+  id: '/qa/$questionId',
+  path: '/qa/$questionId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
@@ -420,6 +420,9 @@ export interface RootRouteChildren {
   NoticesRoute: typeof NoticesRoute
   SignupRoute: typeof SignupRoute
   VideosRoute: typeof VideosRoute
+  QaQuestionIdRoute: typeof QaQuestionIdRoute
+  QaAskRoute: typeof QaAskRoute
+  QaLeaderboardRoute: typeof QaLeaderboardRoute
   QuizCategoryRoute: typeof QuizCategoryRoute
   QuizBookmarksRoute: typeof QuizBookmarksRoute
   QuizLeaderboardRoute: typeof QuizLeaderboardRoute
@@ -556,24 +559,24 @@ declare module '@tanstack/react-router' {
     }
     '/qa/leaderboard': {
       id: '/qa/leaderboard'
-      path: '/leaderboard'
+      path: '/qa/leaderboard'
       fullPath: '/qa/leaderboard'
       preLoaderRoute: typeof QaLeaderboardRouteImport
-      parentRoute: typeof QaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/qa/ask': {
       id: '/qa/ask'
-      path: '/ask'
+      path: '/qa/ask'
       fullPath: '/qa/ask'
       preLoaderRoute: typeof QaAskRouteImport
-      parentRoute: typeof QaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/qa/$questionId': {
       id: '/qa/$questionId'
-      path: '/$questionId'
+      path: '/qa/$questionId'
       fullPath: '/qa/$questionId'
       preLoaderRoute: typeof QaQuestionIdRouteImport
-      parentRoute: typeof QaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
@@ -709,6 +712,9 @@ const rootRouteChildren: RootRouteChildren = {
   NoticesRoute: NoticesRoute,
   SignupRoute: SignupRoute,
   VideosRoute: VideosRoute,
+  QaQuestionIdRoute: QaQuestionIdRoute,
+  QaAskRoute: QaAskRoute,
+  QaLeaderboardRoute: QaLeaderboardRoute,
   QuizCategoryRoute: QuizCategoryRoute,
   QuizBookmarksRoute: QuizBookmarksRoute,
   QuizLeaderboardRoute: QuizLeaderboardRoute,
@@ -724,13 +730,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
