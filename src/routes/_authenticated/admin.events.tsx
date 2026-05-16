@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2, Users } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
   adminListAllEvents, adminUpsertEvent, adminDeleteEvent, listEventCategories,
+  adminListEventRsvps,
 } from "@/lib/events.functions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Route = createFileRoute("/_authenticated/admin/events")({
   head: () => ({ meta: [{ title: "Admin · Events — Halaqah" }] }),
@@ -74,6 +76,7 @@ function AdminEventsPage() {
   const [editing, setEditing] = React.useState<EventRow | null>(null);
   const [creating, setCreating] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
+  const [rsvpEvent, setRsvpEvent] = React.useState<{ id: string; title: string; capacity: number | null; counts: { going: number; interested: number } } | null>(null);
 
   const delMut = useMutation({
     mutationFn: (id: string) => delFn({ data: { id } }),
@@ -141,8 +144,35 @@ function AdminEventsPage() {
                   {new Date(e.starts_at).toLocaleString()} · {e.mode}
                   {e.venue ? ` · ${e.venue}` : ""}
                 </p>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1">
+                    <Users className="h-3 w-3" />
+                    {(e as { counts?: { going: number; interested: number } }).counts?.going ?? 0} going ·{" "}
+                    {(e as { counts?: { going: number; interested: number } }).counts?.interested ?? 0} interested
+                  </span>
+                  {e.capacity ? (
+                    <span>
+                      · {Math.max(0, e.capacity - ((e as { counts?: { going: number } }).counts?.going ?? 0))} of {e.capacity} seats left
+                    </span>
+                  ) : null}
+                </p>
               </div>
               <div className="flex gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  title="View registrations"
+                  onClick={() =>
+                    setRsvpEvent({
+                      id: e.id,
+                      title: e.title_en,
+                      capacity: e.capacity,
+                      counts: (e as { counts?: { going: number; interested: number } }).counts ?? { going: 0, interested: 0 },
+                    })
+                  }
+                >
+                  <Users className="h-4 w-4" />
+                </Button>
                 <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)}>
                   <Pencil className="h-4 w-4" />
                 </Button>
@@ -187,7 +217,89 @@ function AdminEventsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {rsvpEvent && (
+        <RsvpListDialog
+          event={rsvpEvent}
+          onClose={() => setRsvpEvent(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function RsvpListDialog({
+  event,
+  onClose,
+}: {
+  event: { id: string; title: string; capacity: number | null; counts: { going: number; interested: number } };
+  onClose: () => void;
+}) {
+  const fn = useServerFn(adminListEventRsvps);
+  const q = useQuery({
+    queryKey: ["admin-event-rsvps", event.id],
+    queryFn: () => fn({ data: { eventId: event.id } }),
+  });
+  const seatsLeft = event.capacity
+    ? Math.max(0, event.capacity - event.counts.going)
+    : null;
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Registrations · {event.title}</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-3 gap-3 py-3">
+          <Card className="p-3 text-center">
+            <div className="text-2xl font-bold">{event.counts.going}</div>
+            <div className="text-xs text-muted-foreground">Going</div>
+          </Card>
+          <Card className="p-3 text-center">
+            <div className="text-2xl font-bold">{event.counts.interested}</div>
+            <div className="text-xs text-muted-foreground">Interested</div>
+          </Card>
+          <Card className="p-3 text-center">
+            <div className="text-2xl font-bold">
+              {event.capacity ? seatsLeft : "∞"}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {event.capacity ? `Seats left / ${event.capacity}` : "No limit"}
+            </div>
+          </Card>
+        </div>
+        {q.isLoading ? (
+          <Skeleton className="h-40 w-full" />
+        ) : !q.data?.length ? (
+          <Card className="p-6 text-center text-sm text-muted-foreground">
+            No registrations yet.
+          </Card>
+        ) : (
+          <div className="space-y-1.5">
+            {q.data.map((r) => (
+              <Card key={r.user_id + r.status} className="p-3 flex items-center gap-3">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={r.profile?.avatar_url ?? undefined} />
+                  <AvatarFallback>
+                    {(r.profile?.display_name ?? "?").slice(0, 1).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {r.profile?.display_name ?? "Anonymous"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(r.created_at).toLocaleString()}
+                  </p>
+                </div>
+                <Badge variant={r.status === "going" ? "default" : "secondary"} className="text-[10px] capitalize">
+                  {r.status}
+                </Badge>
+              </Card>
+            ))}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 

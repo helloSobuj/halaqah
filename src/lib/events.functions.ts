@@ -303,5 +303,49 @@ export const adminListAllEvents = createServerFn({ method: "GET" })
       .order("starts_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
-    return data ?? [];
+    const list = data ?? [];
+    const ids = list.map((e) => e.id);
+    const counts = new Map<string, { going: number; interested: number }>();
+    if (ids.length) {
+      const { data: rs } = await supabaseAdmin
+        .from("event_rsvps")
+        .select("event_id,status")
+        .in("event_id", ids);
+      for (const r of rs ?? []) {
+        const c = counts.get(r.event_id) ?? { going: 0, interested: 0 };
+        if (r.status === "going") c.going += 1;
+        else if (r.status === "interested") c.interested += 1;
+        counts.set(r.event_id, c);
+      }
+    }
+    return list.map((e) => ({
+      ...e,
+      counts: counts.get(e.id) ?? { going: 0, interested: 0 },
+    }));
+  });
+
+export const adminListEventRsvps = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { data: rsvps, error } = await supabaseAdmin
+      .from("event_rsvps")
+      .select("user_id,status,created_at")
+      .eq("event_id", data.eventId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const list = rsvps ?? [];
+    const userIds = Array.from(new Set(list.map((r) => r.user_id)));
+    const profiles = userIds.length
+      ? (await supabaseAdmin
+          .from("profiles")
+          .select("id,display_name,avatar_url")
+          .in("id", userIds)).data ?? []
+      : [];
+    const pMap = new Map(profiles.map((p) => [p.id, p]));
+    return list.map((r) => ({
+      ...r,
+      profile: pMap.get(r.user_id) ?? null,
+    }));
   });
