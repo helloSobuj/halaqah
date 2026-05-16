@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { SiteFooter } from "@/components/site-footer";
 
 import { cn } from "@/lib/utils";
 
@@ -296,6 +297,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <DesktopTopBar />
       </div>
       <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <SiteFooter />
       <MobileBottomTabs />
     </div>
   );
