@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoCard } from "@/components/videos/video-card";
+import { Markdown } from "@/components/shared/markdown";
 import { getPlaylist } from "@/lib/videos.functions";
 import { useLanguage } from "@/hooks/use-language";
 
