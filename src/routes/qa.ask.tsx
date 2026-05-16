@@ -66,7 +66,14 @@ function AskPage() {
     onError: (e: any) => toast.error(e.message ?? "Failed to post"),
   });
 
-  const valid = title.trim().length >= 10 && body.trim().length >= 20;
+  const titleLen = title.trim().length;
+  const bodyLen = body.trim().length;
+  const valid = titleLen >= 10 && bodyLen >= 20;
+  const disabledReason = !valid
+    ? titleLen < 10
+      ? `Title needs ${10 - titleLen} more character${10 - titleLen === 1 ? "" : "s"}`
+      : `Details need ${20 - bodyLen} more character${20 - bodyLen === 1 ? "" : "s"}`
+    : null;
 
   return (
     <AppShell>
@@ -155,9 +162,21 @@ function AskPage() {
             <Switch checked={anon} onCheckedChange={setAnon} />
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end items-center gap-3">
+            {disabledReason && (
+              <p className="text-xs text-muted-foreground">{disabledReason}</p>
+            )}
             <Button variant="outline" asChild><Link to="/qa">Cancel</Link></Button>
-            <Button onClick={() => mut.mutate()} disabled={!valid || mut.isPending}>
+            <Button
+              onClick={() => {
+                if (!valid) {
+                  toast.error(disabledReason ?? "Please complete the form");
+                  return;
+                }
+                mut.mutate();
+              }}
+              disabled={mut.isPending}
+            >
               {mut.isPending ? "Posting…" : "Post question"}
             </Button>
           </div>
