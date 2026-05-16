@@ -136,17 +136,35 @@ function NoticeFormDialog({
   notice, onClose, onSaved,
 }: { notice: Notice | null; onClose: () => void; onSaved: () => void }) {
   const upsertFn = useServerFn(adminUpsertNotice);
+  const { user } = useAuth();
   const [title_en, setTitleEn] = React.useState(notice?.title_en ?? "");
   const [title_bn, setTitleBn] = React.useState(notice?.title_bn ?? "");
   const [body_md_en, setBodyEn] = React.useState(notice?.body_md_en ?? "");
   const [body_md_bn, setBodyBn] = React.useState(notice?.body_md_bn ?? "");
+  const [cover_image_url, setCover] = React.useState(notice?.cover_image_url ?? "");
+  const [coverUploading, setCoverUploading] = React.useState(false);
   const [priority, setPriority] = React.useState<Notice["priority"]>(notice?.priority ?? "normal");
   const [is_pinned, setPinned] = React.useState(notice?.is_pinned ?? false);
   const [is_published, setPublished] = React.useState(notice?.is_published ?? true);
 
+  const uploadCover = async (file: File) => {
+    if (!user) return toast.error("Sign in");
+    setCoverUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "bin";
+      const path = `${user.id}/notices/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("blog-media").upload(path, file, { contentType: file.type, upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from("blog-media").getPublicUrl(path);
+      setCover(data.publicUrl);
+      toast.success("Uploaded");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setCoverUploading(false); }
+  };
+
   const mut = useMutation({
     mutationFn: () => upsertFn({
-      data: { id: notice?.id, title_en, title_bn, body_md_en, body_md_bn, priority, is_pinned, is_published },
+      data: { id: notice?.id, title_en, title_bn, body_md_en, body_md_bn, cover_image_url: cover_image_url || null, priority, is_pinned, is_published },
     }),
     onSuccess: () => { toast.success(notice ? "Notice updated" : "Notice published"); onSaved(); },
     onError: (e: Error) => toast.error(e.message),
@@ -168,12 +186,27 @@ function NoticeFormDialog({
             <Input value={title_bn} onChange={(e) => setTitleBn(e.target.value)} maxLength={200} />
           </div>
           <div className="space-y-1.5">
+            <Label>Cover image (optional)</Label>
+            <div className="flex items-center gap-2">
+              <Input value={cover_image_url} onChange={(e) => setCover(e.target.value)} placeholder="https://…" />
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadCover(f); }} />
+                <span className="inline-flex">
+                  <Button asChild variant="outline" size="sm" disabled={coverUploading}>
+                    <span>{coverUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}</span>
+                  </Button>
+                </span>
+              </label>
+            </div>
+            {cover_image_url && <img src={cover_image_url} alt="" className="mt-2 h-32 rounded object-cover" />}
+          </div>
+          <div className="space-y-1.5">
             <Label>Body (English)</Label>
-            <MarkdownEditor value={body_md_en} onChange={setBodyEn} rows={8} placeholder="Write the notice…" />
+            <MarkdownEditor value={body_md_en} onChange={setBodyEn} rows={8} placeholder="Write the notice…" mediaBucket="blog-media" />
           </div>
           <div className="space-y-1.5">
             <Label>Body (Bangla)</Label>
-            <MarkdownEditor value={body_md_bn} onChange={setBodyBn} rows={8} />
+            <MarkdownEditor value={body_md_bn} onChange={setBodyBn} rows={8} mediaBucket="blog-media" />
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
