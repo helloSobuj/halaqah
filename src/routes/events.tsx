@@ -33,6 +33,7 @@ export const Route = createFileRoute("/events")({
 });
 
 function EventsPage() {
+  const { t } = useTranslation();
   const [filter, setFilter] = React.useState<"upcoming" | "past" | "featured">("upcoming");
   const [categorySlug, setCategorySlug] = React.useState<string | undefined>();
   const [q, setQ] = React.useState("");
@@ -50,18 +51,16 @@ function EventsPage() {
     <AppShell>
       <div className="max-w-6xl mx-auto px-4 lg:px-8 py-6 lg:py-10 space-y-6">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">Events</h1>
-          <p className="text-muted-foreground mt-2 max-w-2xl">
-            Lectures, workshops, and community gatherings. RSVP and share with friends.
-          </p>
+          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{t("events.title")}</h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">{t("events.subtitle")}</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
             <TabsList>
-              <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-              <TabsTrigger value="featured">Featured</TabsTrigger>
-              <TabsTrigger value="past">Past</TabsTrigger>
+              <TabsTrigger value="upcoming">{t("events.upcoming")}</TabsTrigger>
+              <TabsTrigger value="featured">{t("events.featured")}</TabsTrigger>
+              <TabsTrigger value="past">{t("events.past")}</TabsTrigger>
             </TabsList>
           </Tabs>
           <div className="relative flex-1 max-w-md">
@@ -69,7 +68,7 @@ function EventsPage() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search events…"
+              placeholder={t("events.searchPlaceholder")}
               className="pl-9"
             />
           </div>
@@ -82,7 +81,7 @@ function EventsPage() {
               className="cursor-pointer"
               onClick={() => setCategorySlug(undefined)}
             >
-              All
+              {t("events.all")}
             </Badge>
             {cats.data.map((c) => (
               <Badge
@@ -106,10 +105,8 @@ function EventsPage() {
         ) : !list.data || list.data.length === 0 ? (
           <div className="text-center py-16 border border-dashed rounded-xl">
             <Calendar className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-            <p className="text-muted-foreground">No events to show.</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Check back soon or try a different filter.
-            </p>
+            <p className="text-muted-foreground">{t("events.empty")}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("events.emptyHint")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
