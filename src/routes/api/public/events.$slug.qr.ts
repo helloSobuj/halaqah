@@ -15,12 +15,13 @@ export const Route = createFileRoute("/api/public/events/$slug/qr")({
           return new Response("Not found", { status: 404 });
         }
 
-        // best-effort analytics
-        await supabaseAdmin
-          .from("event_shares")
-          .insert({ event_id: e.id, channel: "qr_scan" })
-          .then(() => {})
-          .catch(() => {});
+        try {
+          await supabaseAdmin
+            .from("event_shares")
+            .insert({ event_id: e.id, channel: "qr_scan" });
+        } catch {
+          // best-effort analytics
+        }
 
         return new Response(null, {
           status: 302,
