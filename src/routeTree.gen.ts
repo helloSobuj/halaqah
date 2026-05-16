@@ -26,6 +26,9 @@ import { Route as QuizMyAttemptsRouteImport } from './routes/quiz.my-attempts'
 import { Route as QuizLeaderboardRouteImport } from './routes/quiz.leaderboard'
 import { Route as QuizBookmarksRouteImport } from './routes/quiz.bookmarks'
 import { Route as QuizCategoryRouteImport } from './routes/quiz.$category'
+import { Route as QaLeaderboardRouteImport } from './routes/qa.leaderboard'
+import { Route as QaAskRouteImport } from './routes/qa.ask'
+import { Route as QaQuestionIdRouteImport } from './routes/qa.$questionId'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -123,6 +126,21 @@ const QuizCategoryRoute = QuizCategoryRouteImport.update({
   path: '/quiz/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QaLeaderboardRoute = QaLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => QaRoute,
+} as any)
+const QaAskRoute = QaAskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => QaRoute,
+} as any)
+const QaQuestionIdRoute = QaQuestionIdRouteImport.update({
+  id: '/$questionId',
+  path: '/$questionId',
+  getParentRoute: () => QaRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -197,11 +215,14 @@ export interface FileRoutesByFullPath {
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
-  '/qa': typeof QaRoute
+  '/qa': typeof QaRouteWithChildren
   '/signup': typeof SignupRoute
   '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/qa/$questionId': typeof QaQuestionIdRoute
+  '/qa/ask': typeof QaAskRoute
+  '/qa/leaderboard': typeof QaLeaderboardRoute
   '/quiz/$category': typeof QuizCategoryRoute
   '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
@@ -227,10 +248,13 @@ export interface FileRoutesByTo {
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
-  '/qa': typeof QaRoute
+  '/qa': typeof QaRouteWithChildren
   '/signup': typeof SignupRoute
   '/videos': typeof VideosRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/qa/$questionId': typeof QaQuestionIdRoute
+  '/qa/ask': typeof QaAskRoute
+  '/qa/leaderboard': typeof QaLeaderboardRoute
   '/quiz/$category': typeof QuizCategoryRoute
   '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
@@ -258,11 +282,14 @@ export interface FileRoutesById {
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
-  '/qa': typeof QaRoute
+  '/qa': typeof QaRouteWithChildren
   '/signup': typeof SignupRoute
   '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/qa/$questionId': typeof QaQuestionIdRoute
+  '/qa/ask': typeof QaAskRoute
+  '/qa/leaderboard': typeof QaLeaderboardRoute
   '/quiz/$category': typeof QuizCategoryRoute
   '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
@@ -295,6 +322,9 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin'
     | '/profile'
+    | '/qa/$questionId'
+    | '/qa/ask'
+    | '/qa/leaderboard'
     | '/quiz/$category'
     | '/quiz/bookmarks'
     | '/quiz/leaderboard'
@@ -324,6 +354,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/videos'
     | '/profile'
+    | '/qa/$questionId'
+    | '/qa/ask'
+    | '/qa/leaderboard'
     | '/quiz/$category'
     | '/quiz/bookmarks'
     | '/quiz/leaderboard'
@@ -355,6 +388,9 @@ export interface FileRouteTypes {
     | '/videos'
     | '/_authenticated/admin'
     | '/_authenticated/profile'
+    | '/qa/$questionId'
+    | '/qa/ask'
+    | '/qa/leaderboard'
     | '/quiz/$category'
     | '/quiz/bookmarks'
     | '/quiz/leaderboard'
@@ -382,7 +418,7 @@ export interface RootRouteChildren {
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
   NoticesRoute: typeof NoticesRoute
-  QaRoute: typeof QaRoute
+  QaRoute: typeof QaRouteWithChildren
   SignupRoute: typeof SignupRoute
   VideosRoute: typeof VideosRoute
   QuizCategoryRoute: typeof QuizCategoryRoute
@@ -518,6 +554,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/qa/leaderboard': {
+      id: '/qa/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/qa/leaderboard'
+      preLoaderRoute: typeof QaLeaderboardRouteImport
+      parentRoute: typeof QaRoute
+    }
+    '/qa/ask': {
+      id: '/qa/ask'
+      path: '/ask'
+      fullPath: '/qa/ask'
+      preLoaderRoute: typeof QaAskRouteImport
+      parentRoute: typeof QaRoute
+    }
+    '/qa/$questionId': {
+      id: '/qa/$questionId'
+      path: '/$questionId'
+      fullPath: '/qa/$questionId'
+      preLoaderRoute: typeof QaQuestionIdRouteImport
+      parentRoute: typeof QaRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -642,6 +699,20 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface QaRouteChildren {
+  QaQuestionIdRoute: typeof QaQuestionIdRoute
+  QaAskRoute: typeof QaAskRoute
+  QaLeaderboardRoute: typeof QaLeaderboardRoute
+}
+
+const QaRouteChildren: QaRouteChildren = {
+  QaQuestionIdRoute: QaQuestionIdRoute,
+  QaAskRoute: QaAskRoute,
+  QaLeaderboardRoute: QaLeaderboardRoute,
+}
+
+const QaRouteWithChildren = QaRoute._addFileChildren(QaRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -650,7 +721,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
   NoticesRoute: NoticesRoute,
-  QaRoute: QaRoute,
+  QaRoute: QaRouteWithChildren,
   SignupRoute: SignupRoute,
   VideosRoute: VideosRoute,
   QuizCategoryRoute: QuizCategoryRoute,

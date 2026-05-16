@@ -15,7 +15,7 @@ import { listQuestions, listQACategories, getDailyQuests } from "@/lib/qa.functi
 import { QuestionRow } from "@/components/qa/qa-shared";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/qa")({
+export const Route = createFileRoute("/qa/")({
   head: () => ({
     meta: [
       { title: "Q&A — Halaqah" },
