@@ -8,10 +8,12 @@ import { ArrowLeft, Check, ShieldCheck, Eye, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Markdown } from "@/components/qa/markdown";
+import { MarkdownEditor } from "@/components/qa/markdown-editor";
 import {
   getQuestion,
   myVotesForQuestion,
@@ -154,11 +156,7 @@ function QuestionDetail() {
 }
 
 function Body({ text }: { text: string }) {
-  return (
-    <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap break-words text-foreground">
-      {text}
-    </div>
-  );
+  return <Markdown source={text} />;
 }
 
 function DeleteQuestionBtn({ id }: { id: string }) {
@@ -343,12 +341,11 @@ function AnswerForm({ questionId, onPosted }: { questionId: string; onPosted: ()
   return (
     <Card className="p-5 space-y-3">
       <h3 className="font-semibold">Your answer</h3>
-      <Textarea
-        rows={6}
+      <MarkdownEditor
         value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder="Write a clear, sourced answer. Markdown supported."
-        maxLength={20000}
+        onChange={setBody}
+        rows={8}
+        placeholder="Write a clear, sourced answer. Markdown and images supported."
       />
       <div className="flex justify-end">
         <Button onClick={() => mut.mutate()} disabled={body.trim().length < 20 || mut.isPending}>
