@@ -336,6 +336,45 @@ export const myBookSubmissions = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+export const getMyBookSubmission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await supabaseAdmin
+      .from("library_books")
+      .select("*")
+      .eq("id", data.id)
+      .eq("submitted_by", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Not found");
+    return row;
+  });
+
+export const updateMyBookSubmission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => BookInputSchema.extend({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { id, ...rest } = data;
+    if (rest.source_type === "pdf" && !rest.pdf_path) throw new Error("PDF file required");
+    if (rest.source_type === "external" && !rest.external_url) throw new Error("External URL required");
+    const { data: existing } = await supabaseAdmin
+      .from("library_books")
+      .select("submitted_by, status")
+      .eq("id", id)
+      .maybeSingle();
+    if (!existing || existing.submitted_by !== context.userId) throw new Error("Forbidden");
+    if (existing.status === "approved") throw new Error("Approved books can't be edited");
+    const { data: row, error } = await supabaseAdmin
+      .from("library_books")
+      .update({ ...rest, status: "pending", rejection_reason: null })
+      .eq("id", id)
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
 export const myBookmarks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

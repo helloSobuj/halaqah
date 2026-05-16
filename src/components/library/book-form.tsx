@@ -5,8 +5,8 @@ import { Loader2, Upload, ImagePlus, FileText, Link as LinkIcon, X } from "lucid
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MarkdownEditor } from "@/components/qa/markdown-editor";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -159,11 +159,12 @@ export function BookForm({
       </div>
       <div>
         <Label>Description</Label>
-        <Textarea
+        <MarkdownEditor
           value={value.description}
-          onChange={(e) => patch({ description: e.target.value })}
-          rows={4}
+          onChange={(v) => patch({ description: v })}
+          rows={8}
           maxLength={5000}
+          placeholder="Write a short summary or notes about this book…"
         />
       </div>
 

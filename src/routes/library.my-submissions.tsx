@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Plus, BookOpen } from "lucide-react";
+import { ArrowLeft, Plus, BookOpen, Pencil } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -98,11 +98,18 @@ function MySubmissionsPage() {
                       <span className="font-medium">{t("library.rejectionReason", "Reason")}:</span> {b.rejection_reason}
                     </p>
                   )}
-                  {b.status === "approved" && (
-                    <Link to="/library/$bookId" params={{ bookId: b.slug }} className="text-xs text-primary underline mt-2 inline-block">
-                      {t("library.viewBook", "View book")}
-                    </Link>
-                  )}
+                  <div className="flex items-center gap-3 mt-2">
+                    {b.status === "approved" && (
+                      <Link to="/library/$bookId" params={{ bookId: b.slug }} className="text-xs text-primary underline">
+                        {t("library.viewBook", "View book")}
+                      </Link>
+                    )}
+                    {b.status !== "approved" && (
+                      <Link to="/library/edit/$bookId" params={{ bookId: b.id }} className="text-xs text-primary underline inline-flex items-center gap-1">
+                        <Pencil className="h-3 w-3" /> {t("library.editSubmission", "Edit")}
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </Card>
             ))}
