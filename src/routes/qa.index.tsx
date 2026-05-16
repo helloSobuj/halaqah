@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
-import { PenSquare, Trophy, Search, Flame } from "lucide-react";
+import { PenSquare, Trophy, Search, Flame, Gift } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { listQuestions, listQACategories, getDailyQuests } from "@/lib/qa.functions";
+import { listQuestions, listQACategories, getDailyQuests, claimDailyBonus } from "@/lib/qa.functions";
 import { QuestionRow } from "@/components/qa/qa-shared";
 import { useAuth } from "@/hooks/use-auth";
 
