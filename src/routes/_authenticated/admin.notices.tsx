@@ -36,6 +36,7 @@ type Notice = {
   title_bn: string;
   body_md_en: string;
   body_md_bn: string;
+  cover_image_url: string | null;
   priority: "normal" | "important" | "urgent";
   is_pinned: boolean;
   is_published: boolean;
