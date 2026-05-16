@@ -78,6 +78,8 @@ export const Route = createFileRoute("/events/$slug")({
 function EventDetail() {
   const initial = Route.useLoaderData();
   const params = Route.useParams();
+  const { t } = useTranslation();
+  const { lang } = useLanguage();
   const getFn = useServerFn(getEventBySlug);
   const { data } = useQuery({
     queryKey: ["event-detail", params.slug],
@@ -87,11 +89,16 @@ function EventDetail() {
   if (!data) return null;
   const { category, counts } = data;
   const e = { ...data.event, mode: data.event.mode as "online" | "offline" | "hybrid" };
+  const isBn = lang === "bn";
+  const title = isBn && e.title_bn ? e.title_bn : e.title_en;
+  const altTitle = isBn ? e.title_en : e.title_bn;
+  const description = isBn && e.description_md_bn ? e.description_md_bn : e.description_md_en;
+  const categoryName = category ? (isBn ? category.name_bn : category.name_en) : null;
 
   const startDate = new Date(e.starts_at);
   const endDate = e.ends_at ? new Date(e.ends_at) : null;
   const fmt = (d: Date) =>
-    d.toLocaleString("en-US", {
+    d.toLocaleString(isBn ? "bn-BD" : "en-US", {
       weekday: "long",
       month: "long",
       day: "numeric",
