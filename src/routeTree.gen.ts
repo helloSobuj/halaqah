@@ -13,13 +13,13 @@ import { Route as VideosRouteImport } from './routes/videos'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as NoticesRouteImport } from './routes/notices'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as LibraryRouteImport } from './routes/library'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index'
 import { Route as QuizIndexRouteImport } from './routes/quiz.index'
 import { Route as QaIndexRouteImport } from './routes/qa.index'
+import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as QuizMyAttemptsRouteImport } from './routes/quiz.my-attempts'
@@ -29,6 +29,8 @@ import { Route as QuizCategoryRouteImport } from './routes/quiz.$category'
 import { Route as QaLeaderboardRouteImport } from './routes/qa.leaderboard'
 import { Route as QaAskRouteImport } from './routes/qa.ask'
 import { Route as QaQuestionIdRouteImport } from './routes/qa.$questionId'
+import { Route as LibrarySubmitRouteImport } from './routes/library.submit'
+import { Route as LibraryBookIdRouteImport } from './routes/library.$bookId'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -66,11 +68,6 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LibraryRoute = LibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
@@ -98,6 +95,11 @@ const QuizIndexRoute = QuizIndexRouteImport.update({
 const QaIndexRoute = QaIndexRouteImport.update({
   id: '/qa/',
   path: '/qa/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryIndexRoute = LibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
@@ -143,6 +145,16 @@ const QaAskRoute = QaAskRouteImport.update({
 const QaQuestionIdRoute = QaQuestionIdRouteImport.update({
   id: '/qa/$questionId',
   path: '/qa/$questionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibrarySubmitRoute = LibrarySubmitRouteImport.update({
+  id: '/library/submit',
+  path: '/library/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryBookIdRoute = LibraryBookIdRouteImport.update({
+  id: '/library/$bookId',
+  path: '/library/$bookId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsSlugRoute = EventsSlugRouteImport.update({
@@ -236,7 +248,6 @@ const ApiPublicEventsSlugQrRoute = ApiPublicEventsSlugQrRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
-  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
@@ -244,6 +255,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/library/$bookId': typeof LibraryBookIdRoute
+  '/library/submit': typeof LibrarySubmitRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -253,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/events/': typeof EventsIndexRoute
+  '/library/': typeof LibraryIndexRoute
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
@@ -273,13 +287,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
-  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
   '/videos': typeof VideosRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/library/$bookId': typeof LibraryBookIdRoute
+  '/library/submit': typeof LibrarySubmitRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -289,6 +304,7 @@ export interface FileRoutesByTo {
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/events': typeof EventsIndexRoute
+  '/library': typeof LibraryIndexRoute
   '/qa': typeof QaIndexRoute
   '/quiz': typeof QuizIndexRoute
   '/tournaments': typeof TournamentsIndexRoute
@@ -311,7 +327,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/blog': typeof BlogRoute
-  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
@@ -319,6 +334,8 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/library/$bookId': typeof LibraryBookIdRoute
+  '/library/submit': typeof LibrarySubmitRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -328,6 +345,7 @@ export interface FileRoutesById {
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/events/': typeof EventsIndexRoute
+  '/library/': typeof LibraryIndexRoute
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
@@ -350,7 +368,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/blog'
-    | '/library'
     | '/login'
     | '/notices'
     | '/signup'
@@ -358,6 +375,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/profile'
     | '/events/$slug'
+    | '/library/$bookId'
+    | '/library/submit'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -367,6 +386,7 @@ export interface FileRouteTypes {
     | '/quiz/my-attempts'
     | '/tournaments/$id'
     | '/events/'
+    | '/library/'
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
@@ -387,13 +407,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/blog'
-    | '/library'
     | '/login'
     | '/notices'
     | '/signup'
     | '/videos'
     | '/profile'
     | '/events/$slug'
+    | '/library/$bookId'
+    | '/library/submit'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -403,6 +424,7 @@ export interface FileRouteTypes {
     | '/quiz/my-attempts'
     | '/tournaments/$id'
     | '/events'
+    | '/library'
     | '/qa'
     | '/quiz'
     | '/tournaments'
@@ -424,7 +446,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/blog'
-    | '/library'
     | '/login'
     | '/notices'
     | '/signup'
@@ -432,6 +453,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/profile'
     | '/events/$slug'
+    | '/library/$bookId'
+    | '/library/submit'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -441,6 +464,7 @@ export interface FileRouteTypes {
     | '/quiz/my-attempts'
     | '/tournaments/$id'
     | '/events/'
+    | '/library/'
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
@@ -463,12 +487,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   BlogRoute: typeof BlogRoute
-  LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
   NoticesRoute: typeof NoticesRoute
   SignupRoute: typeof SignupRoute
   VideosRoute: typeof VideosRoute
   EventsSlugRoute: typeof EventsSlugRoute
+  LibraryBookIdRoute: typeof LibraryBookIdRoute
+  LibrarySubmitRoute: typeof LibrarySubmitRoute
   QaQuestionIdRoute: typeof QaQuestionIdRoute
   QaAskRoute: typeof QaAskRoute
   QaLeaderboardRoute: typeof QaLeaderboardRoute
@@ -478,6 +503,7 @@ export interface RootRouteChildren {
   QuizMyAttemptsRoute: typeof QuizMyAttemptsRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
   EventsIndexRoute: typeof EventsIndexRoute
+  LibraryIndexRoute: typeof LibraryIndexRoute
   QaIndexRoute: typeof QaIndexRoute
   QuizIndexRoute: typeof QuizIndexRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
@@ -515,13 +541,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library': {
-      id: '/library'
-      path: '/library'
-      fullPath: '/library'
-      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog': {
@@ -564,6 +583,13 @@ declare module '@tanstack/react-router' {
       path: '/qa'
       fullPath: '/qa/'
       preLoaderRoute: typeof QaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/': {
+      id: '/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof LibraryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/': {
@@ -627,6 +653,20 @@ declare module '@tanstack/react-router' {
       path: '/qa/$questionId'
       fullPath: '/qa/$questionId'
       preLoaderRoute: typeof QaQuestionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/submit': {
+      id: '/library/submit'
+      path: '/library/submit'
+      fullPath: '/library/submit'
+      preLoaderRoute: typeof LibrarySubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/$bookId': {
+      id: '/library/$bookId'
+      path: '/library/$bookId'
+      fullPath: '/library/$bookId'
+      preLoaderRoute: typeof LibraryBookIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/$slug': {
@@ -789,12 +829,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   BlogRoute: BlogRoute,
-  LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
   NoticesRoute: NoticesRoute,
   SignupRoute: SignupRoute,
   VideosRoute: VideosRoute,
   EventsSlugRoute: EventsSlugRoute,
+  LibraryBookIdRoute: LibraryBookIdRoute,
+  LibrarySubmitRoute: LibrarySubmitRoute,
   QaQuestionIdRoute: QaQuestionIdRoute,
   QaAskRoute: QaAskRoute,
   QaLeaderboardRoute: QaLeaderboardRoute,
@@ -804,6 +845,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuizMyAttemptsRoute: QuizMyAttemptsRoute,
   TournamentsIdRoute: TournamentsIdRoute,
   EventsIndexRoute: EventsIndexRoute,
+  LibraryIndexRoute: LibraryIndexRoute,
   QaIndexRoute: QaIndexRoute,
   QuizIndexRoute: QuizIndexRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,

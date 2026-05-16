@@ -200,6 +200,275 @@ export type Database = {
           },
         ]
       }
+      library_bookmarks: {
+        Row: {
+          book_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_bookmarks_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "library_books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library_books: {
+        Row: {
+          author: string | null
+          avg_rating: number
+          category_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          download_count: number
+          external_url: string | null
+          id: string
+          is_featured: boolean
+          language: string
+          pages: number | null
+          pdf_path: string | null
+          pdf_size_bytes: number | null
+          published_year: number | null
+          rating_count: number
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          share_count: number
+          slug: string
+          source_type: string
+          status: string
+          submitted_by: string | null
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author?: string | null
+          avg_rating?: number
+          category_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          external_url?: string | null
+          id?: string
+          is_featured?: boolean
+          language?: string
+          pages?: number | null
+          pdf_path?: string | null
+          pdf_size_bytes?: number | null
+          published_year?: number | null
+          rating_count?: number
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          share_count?: number
+          slug: string
+          source_type: string
+          status?: string
+          submitted_by?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author?: string | null
+          avg_rating?: number
+          category_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          external_url?: string | null
+          id?: string
+          is_featured?: boolean
+          language?: string
+          pages?: number | null
+          pdf_path?: string | null
+          pdf_size_bytes?: number | null
+          published_year?: number | null
+          rating_count?: number
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          share_count?: number
+          slug?: string
+          source_type?: string
+          status?: string
+          submitted_by?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_books_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "library_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      library_comments: {
+        Row: {
+          body_md: string
+          book_id: string
+          created_at: string
+          id: string
+          is_deleted: boolean
+          parent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body_md: string
+          book_id: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          parent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body_md?: string
+          book_id?: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_comments_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "library_books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "library_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library_downloads: {
+        Row: {
+          book_id: string
+          created_at: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_downloads_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "library_books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library_ratings: {
+        Row: {
+          book_id: string
+          created_at: string
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_ratings_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "library_books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1245,6 +1514,10 @@ export type Database = {
     }
     Functions: {
       _advance_byes: { Args: { _tournament_id: string }; Returns: undefined }
+      _library_recompute_rating: {
+        Args: { _book_id: string }
+        Returns: undefined
+      }
       _qa_add_rep: {
         Args: {
           _delta: number
@@ -1274,6 +1547,8 @@ export type Database = {
             Returns: number
           }
       bump_event_view: { Args: { _event_id: string }; Returns: undefined }
+      bump_library_download: { Args: { _book_id: string }; Returns: undefined }
+      bump_library_view: { Args: { _book_id: string }; Returns: undefined }
       get_quiz_leaderboard: {
         Args: { _category_id?: string; _period?: string; _quiz_id?: string }
         Returns: {
