@@ -168,8 +168,13 @@ function NoticeBoard() {
     </section>
   );
 }
+
+function Index() {
   const { t } = useTranslation();
   return (
+    <AppShell>
+      <Hero />
+      <NoticeBoard />
     <AppShell>
       <Hero />
       <section id="modules" className="px-4 lg:px-8 pb-12 max-w-6xl mx-auto">
