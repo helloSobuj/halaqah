@@ -181,6 +181,15 @@ function BookDetailPage() {
           </div>
         </div>
 
+        {b.description && (
+          <Card className="p-5">
+            <h2 className="font-semibold mb-3">Description</h2>
+            <div className="prose prose-sm dark:prose-invert max-w-none">
+              <Markdown source={b.description} />
+            </div>
+          </Card>
+        )}
+
         <Card className="p-5">
           <h2 className="font-semibold mb-3">Comments</h2>
           {user ? (
