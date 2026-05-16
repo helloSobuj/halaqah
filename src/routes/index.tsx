@@ -113,12 +113,16 @@ function BlogStrip({ title, sortBy }: { title: string; sortBy: "recent" | "popul
 type NoticeRow = {
   id: string;
   title_en: string;
+  title_bn: string;
+  cover_image_url: string | null;
   priority: "normal" | "important" | "urgent";
   is_pinned: boolean;
   published_at: string | null;
 };
 
 function NoticeBoard() {
+  const { i18n } = useTranslation();
+  const isBn = i18n.resolvedLanguage === "bn";
   const fn = useServerFn(listNotices);
   const { data } = useQuery({
     queryKey: ["notices-public", "home"],
@@ -130,39 +134,47 @@ function NoticeBoard() {
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl lg:text-2xl font-bold text-foreground flex items-center gap-2">
           <Bell className="h-5 w-5 text-primary" />
-          Notice board
+          {isBn ? "নোটিশ বোর্ড" : "Notice board"}
         </h2>
         <Link to="/notices" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
-          See all <ArrowRight className="h-3.5 w-3.5" />
+          {isBn ? "সব দেখুন" : "See all"} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
       {!items.length ? (
         <Card className="p-6 text-sm text-muted-foreground text-center border-dashed">
-          No notices yet.
+          {isBn ? "এখনো কোনো নোটিশ নেই।" : "No notices yet."}
         </Card>
       ) : (
         <div className="grid gap-3">
-          {items.map((n) => (
-            <Link key={n.id} to="/notices" className="block">
-              <Card className="p-4 border-border hover:border-primary/40 hover:shadow-elegant transition-all">
-                <div className="flex items-start gap-3">
-                  {n.is_pinned && <Pin className="h-4 w-4 text-primary mt-1 flex-shrink-0" />}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium text-foreground truncate">{n.title_en}</p>
-                      {n.priority === "urgent" && <Badge className="bg-rose-500/15 text-rose-700 dark:text-rose-300 border-0 text-[10px]">Urgent</Badge>}
-                      {n.priority === "important" && <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border-0 text-[10px]">Important</Badge>}
-                    </div>
-                    {n.published_at && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {new Date(n.published_at).toLocaleDateString()}
-                      </p>
+          {items.map((n) => {
+            const title = isBn && n.title_bn ? n.title_bn : n.title_en;
+            return (
+              <Link key={n.id} to="/notices" className="block">
+                <Card className="overflow-hidden border-border hover:border-primary/40 hover:shadow-elegant transition-all">
+                  <div className="flex items-stretch gap-0">
+                    {n.cover_image_url && (
+                      <img src={n.cover_image_url} alt="" className="w-24 sm:w-32 h-auto object-cover flex-shrink-0" />
                     )}
+                    <div className="flex items-start gap-3 p-4 flex-1 min-w-0">
+                      {n.is_pinned && <Pin className="h-4 w-4 text-primary mt-1 flex-shrink-0" />}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-foreground truncate">{title}</p>
+                          {n.priority === "urgent" && <Badge className="bg-rose-500/15 text-rose-700 dark:text-rose-300 border-0 text-[10px]">{isBn ? "জরুরি" : "Urgent"}</Badge>}
+                          {n.priority === "important" && <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border-0 text-[10px]">{isBn ? "গুরুত্বপূর্ণ" : "Important"}</Badge>}
+                        </div>
+                        {n.published_at && (
+                          <p className="text-xs text-muted-foreground mt-0.5" suppressHydrationWarning>
+                            {new Date(n.published_at).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       )}
     </section>

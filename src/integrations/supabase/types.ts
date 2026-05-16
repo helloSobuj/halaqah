@@ -778,6 +778,7 @@ export type Database = {
         Row: {
           body_md_bn: string
           body_md_en: string
+          cover_image_url: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -792,6 +793,7 @@ export type Database = {
         Insert: {
           body_md_bn?: string
           body_md_en?: string
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -806,6 +808,7 @@ export type Database = {
         Update: {
           body_md_bn?: string
           body_md_en?: string
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
