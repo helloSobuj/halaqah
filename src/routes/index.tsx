@@ -175,8 +175,6 @@ function Index() {
     <AppShell>
       <Hero />
       <NoticeBoard />
-    <AppShell>
-      <Hero />
       <section id="modules" className="px-4 lg:px-8 pb-12 max-w-6xl mx-auto">
         <h2 className="text-xl lg:text-2xl font-bold text-foreground mb-5">{t("home.modules")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
