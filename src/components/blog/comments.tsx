@@ -34,7 +34,7 @@ export function Comments({ postId }: { postId: string }) {
 
   const { data: comments = [], isLoading } = useQuery({
     queryKey: ["blog-comments", postId],
-    queryFn: () => listFn({ data: { postId } }) as Promise<Comment[]>,
+    queryFn: () => listFn({ data: { postId } }) as unknown as Promise<Comment[]>,
   });
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["blog-comments", postId] });
