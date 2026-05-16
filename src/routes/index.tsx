@@ -19,7 +19,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { listPosts } from "@/lib/blog.functions";
+import { listNotices } from "@/lib/notices.functions";
 import { PostCard, type BlogPostCardData } from "@/components/blog/post-card";
+import { Badge } from "@/components/ui/badge";
+import { Pin } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
