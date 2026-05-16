@@ -3,13 +3,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, History, Eye } from "lucide-react";
+import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, Eye, MessageSquare, ThumbsUp, CheckCircle2, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listMyAttempts } from "@/lib/quiz.functions";
+import { listMyQA, getMyBadges } from "@/lib/qa.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -115,14 +116,19 @@ function ProfilePage() {
         </Card>
 
         <Tabs defaultValue="identity">
-          <TabsList className="w-full grid grid-cols-3">
+          <TabsList className="w-full grid grid-cols-4">
             <TabsTrigger value="identity">{t("profile.tabs.identity")}</TabsTrigger>
+            <TabsTrigger value="qa">Q&amp;A</TabsTrigger>
             <TabsTrigger value="saved">{t("profile.tabs.saved")}</TabsTrigger>
             <TabsTrigger value="activity">{t("profile.tabs.activity")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="identity">
             {profile && <IdentityForm profile={profile} userId={user!.id} />}
+          </TabsContent>
+
+          <TabsContent value="qa">
+            <QAPanel />
           </TabsContent>
 
           <TabsContent value="saved">
