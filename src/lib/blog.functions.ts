@@ -58,6 +58,7 @@ export const listPosts = createServerFn({ method: "POST" })
       tagSlug: z.string().max(80).optional(),
       q: z.string().max(120).optional(),
       featured: z.boolean().optional(),
+      sortBy: z.enum(["recent", "popular"]).default("recent"),
       page: z.number().min(1).default(1),
       pageSize: z.number().min(1).max(50).default(12),
     }).parse(i ?? {}),
@@ -92,10 +93,14 @@ export const listPosts = createServerFn({ method: "POST" })
 
     const from = (data.page - 1) * data.pageSize;
     const to = from + data.pageSize - 1;
-    const { data: rows, error, count } = await q
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .order("created_at", { ascending: false })
-      .range(from, to);
+    if (data.sortBy === "popular") {
+      q = q.order("view_count", { ascending: false })
+           .order("like_count", { ascending: false });
+    } else {
+      q = q.order("published_at", { ascending: false, nullsFirst: false })
+           .order("created_at", { ascending: false });
+    }
+    const { data: rows, error, count } = await q.range(from, to);
     if (error) throw new Error(error.message);
     return { posts: rows ?? [], total: count ?? 0 };
   });

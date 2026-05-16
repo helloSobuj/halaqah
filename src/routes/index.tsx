@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   BookOpen,
   HelpCircle,
@@ -16,6 +18,8 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
+import { listPosts } from "@/lib/blog.functions";
+import { PostCard, type BlogPostCardData } from "@/components/blog/post-card";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -80,6 +84,29 @@ function Hero() {
   );
 }
 
+function BlogStrip({ title, sortBy }: { title: string; sortBy: "recent" | "popular" }) {
+  const fn = useServerFn(listPosts);
+  const { data } = useQuery({
+    queryKey: ["home-blog", sortBy],
+    queryFn: () => fn({ data: { sortBy, pageSize: 3, page: 1 } }) as unknown as Promise<{ posts: BlogPostCardData[]; total: number }>,
+  });
+  const posts = data?.posts ?? [];
+  if (!posts.length) return null;
+  return (
+    <section className="px-4 lg:px-8 pb-12 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl lg:text-2xl font-bold text-foreground">{title}</h2>
+        <Link to="/blog" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
+          View all <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {posts.map((p) => <PostCard key={p.id} post={p} />)}
+      </div>
+    </section>
+  );
+}
+
 function Index() {
   const { t } = useTranslation();
   return (
@@ -106,6 +133,8 @@ function Index() {
           })}
         </div>
       </section>
+      <BlogStrip title="Latest from the blog" sortBy="recent" />
+      <BlogStrip title="Popular posts" sortBy="popular" />
     </AppShell>
   );
 }

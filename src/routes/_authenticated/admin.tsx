@@ -29,7 +29,7 @@ const SECTIONS = [
   { to: "/admin/users", labelKey: "admin.users", icon: Users },
   { to: "/admin/notices", labelKey: "nav.notices", icon: Bell, soon: true },
   { to: "/admin/events", labelKey: "nav.events", icon: Calendar, soon: true },
-  { to: "/admin/blog", labelKey: "nav.blog", icon: PenSquare, soon: true },
+  { to: "/admin/blog", labelKey: "nav.blog", icon: PenSquare },
   { to: "/admin/qa", labelKey: "nav.qa", icon: HelpCircle },
   { to: "/admin/quiz", labelKey: "nav.quiz", icon: BookOpen },
   { to: "/admin/tournaments", labelKey: "nav.tournaments", icon: Trophy },
