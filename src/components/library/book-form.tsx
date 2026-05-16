@@ -159,11 +159,12 @@ export function BookForm({
       </div>
       <div>
         <Label>Description</Label>
-        <Textarea
+        <MarkdownEditor
           value={value.description}
-          onChange={(e) => patch({ description: e.target.value })}
-          rows={4}
+          onChange={(v) => patch({ description: v })}
+          rows={8}
           maxLength={5000}
+          placeholder="Write a short summary or notes about this book…"
         />
       </div>
 
