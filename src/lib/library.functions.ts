@@ -127,21 +127,23 @@ export const listBookComments = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { data: rows, error } = await supabaseAdmin
       .from("library_comments")
-      .select("*, profiles:profiles!library_comments_user_id_fkey(display_name, avatar_url)")
+      .select("*")
       .eq("book_id", data.bookId)
       .eq("is_deleted", false)
       .order("created_at", { ascending: true });
-    if (error) {
-      // fallback without join if FK alias not present
-      const { data: rows2 } = await supabaseAdmin
-        .from("library_comments")
-        .select("*")
-        .eq("book_id", data.bookId)
-        .eq("is_deleted", false)
-        .order("created_at", { ascending: true });
-      return rows2 ?? [];
+    if (error) throw new Error(error.message);
+    const userIds = Array.from(new Set((rows ?? []).map((r) => r.user_id)));
+    let profilesById: Record<string, { display_name: string | null; avatar_url: string | null }> = {};
+    if (userIds.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", userIds);
+      profilesById = Object.fromEntries(
+        (profs ?? []).map((p) => [p.id, { display_name: p.display_name, avatar_url: p.avatar_url }]),
+      );
     }
-    return rows ?? [];
+    return (rows ?? []).map((r) => ({ ...r, profile: profilesById[r.user_id] ?? null }));
   });
 
 // ------------------- Authed user actions -------------------
