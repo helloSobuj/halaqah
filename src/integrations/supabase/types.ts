@@ -14,6 +14,192 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      event_rsvps: {
+        Row: {
+          created_at: string
+          event_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_shares: {
+        Row: {
+          channel: string
+          created_at: string
+          event_id: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          event_id: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_shares_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          address: string | null
+          capacity: number | null
+          category_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          description_md_bn: string
+          description_md_en: string
+          ends_at: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          mode: string
+          online_url: string | null
+          share_count: number
+          slug: string
+          starts_at: string
+          timezone: string
+          title_bn: string
+          title_en: string
+          updated_at: string
+          venue: string | null
+          view_count: number
+        }
+        Insert: {
+          address?: string | null
+          capacity?: number | null
+          category_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_md_bn?: string
+          description_md_en?: string
+          ends_at?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          mode?: string
+          online_url?: string | null
+          share_count?: number
+          slug: string
+          starts_at: string
+          timezone?: string
+          title_bn: string
+          title_en: string
+          updated_at?: string
+          venue?: string | null
+          view_count?: number
+        }
+        Update: {
+          address?: string | null
+          capacity?: number | null
+          category_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_md_bn?: string
+          description_md_en?: string
+          ends_at?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          mode?: string
+          online_url?: string | null
+          share_count?: number
+          slug?: string
+          starts_at?: string
+          timezone?: string
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+          venue?: string | null
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "event_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1087,6 +1273,7 @@ export type Database = {
             }
             Returns: number
           }
+      bump_event_view: { Args: { _event_id: string }; Returns: undefined }
       get_quiz_leaderboard: {
         Args: { _category_id?: string; _period?: string; _quiz_id?: string }
         Returns: {

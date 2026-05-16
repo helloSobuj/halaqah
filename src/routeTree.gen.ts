@@ -29,6 +29,7 @@ import { Route as QuizCategoryRouteImport } from './routes/quiz.$category'
 import { Route as QaLeaderboardRouteImport } from './routes/qa.leaderboard'
 import { Route as QaAskRouteImport } from './routes/qa.ask'
 import { Route as QaQuestionIdRouteImport } from './routes/qa.$questionId'
+import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -42,6 +43,7 @@ import { Route as ApiPublicHooksDispatchRemindersRouteImport } from './routes/ap
 import { Route as AuthenticatedAdminQuizCategoriesRouteImport } from './routes/_authenticated/admin.quiz.categories'
 import { Route as AuthenticatedAdminQuizAttemptsRouteImport } from './routes/_authenticated/admin.quiz.attempts'
 import { Route as AuthenticatedAdminQuizQuizIdRouteImport } from './routes/_authenticated/admin.quiz.$quizId'
+import { Route as ApiPublicEventsSlugQrRouteImport } from './routes/api/public/events.$slug.qr'
 
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
@@ -142,6 +144,11 @@ const QaQuestionIdRoute = QaQuestionIdRouteImport.update({
   path: '/qa/$questionId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsSlugRoute = EventsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EventsRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -213,11 +220,16 @@ const AuthenticatedAdminQuizQuizIdRoute =
     path: '/quiz/$quizId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const ApiPublicEventsSlugQrRoute = ApiPublicEventsSlugQrRouteImport.update({
+  id: '/api/public/events/$slug/qr',
+  path: '/api/public/events/$slug/qr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
@@ -225,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/events/$slug': typeof EventsSlugRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -247,17 +260,19 @@ export interface FileRoutesByFullPath {
   '/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
   '/api/public/hooks/dispatch-reminders': typeof ApiPublicHooksDispatchRemindersRoute
   '/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
+  '/api/public/events/$slug/qr': typeof ApiPublicEventsSlugQrRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
   '/videos': typeof VideosRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/events/$slug': typeof EventsSlugRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -280,13 +295,14 @@ export interface FileRoutesByTo {
   '/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
   '/api/public/hooks/dispatch-reminders': typeof ApiPublicHooksDispatchRemindersRoute
   '/admin/quiz': typeof AuthenticatedAdminQuizIndexRoute
+  '/api/public/events/$slug/qr': typeof ApiPublicEventsSlugQrRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/blog': typeof BlogRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
@@ -294,6 +310,7 @@ export interface FileRoutesById {
   '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/events/$slug': typeof EventsSlugRoute
   '/qa/$questionId': typeof QaQuestionIdRoute
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
@@ -316,6 +333,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/quiz/categories': typeof AuthenticatedAdminQuizCategoriesRoute
   '/api/public/hooks/dispatch-reminders': typeof ApiPublicHooksDispatchRemindersRoute
   '/_authenticated/admin/quiz/': typeof AuthenticatedAdminQuizIndexRoute
+  '/api/public/events/$slug/qr': typeof ApiPublicEventsSlugQrRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -330,6 +348,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin'
     | '/profile'
+    | '/events/$slug'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -352,6 +371,7 @@ export interface FileRouteTypes {
     | '/admin/quiz/categories'
     | '/api/public/hooks/dispatch-reminders'
     | '/admin/quiz/'
+    | '/api/public/events/$slug/qr'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -363,6 +383,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/videos'
     | '/profile'
+    | '/events/$slug'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -385,6 +406,7 @@ export interface FileRouteTypes {
     | '/admin/quiz/categories'
     | '/api/public/hooks/dispatch-reminders'
     | '/admin/quiz'
+    | '/api/public/events/$slug/qr'
   id:
     | '__root__'
     | '/'
@@ -398,6 +420,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/_authenticated/admin'
     | '/_authenticated/profile'
+    | '/events/$slug'
     | '/qa/$questionId'
     | '/qa/ask'
     | '/qa/leaderboard'
@@ -420,13 +443,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/quiz/categories'
     | '/api/public/hooks/dispatch-reminders'
     | '/_authenticated/admin/quiz/'
+    | '/api/public/events/$slug/qr'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   BlogRoute: typeof BlogRoute
-  EventsRoute: typeof EventsRoute
+  EventsRoute: typeof EventsRouteWithChildren
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
   NoticesRoute: typeof NoticesRoute
@@ -446,6 +470,7 @@ export interface RootRouteChildren {
   QuizPlayQuizIdRoute: typeof QuizPlayQuizIdRoute
   QuizReviewAttemptIdRoute: typeof QuizReviewAttemptIdRoute
   ApiPublicHooksDispatchRemindersRoute: typeof ApiPublicHooksDispatchRemindersRoute
+  ApiPublicEventsSlugQrRoute: typeof ApiPublicEventsSlugQrRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -590,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QaQuestionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/$slug': {
+      id: '/events/$slug'
+      path: '/$slug'
+      fullPath: '/events/$slug'
+      preLoaderRoute: typeof EventsSlugRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -681,6 +713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminQuizQuizIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/api/public/events/$slug/qr': {
+      id: '/api/public/events/$slug/qr'
+      path: '/api/public/events/$slug/qr'
+      fullPath: '/api/public/events/$slug/qr'
+      preLoaderRoute: typeof ApiPublicEventsSlugQrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -723,11 +762,22 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface EventsRouteChildren {
+  EventsSlugRoute: typeof EventsSlugRoute
+}
+
+const EventsRouteChildren: EventsRouteChildren = {
+  EventsSlugRoute: EventsSlugRoute,
+}
+
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   BlogRoute: BlogRoute,
-  EventsRoute: EventsRoute,
+  EventsRoute: EventsRouteWithChildren,
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
   NoticesRoute: NoticesRoute,
@@ -747,6 +797,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuizPlayQuizIdRoute: QuizPlayQuizIdRoute,
   QuizReviewAttemptIdRoute: QuizReviewAttemptIdRoute,
   ApiPublicHooksDispatchRemindersRoute: ApiPublicHooksDispatchRemindersRoute,
+  ApiPublicEventsSlugQrRoute: ApiPublicEventsSlugQrRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
