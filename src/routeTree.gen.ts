@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VideosRouteImport } from './routes/videos'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as NoticesRouteImport } from './routes/notices'
 import { Route as LoginRouteImport } from './routes/login'
@@ -51,11 +50,6 @@ import { Route as AuthenticatedAdminQuizAttemptsRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminQuizQuizIdRouteImport } from './routes/_authenticated/admin.quiz.$quizId'
 import { Route as ApiPublicEventsSlugQrRouteImport } from './routes/api/public/events.$slug.qr'
 
-const VideosRoute = VideosRouteImport.update({
-  id: '/videos',
-  path: '/videos',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -106,9 +100,9 @@ const LibraryIndexRoute = LibraryIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
-  id: '/events/',
-  path: '/events/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsRoute,
 } as any)
 const TournamentsIdRoute = TournamentsIdRouteImport.update({
   id: '/tournaments/$id',
@@ -270,7 +264,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
-  '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
@@ -312,7 +305,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
-  '/videos': typeof VideosRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/library/$bookId': typeof LibraryBookIdRoute
@@ -355,7 +347,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
   '/signup': typeof SignupRoute
-  '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
@@ -399,7 +390,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/notices'
     | '/signup'
-    | '/videos'
     | '/admin'
     | '/profile'
     | '/events/$slug'
@@ -441,7 +431,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/notices'
     | '/signup'
-    | '/videos'
     | '/profile'
     | '/events/$slug'
     | '/library/$bookId'
@@ -483,7 +472,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/notices'
     | '/signup'
-    | '/videos'
     | '/_authenticated/admin'
     | '/_authenticated/profile'
     | '/events/$slug'
@@ -527,7 +515,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   NoticesRoute: typeof NoticesRoute
   SignupRoute: typeof SignupRoute
-  VideosRoute: typeof VideosRoute
   EventsSlugRoute: typeof EventsSlugRoute
   LibraryBookIdRoute: typeof LibraryBookIdRoute
   LibraryMySubmissionsRoute: typeof LibraryMySubmissionsRoute
@@ -540,7 +527,6 @@ export interface RootRouteChildren {
   QuizLeaderboardRoute: typeof QuizLeaderboardRoute
   QuizMyAttemptsRoute: typeof QuizMyAttemptsRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
-  EventsIndexRoute: typeof EventsIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   QaIndexRoute: typeof QaIndexRoute
   QuizIndexRoute: typeof QuizIndexRoute
@@ -554,13 +540,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/videos': {
-      id: '/videos'
-      path: '/videos'
-      fullPath: '/videos'
-      preLoaderRoute: typeof VideosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -633,10 +612,10 @@ declare module '@tanstack/react-router' {
     }
     '/events/': {
       id: '/events/'
-      path: '/events'
+      path: '/'
       fullPath: '/events/'
       preLoaderRoute: typeof EventsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/tournaments/$id': {
       id: '/tournaments/$id'
@@ -894,7 +873,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NoticesRoute: NoticesRoute,
   SignupRoute: SignupRoute,
-  VideosRoute: VideosRoute,
   EventsSlugRoute: EventsSlugRoute,
   LibraryBookIdRoute: LibraryBookIdRoute,
   LibraryMySubmissionsRoute: LibraryMySubmissionsRoute,
@@ -907,7 +885,6 @@ const rootRouteChildren: RootRouteChildren = {
   QuizLeaderboardRoute: QuizLeaderboardRoute,
   QuizMyAttemptsRoute: QuizMyAttemptsRoute,
   TournamentsIdRoute: TournamentsIdRoute,
-  EventsIndexRoute: EventsIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   QaIndexRoute: QaIndexRoute,
   QuizIndexRoute: QuizIndexRoute,
@@ -921,3 +898,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
