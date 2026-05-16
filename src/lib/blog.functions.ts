@@ -124,7 +124,7 @@ export const getPost = createServerFn({ method: "POST" })
         : Promise.resolve({ data: null }),
       supabaseAdmin
         .from("blog_posts")
-        .select("id, slug, title_en, title_bn, excerpt_en, cover_image_url, reading_minutes, published_at, audio_url, category:blog_categories(name_en, slug, color)")
+        .select("id, slug, title_en, title_bn, excerpt_en, excerpt_bn, cover_image_url, reading_minutes, published_at, audio_url, category:blog_categories(name_en, name_bn, slug, color)")
         .eq("is_published", true)
         .neq("id", post.id)
         .eq(post.category_id ? "category_id" : "is_published", post.category_id ?? true)
