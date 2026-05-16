@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Markdown } from "@/components/qa/markdown";
+import { MarkdownEditor } from "@/components/qa/markdown-editor";
 import {
   getQuestion,
   myVotesForQuestion,
@@ -154,11 +156,7 @@ function QuestionDetail() {
 }
 
 function Body({ text }: { text: string }) {
-  return (
-    <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap break-words text-foreground">
-      {text}
-    </div>
-  );
+  return <Markdown source={text} />;
 }
 
 function DeleteQuestionBtn({ id }: { id: string }) {
