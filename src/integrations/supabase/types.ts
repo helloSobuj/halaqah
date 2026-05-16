@@ -1508,6 +1508,194 @@ export type Database = {
         }
         Relationships: []
       }
+      video_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      video_playlists: {
+        Row: {
+          category_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          slug: string
+          sort_order: number
+          title_bn: string
+          title_en: string
+          updated_at: string
+          view_count: number
+          youtube_playlist_id: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          slug: string
+          sort_order?: number
+          title_bn?: string
+          title_en: string
+          updated_at?: string
+          view_count?: number
+          youtube_playlist_id?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          slug?: string
+          sort_order?: number
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+          view_count?: number
+          youtube_playlist_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_playlists_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "video_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          created_by: string | null
+          description_bn: string | null
+          description_en: string | null
+          duration_seconds: number | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          language: string
+          playlist_id: string | null
+          slug: string
+          sort_order: number
+          speaker: string | null
+          thumbnail_url: string | null
+          title_bn: string
+          title_en: string
+          updated_at: string
+          view_count: number
+          youtube_url: string
+          youtube_video_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_bn?: string | null
+          description_en?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          language?: string
+          playlist_id?: string | null
+          slug: string
+          sort_order?: number
+          speaker?: string | null
+          thumbnail_url?: string | null
+          title_bn?: string
+          title_en: string
+          updated_at?: string
+          view_count?: number
+          youtube_url: string
+          youtube_video_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_bn?: string | null
+          description_en?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          language?: string
+          playlist_id?: string | null
+          slug?: string
+          sort_order?: number
+          speaker?: string | null
+          thumbnail_url?: string | null
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+          view_count?: number
+          youtube_url?: string
+          youtube_video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "video_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "videos_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "video_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1549,6 +1737,7 @@ export type Database = {
       bump_event_view: { Args: { _event_id: string }; Returns: undefined }
       bump_library_download: { Args: { _book_id: string }; Returns: undefined }
       bump_library_view: { Args: { _book_id: string }; Returns: undefined }
+      bump_video_view: { Args: { _video_id: string }; Returns: undefined }
       get_quiz_leaderboard: {
         Args: { _category_id?: string; _period?: string; _quiz_id?: string }
         Returns: {
