@@ -76,6 +76,7 @@ function AdminEventsPage() {
   const [editing, setEditing] = React.useState<EventRow | null>(null);
   const [creating, setCreating] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
+  const [rsvpEvent, setRsvpEvent] = React.useState<{ id: string; title: string; capacity: number | null; counts: { going: number; interested: number } } | null>(null);
 
   const delMut = useMutation({
     mutationFn: (id: string) => delFn({ data: { id } }),
