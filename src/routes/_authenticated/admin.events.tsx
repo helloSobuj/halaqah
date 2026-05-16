@@ -217,7 +217,89 @@ function AdminEventsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {rsvpEvent && (
+        <RsvpListDialog
+          event={rsvpEvent}
+          onClose={() => setRsvpEvent(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function RsvpListDialog({
+  event,
+  onClose,
+}: {
+  event: { id: string; title: string; capacity: number | null; counts: { going: number; interested: number } };
+  onClose: () => void;
+}) {
+  const fn = useServerFn(adminListEventRsvps);
+  const q = useQuery({
+    queryKey: ["admin-event-rsvps", event.id],
+    queryFn: () => fn({ data: { eventId: event.id } }),
+  });
+  const seatsLeft = event.capacity
+    ? Math.max(0, event.capacity - event.counts.going)
+    : null;
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Registrations · {event.title}</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-3 gap-3 py-3">
+          <Card className="p-3 text-center">
+            <div className="text-2xl font-bold">{event.counts.going}</div>
+            <div className="text-xs text-muted-foreground">Going</div>
+          </Card>
+          <Card className="p-3 text-center">
+            <div className="text-2xl font-bold">{event.counts.interested}</div>
+            <div className="text-xs text-muted-foreground">Interested</div>
+          </Card>
+          <Card className="p-3 text-center">
+            <div className="text-2xl font-bold">
+              {event.capacity ? seatsLeft : "∞"}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {event.capacity ? `Seats left / ${event.capacity}` : "No limit"}
+            </div>
+          </Card>
+        </div>
+        {q.isLoading ? (
+          <Skeleton className="h-40 w-full" />
+        ) : !q.data?.length ? (
+          <Card className="p-6 text-center text-sm text-muted-foreground">
+            No registrations yet.
+          </Card>
+        ) : (
+          <div className="space-y-1.5">
+            {q.data.map((r) => (
+              <Card key={r.user_id + r.status} className="p-3 flex items-center gap-3">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={r.profile?.avatar_url ?? undefined} />
+                  <AvatarFallback>
+                    {(r.profile?.display_name ?? "?").slice(0, 1).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {r.profile?.display_name ?? "Anonymous"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(r.created_at).toLocaleString()}
+                  </p>
+                </div>
+                <Badge variant={r.status === "going" ? "default" : "secondary"} className="text-[10px] capitalize">
+                  {r.status}
+                </Badge>
+              </Card>
+            ))}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
