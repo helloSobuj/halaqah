@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { YouTubePlayer } from "@/components/videos/youtube-player";
+import { Markdown } from "@/components/shared/markdown";
 import { getVideo, bumpVideoView } from "@/lib/videos.functions";
 import { useLanguage } from "@/hooks/use-language";
 import { youtubeThumbnail } from "@/lib/youtube";
