@@ -36,6 +36,7 @@ import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as VideosWatchSlugRouteImport } from './routes/videos.watch.$slug'
 import { Route as VideosPlaylistSlugRouteImport } from './routes/videos.playlist.$slug'
 import { Route as VideosCategorySlugRouteImport } from './routes/videos.category.$slug'
 import { Route as QuizReviewAttemptIdRouteImport } from './routes/quiz.review.$attemptId'
@@ -187,6 +188,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const VideosWatchSlugRoute = VideosWatchSlugRouteImport.update({
+  id: '/videos/watch/$slug',
+  path: '/videos/watch/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideosPlaylistSlugRoute = VideosPlaylistSlugRouteImport.update({
   id: '/videos/playlist/$slug',
   path: '/videos/playlist/$slug',
@@ -312,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/videos/category/$slug': typeof VideosCategorySlugRoute
   '/videos/playlist/$slug': typeof VideosPlaylistSlugRoute
+  '/videos/watch/$slug': typeof VideosWatchSlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
@@ -355,6 +362,7 @@ export interface FileRoutesByTo {
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/videos/category/$slug': typeof VideosCategorySlugRoute
   '/videos/playlist/$slug': typeof VideosPlaylistSlugRoute
+  '/videos/watch/$slug': typeof VideosWatchSlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
@@ -401,6 +409,7 @@ export interface FileRoutesById {
   '/quiz/review/$attemptId': typeof QuizReviewAttemptIdRoute
   '/videos/category/$slug': typeof VideosCategorySlugRoute
   '/videos/playlist/$slug': typeof VideosPlaylistSlugRoute
+  '/videos/watch/$slug': typeof VideosWatchSlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/quiz/$quizId': typeof AuthenticatedAdminQuizQuizIdRoute
   '/_authenticated/admin/quiz/attempts': typeof AuthenticatedAdminQuizAttemptsRoute
@@ -447,6 +456,7 @@ export interface FileRouteTypes {
     | '/quiz/review/$attemptId'
     | '/videos/category/$slug'
     | '/videos/playlist/$slug'
+    | '/videos/watch/$slug'
     | '/admin/'
     | '/admin/quiz/$quizId'
     | '/admin/quiz/attempts'
@@ -490,6 +500,7 @@ export interface FileRouteTypes {
     | '/quiz/review/$attemptId'
     | '/videos/category/$slug'
     | '/videos/playlist/$slug'
+    | '/videos/watch/$slug'
     | '/admin'
     | '/admin/quiz/$quizId'
     | '/admin/quiz/attempts'
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/quiz/review/$attemptId'
     | '/videos/category/$slug'
     | '/videos/playlist/$slug'
+    | '/videos/watch/$slug'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/quiz/$quizId'
     | '/_authenticated/admin/quiz/attempts'
@@ -574,6 +586,7 @@ export interface RootRouteChildren {
   QuizReviewAttemptIdRoute: typeof QuizReviewAttemptIdRoute
   VideosCategorySlugRoute: typeof VideosCategorySlugRoute
   VideosPlaylistSlugRoute: typeof VideosPlaylistSlugRoute
+  VideosWatchSlugRoute: typeof VideosWatchSlugRoute
   ApiPublicHooksDispatchRemindersRoute: typeof ApiPublicHooksDispatchRemindersRoute
   ApiPublicEventsSlugQrRoute: typeof ApiPublicEventsSlugQrRoute
 }
@@ -769,6 +782,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/videos/watch/$slug': {
+      id: '/videos/watch/$slug'
+      path: '/videos/watch/$slug'
+      fullPath: '/videos/watch/$slug'
+      preLoaderRoute: typeof VideosWatchSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/videos/playlist/$slug': {
       id: '/videos/playlist/$slug'
       path: '/videos/playlist/$slug'
@@ -957,6 +977,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuizReviewAttemptIdRoute: QuizReviewAttemptIdRoute,
   VideosCategorySlugRoute: VideosCategorySlugRoute,
   VideosPlaylistSlugRoute: VideosPlaylistSlugRoute,
+  VideosWatchSlugRoute: VideosWatchSlugRoute,
   ApiPublicHooksDispatchRemindersRoute: ApiPublicHooksDispatchRemindersRoute,
   ApiPublicEventsSlugQrRoute: ApiPublicEventsSlugQrRoute,
 }
