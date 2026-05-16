@@ -172,12 +172,7 @@ function AdminLibraryPage() {
         </Card>
       ) : (
         <div className="space-y-2">
-          {books.data.map((b: any) => (
-            <Card key={b.id} className="p-4 flex items-start gap-3">{(() => { const _b = b as BookRow; return (<></>); })()}</Card>
-          )).slice(0, 0)}
-          {books.data.map((raw: any) => {
-            const b = raw as BookRow;
-            return (
+          {(books.data as BookRow[]).map((b) => (
             <Card key={b.id} className="p-4 flex items-start gap-3">
               <div className="h-16 w-12 rounded bg-muted overflow-hidden flex-shrink-0">
                 {b.cover_image_url ? (
