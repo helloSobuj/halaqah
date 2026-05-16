@@ -1,0 +1,307 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
+const ModeSchema = z.enum(["online", "offline", "hybrid"]);
+const ChannelSchema = z.enum([
+  "link",
+  "image",
+  "whatsapp",
+  "facebook",
+  "x",
+  "telegram",
+  "native",
+  "qr_scan",
+]);
+
+async function assertStaff(userId: string) {
+  const { data } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
+  const roles = (data ?? []).map((r) => r.role as string);
+  if (!roles.includes("admin") && !roles.includes("moderator")) {
+    throw new Error("Forbidden");
+  }
+}
+
+function slugify(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+// ------------------- Public reads -------------------
+
+export const listEventCategories = createServerFn({ method: "GET" }).handler(async () => {
+  const { data, error } = await supabaseAdmin
+    .from("event_categories")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+export const listEvents = createServerFn({ method: "POST" })
+  .inputValidator((i) =>
+    z
+      .object({
+        filter: z.enum(["upcoming", "past", "featured", "all"]).default("upcoming"),
+        categorySlug: z.string().max(60).optional(),
+        q: z.string().max(120).optional(),
+        limit: z.number().min(1).max(50).default(24),
+      })
+      .parse(i ?? {}),
+  )
+  .handler(async ({ data }) => {
+    let categoryId: string | null = null;
+    if (data.categorySlug) {
+      const { data: c } = await supabaseAdmin
+        .from("event_categories")
+        .select("id")
+        .eq("slug", data.categorySlug)
+        .maybeSingle();
+      categoryId = c?.id ?? null;
+    }
+
+    let query = supabaseAdmin
+      .from("events")
+      .select("*")
+      .eq("is_published", true)
+      .limit(data.limit);
+
+    const nowIso = new Date().toISOString();
+    if (data.filter === "upcoming") {
+      query = query
+        .gte("starts_at", nowIso)
+        .order("starts_at", { ascending: true });
+    } else if (data.filter === "past") {
+      query = query
+        .lt("starts_at", nowIso)
+        .order("starts_at", { ascending: false });
+    } else if (data.filter === "featured") {
+      query = query.eq("is_featured", true).order("starts_at", { ascending: true });
+    } else {
+      query = query.order("starts_at", { ascending: false });
+    }
+
+    if (categoryId) query = query.eq("category_id", categoryId);
+    if (data.q && data.q.trim().length > 1) {
+      const term = `%${data.q.trim()}%`;
+      query = query.or(`title_en.ilike.${term},title_bn.ilike.${term}`);
+    }
+
+    const { data: rows, error } = await query;
+    if (error) throw new Error(error.message);
+    const list = rows ?? [];
+
+    const catIds = Array.from(new Set(list.map((r) => r.category_id).filter(Boolean) as string[]));
+    const evIds = list.map((r) => r.id);
+
+    const [{ data: cats }, { data: rsvps }] = await Promise.all([
+      catIds.length
+        ? supabaseAdmin.from("event_categories").select("id,slug,name_en,name_bn,color,icon").in("id", catIds)
+        : Promise.resolve({ data: [] as Array<{ id: string; slug: string; name_en: string; name_bn: string; color: string | null; icon: string | null }> }),
+      evIds.length
+        ? supabaseAdmin.from("event_rsvps").select("event_id,status").in("event_id", evIds)
+        : Promise.resolve({ data: [] as Array<{ event_id: string; status: string }> }),
+    ]);
+
+    const catMap = new Map((cats ?? []).map((c) => [c.id, c]));
+    const rsvpMap = new Map<string, { going: number; interested: number }>();
+    for (const r of rsvps ?? []) {
+      const cur = rsvpMap.get(r.event_id) ?? { going: 0, interested: 0 };
+      if (r.status === "going") cur.going += 1;
+      else if (r.status === "interested") cur.interested += 1;
+      rsvpMap.set(r.event_id, cur);
+    }
+
+    return list.map((e) => ({
+      ...e,
+      category: e.category_id ? catMap.get(e.category_id) ?? null : null,
+      counts: rsvpMap.get(e.id) ?? { going: 0, interested: 0 },
+    }));
+  });
+
+export const getEventBySlug = createServerFn({ method: "POST" })
+  .inputValidator((i) => z.object({ slug: z.string().min(1).max(100) }).parse(i))
+  .handler(async ({ data }) => {
+    const { data: e, error } = await supabaseAdmin
+      .from("events")
+      .select("*")
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!e) throw new Error("Event not found");
+
+    await supabaseAdmin.rpc("bump_event_view", { _event_id: e.id });
+
+    const [{ data: cat }, { data: rsvps }] = await Promise.all([
+      e.category_id
+        ? supabaseAdmin
+            .from("event_categories")
+            .select("id,slug,name_en,name_bn,color,icon")
+            .eq("id", e.category_id)
+            .maybeSingle()
+        : Promise.resolve({ data: null as null | { id: string; slug: string; name_en: string; name_bn: string; color: string | null; icon: string | null } }),
+      supabaseAdmin.from("event_rsvps").select("status").eq("event_id", e.id),
+    ]);
+
+    const counts = { going: 0, interested: 0 };
+    for (const r of rsvps ?? []) {
+      if (r.status === "going") counts.going += 1;
+      else if (r.status === "interested") counts.interested += 1;
+    }
+
+    return { event: e, category: cat ?? null, counts };
+  });
+
+export const getMyRsvp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: r } = await supabaseAdmin
+      .from("event_rsvps")
+      .select("status")
+      .eq("event_id", data.eventId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    return { status: (r?.status as "going" | "interested" | "cancelled" | undefined) ?? null };
+  });
+
+export const setMyRsvp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+        status: z.enum(["going", "interested", "cancelled"]),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await supabaseAdmin
+      .from("event_rsvps")
+      .upsert(
+        { event_id: data.eventId, user_id: context.userId, status: data.status },
+        { onConflict: "event_id,user_id" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const recordShare = createServerFn({ method: "POST" })
+  .inputValidator((i) =>
+    z.object({ eventId: z.string().uuid(), channel: ChannelSchema }).parse(i),
+  )
+  .handler(async ({ data }) => {
+    await supabaseAdmin.from("event_shares").insert({
+      event_id: data.eventId,
+      channel: data.channel,
+    });
+    await supabaseAdmin.rpc("bump_event_view", { _event_id: data.eventId });
+    // best-effort: also bump share_count
+    await supabaseAdmin
+      .from("events")
+      .update({ share_count: (await supabaseAdmin.from("events").select("share_count").eq("id", data.eventId).maybeSingle()).data?.share_count ?? 0 })
+      .eq("id", data.eventId);
+    return { ok: true };
+  });
+
+// ------------------- Admin writes -------------------
+
+const EventInput = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().max(80).optional(),
+  category_id: z.string().uuid().nullable().optional(),
+  title_en: z.string().min(2).max(200),
+  title_bn: z.string().min(1).max(200),
+  description_md_en: z.string().max(20000).default(""),
+  description_md_bn: z.string().max(20000).default(""),
+  cover_image_url: z.string().url().nullable().optional(),
+  starts_at: z.string().min(1),
+  ends_at: z.string().nullable().optional(),
+  timezone: z.string().min(1).max(60).default("UTC"),
+  mode: ModeSchema.default("offline"),
+  venue: z.string().max(200).nullable().optional(),
+  address: z.string().max(500).nullable().optional(),
+  online_url: z.string().url().nullable().optional().or(z.literal("").transform(() => null)),
+  capacity: z.number().int().min(0).nullable().optional(),
+  is_published: z.boolean().default(false),
+  is_featured: z.boolean().default(false),
+});
+
+export const adminUpsertEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => EventInput.parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    let slug = (data.slug && data.slug.length > 0 ? data.slug : slugify(data.title_en)) || slugify(data.title_en);
+    if (!slug) slug = `event-${Date.now().toString(36)}`;
+
+    const payload = {
+      slug,
+      category_id: data.category_id ?? null,
+      title_en: data.title_en,
+      title_bn: data.title_bn,
+      description_md_en: data.description_md_en ?? "",
+      description_md_bn: data.description_md_bn ?? "",
+      cover_image_url: data.cover_image_url ?? null,
+      starts_at: data.starts_at,
+      ends_at: data.ends_at ?? null,
+      timezone: data.timezone,
+      mode: data.mode,
+      venue: data.venue ?? null,
+      address: data.address ?? null,
+      online_url: data.online_url ?? null,
+      capacity: data.capacity ?? null,
+      is_published: data.is_published,
+      is_featured: data.is_featured,
+      created_by: context.userId,
+    };
+
+    if (data.id) {
+      const { data: row, error } = await supabaseAdmin
+        .from("events")
+        .update(payload)
+        .eq("id", data.id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return row;
+    }
+    const { data: row, error } = await supabaseAdmin
+      .from("events")
+      .insert(payload)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const adminDeleteEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { error } = await supabaseAdmin.from("events").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListAllEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context.userId);
+    const { data, error } = await supabaseAdmin
+      .from("events")
+      .select("*")
+      .order("starts_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
