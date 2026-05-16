@@ -160,6 +160,30 @@ export type Database = {
           },
         ]
       }
+      qa_badges: {
+        Row: {
+          awarded_at: string
+          code: string
+          id: string
+          meta: Json
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          code: string
+          id?: string
+          meta?: Json
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          code?: string
+          id?: string
+          meta?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       qa_categories: {
         Row: {
           color: string | null
@@ -347,6 +371,7 @@ export type Database = {
           id: string
           is_anonymous: boolean
           is_deleted: boolean
+          is_locked: boolean
           language: string
           last_activity_at: string
           scholar_review_required: boolean
@@ -368,6 +393,7 @@ export type Database = {
           id?: string
           is_anonymous?: boolean
           is_deleted?: boolean
+          is_locked?: boolean
           language?: string
           last_activity_at?: string
           scholar_review_required?: boolean
@@ -389,6 +415,7 @@ export type Database = {
           id?: string
           is_anonymous?: boolean
           is_deleted?: boolean
+          is_locked?: boolean
           language?: string
           last_activity_at?: string
           scholar_review_required?: boolean
@@ -1042,6 +1069,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      _qa_award_badge: {
+        Args: { _code: string; _meta?: Json; _user: string }
+        Returns: boolean
+      }
       attempts_left:
         | {
             Args: { _fingerprint: string; _ip: string; _quiz_id: string }
@@ -1089,6 +1120,7 @@ export type Database = {
         Args: { _target_id: string; _target_type: string; _value: number }
         Returns: Json
       }
+      qa_claim_daily_bonus: { Args: never; Returns: Json }
       qa_endorse_answer: { Args: { _answer_id: string }; Returns: undefined }
       qa_leaderboard: {
         Args: { _period?: string }

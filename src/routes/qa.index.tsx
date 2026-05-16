@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
-import { PenSquare, Trophy, Search, Flame } from "lucide-react";
+import { PenSquare, Trophy, Search, Flame, Gift } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { listQuestions, listQACategories, getDailyQuests } from "@/lib/qa.functions";
+import { listQuestions, listQACategories, getDailyQuests, claimDailyBonus } from "@/lib/qa.functions";
 import { QuestionRow } from "@/components/qa/qa-shared";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -34,6 +35,8 @@ function QAFeed() {
   const listFn = useServerFn(listQuestions);
   const catsFn = useServerFn(listQACategories);
   const questsFn = useServerFn(getDailyQuests);
+  const claimFn = useServerFn(claimDailyBonus);
+  const qc = useQueryClient();
 
   const cats = useQuery({ queryKey: ["qa-cats"], queryFn: () => catsFn() });
   const list = useQuery({
@@ -44,6 +47,15 @@ function QAFeed() {
     queryKey: ["qa-daily-quests"],
     queryFn: () => questsFn(),
     enabled: !!user,
+  });
+
+  const claimMut = useMutation({
+    mutationFn: () => claimFn(),
+    onSuccess: (r) => {
+      toast.success(`+${r.rep_awarded} reputation claimed!`);
+      qc.invalidateQueries({ queryKey: ["qa-daily-quests"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
@@ -66,19 +78,37 @@ function QAFeed() {
           </div>
         </div>
 
-        {user && quests.data && (
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Flame className="h-4 w-4 text-orange-500" />
-              <h2 className="font-semibold text-sm">Today's goals</h2>
-            </div>
-            <div className="grid grid-cols-3 gap-3 text-sm">
-              <QuestProgress label="Ask 1 question" cur={quests.data.asked} goal={quests.data.goals.ask} />
-              <QuestProgress label="Answer 1 question" cur={quests.data.answered} goal={quests.data.goals.answer} />
-              <QuestProgress label="Upvote 3 helpful answers" cur={quests.data.upvoted} goal={quests.data.goals.upvote} />
-            </div>
-          </Card>
-        )}
+        {user && quests.data && (() => {
+          const allDone =
+            quests.data.asked >= quests.data.goals.ask &&
+            quests.data.answered >= quests.data.goals.answer &&
+            quests.data.upvoted >= quests.data.goals.upvote;
+          const claimed = (quests.data as any).bonusClaimed;
+          return (
+            <Card className="p-4">
+              <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Flame className="h-4 w-4 text-orange-500" />
+                  <h2 className="font-semibold text-sm">Today's goals</h2>
+                </div>
+                {allDone && !claimed && (
+                  <Button size="sm" onClick={() => claimMut.mutate()} disabled={claimMut.isPending}>
+                    <Gift className="h-3.5 w-3.5 mr-1.5" />
+                    Claim +10 reputation
+                  </Button>
+                )}
+                {claimed && (
+                  <Badge variant="outline" className="text-emerald-600 border-emerald-600">Bonus claimed</Badge>
+                )}
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <QuestProgress label="Ask 1 question" cur={quests.data.asked} goal={quests.data.goals.ask} />
+                <QuestProgress label="Answer 1 question" cur={quests.data.answered} goal={quests.data.goals.answer} />
+                <QuestProgress label="Upvote 3 helpful answers" cur={quests.data.upvoted} goal={quests.data.goals.upvote} />
+              </div>
+            </Card>
+          );
+        })()}
 
         <div className="grid lg:grid-cols-[1fr_240px] gap-6">
           <div className="space-y-4">

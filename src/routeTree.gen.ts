@@ -36,6 +36,7 @@ import { Route as QuizReviewAttemptIdRouteImport } from './routes/quiz.review.$a
 import { Route as QuizPlayQuizIdRouteImport } from './routes/quiz.play.$quizId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTournamentsRouteImport } from './routes/_authenticated/admin.tournaments'
+import { Route as AuthenticatedAdminQaRouteImport } from './routes/_authenticated/admin.qa'
 import { Route as AuthenticatedAdminQuizIndexRouteImport } from './routes/_authenticated/admin.quiz.index'
 import { Route as ApiPublicHooksDispatchRemindersRouteImport } from './routes/api/public/hooks/dispatch-reminders'
 import { Route as AuthenticatedAdminQuizCategoriesRouteImport } from './routes/_authenticated/admin.quiz.categories'
@@ -127,19 +128,19 @@ const QuizCategoryRoute = QuizCategoryRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaLeaderboardRoute = QaLeaderboardRouteImport.update({
-  id: '/leaderboard',
-  path: '/leaderboard',
-  getParentRoute: () => QaRoute,
+  id: '/qa/leaderboard',
+  path: '/qa/leaderboard',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QaAskRoute = QaAskRouteImport.update({
-  id: '/ask',
-  path: '/ask',
-  getParentRoute: () => QaRoute,
+  id: '/qa/ask',
+  path: '/qa/ask',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QaQuestionIdRoute = QaQuestionIdRouteImport.update({
-  id: '/$questionId',
-  path: '/$questionId',
-  getParentRoute: () => QaRoute,
+  id: '/qa/$questionId',
+  path: '/qa/$questionId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
@@ -177,6 +178,11 @@ const AuthenticatedAdminTournamentsRoute =
     path: '/tournaments',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminQaRoute = AuthenticatedAdminQaRouteImport.update({
+  id: '/qa',
+  path: '/qa',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminQuizIndexRoute =
   AuthenticatedAdminQuizIndexRouteImport.update({
     id: '/quiz/',
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
+  '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
@@ -262,6 +269,7 @@ export interface FileRoutesByTo {
   '/qa': typeof QaIndexRoute
   '/quiz': typeof QuizIndexRoute
   '/tournaments': typeof TournamentsIndexRoute
+  '/admin/qa': typeof AuthenticatedAdminQaRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/qa/': typeof QaIndexRoute
   '/quiz/': typeof QuizIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
+  '/_authenticated/admin/qa': typeof AuthenticatedAdminQaRoute
   '/_authenticated/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/quiz/play/$quizId': typeof QuizPlayQuizIdRoute
@@ -332,6 +341,7 @@ export interface FileRouteTypes {
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
+    | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
     | '/quiz/play/$quizId'
@@ -364,6 +374,7 @@ export interface FileRouteTypes {
     | '/qa'
     | '/quiz'
     | '/tournaments'
+    | '/admin/qa'
     | '/admin/tournaments'
     | '/admin/users'
     | '/quiz/play/$quizId'
@@ -398,6 +409,7 @@ export interface FileRouteTypes {
     | '/qa/'
     | '/quiz/'
     | '/tournaments/'
+    | '/_authenticated/admin/qa'
     | '/_authenticated/admin/tournaments'
     | '/_authenticated/admin/users'
     | '/quiz/play/$quizId'
@@ -420,6 +432,9 @@ export interface RootRouteChildren {
   NoticesRoute: typeof NoticesRoute
   SignupRoute: typeof SignupRoute
   VideosRoute: typeof VideosRoute
+  QaQuestionIdRoute: typeof QaQuestionIdRoute
+  QaAskRoute: typeof QaAskRoute
+  QaLeaderboardRoute: typeof QaLeaderboardRoute
   QuizCategoryRoute: typeof QuizCategoryRoute
   QuizBookmarksRoute: typeof QuizBookmarksRoute
   QuizLeaderboardRoute: typeof QuizLeaderboardRoute
@@ -556,24 +571,24 @@ declare module '@tanstack/react-router' {
     }
     '/qa/leaderboard': {
       id: '/qa/leaderboard'
-      path: '/leaderboard'
+      path: '/qa/leaderboard'
       fullPath: '/qa/leaderboard'
       preLoaderRoute: typeof QaLeaderboardRouteImport
-      parentRoute: typeof QaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/qa/ask': {
       id: '/qa/ask'
-      path: '/ask'
+      path: '/qa/ask'
       fullPath: '/qa/ask'
       preLoaderRoute: typeof QaAskRouteImport
-      parentRoute: typeof QaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/qa/$questionId': {
       id: '/qa/$questionId'
-      path: '/$questionId'
+      path: '/qa/$questionId'
       fullPath: '/qa/$questionId'
       preLoaderRoute: typeof QaQuestionIdRouteImport
-      parentRoute: typeof QaRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
@@ -624,6 +639,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTournamentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/qa': {
+      id: '/_authenticated/admin/qa'
+      path: '/qa'
+      fullPath: '/admin/qa'
+      preLoaderRoute: typeof AuthenticatedAdminQaRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/quiz/': {
       id: '/_authenticated/admin/quiz/'
       path: '/quiz'
@@ -663,6 +685,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminQaRoute: typeof AuthenticatedAdminQaRoute
   AuthenticatedAdminTournamentsRoute: typeof AuthenticatedAdminTournamentsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -673,6 +696,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminQaRoute: AuthenticatedAdminQaRoute,
   AuthenticatedAdminTournamentsRoute: AuthenticatedAdminTournamentsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -709,6 +733,9 @@ const rootRouteChildren: RootRouteChildren = {
   NoticesRoute: NoticesRoute,
   SignupRoute: SignupRoute,
   VideosRoute: VideosRoute,
+  QaQuestionIdRoute: QaQuestionIdRoute,
+  QaAskRoute: QaAskRoute,
+  QaLeaderboardRoute: QaLeaderboardRoute,
   QuizCategoryRoute: QuizCategoryRoute,
   QuizBookmarksRoute: QuizBookmarksRoute,
   QuizLeaderboardRoute: QuizLeaderboardRoute,
@@ -724,13 +751,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

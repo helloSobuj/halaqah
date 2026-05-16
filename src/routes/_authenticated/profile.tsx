@@ -3,14 +3,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, History, Eye } from "lucide-react";
+import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, Eye, MessageSquare, ThumbsUp, CheckCircle2, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listMyAttempts } from "@/lib/quiz.functions";
+import { listMyQA, getMyBadges } from "@/lib/qa.functions";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,14 +117,19 @@ function ProfilePage() {
         </Card>
 
         <Tabs defaultValue="identity">
-          <TabsList className="w-full grid grid-cols-3">
+          <TabsList className="w-full grid grid-cols-4">
             <TabsTrigger value="identity">{t("profile.tabs.identity")}</TabsTrigger>
+            <TabsTrigger value="qa">Q&amp;A</TabsTrigger>
             <TabsTrigger value="saved">{t("profile.tabs.saved")}</TabsTrigger>
             <TabsTrigger value="activity">{t("profile.tabs.activity")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="identity">
             {profile && <IdentityForm profile={profile} userId={user!.id} />}
+          </TabsContent>
+
+          <TabsContent value="qa">
+            <QAPanel />
           </TabsContent>
 
           <TabsContent value="saved">
@@ -394,6 +401,142 @@ function ActivityList() {
           </Card>
         );
       })}
+    </div>
+  );
+}
+
+const REP_REASON_LABELS: Record<string, string> = {
+  q_upvoted: "Question upvoted",
+  a_upvoted: "Answer upvoted",
+  answer_accepted: "Answer accepted",
+  accepted_pick: "Picked an accepted answer",
+  scholar_endorsed: "Scholar endorsed",
+  downvoted: "Post downvoted",
+  downvote_cost: "Cast downvote",
+  daily_quest_bonus: "Daily quest bonus",
+  endorse_removed: "Endorsement removed",
+  accept_removed: "Acceptance removed",
+};
+
+const BADGE_META: Record<string, { label: string; desc: string; emoji: string }> = {
+  curious: { label: "Curious", desc: "Asked your first question", emoji: "🌱" },
+  helpful: { label: "Helpful", desc: "First accepted answer", emoji: "✨" },
+  teacher: { label: "Teacher", desc: "10 accepted answers", emoji: "🎓" },
+  scholars_pick: { label: "Scholar's Pick", desc: "Endorsed by a scholar", emoji: "🌟" },
+  streak_sage: { label: "Streak Sage", desc: "7-day answer streak", emoji: "🔥" },
+};
+
+function QAPanel() {
+  const fn = useServerFn(listMyQA);
+  const badgesFn = useServerFn(getMyBadges);
+  const q = useQuery({ queryKey: ["my-qa"], queryFn: () => fn() });
+  const badgesQ = useQuery({ queryKey: ["my-qa-badges"], queryFn: () => badgesFn() });
+
+  if (q.isLoading) return <Skeleton className="h-60 w-full" />;
+  if (!q.data) return null;
+  const data = q.data;
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Stat icon={Sparkles} label="Reputation" value={data.reputation} />
+          <Stat icon={Flame} label="Answer streak" value={data.answerStreak} />
+          <Stat icon={MessageSquare} label="Questions" value={data.questions.length} />
+          <Stat icon={CheckCircle2} label="Answers" value={data.answers.length} />
+        </div>
+      </Card>
+
+      {badgesQ.data && badgesQ.data.length > 0 && (
+        <Card className="p-5">
+          <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
+            <Award className="h-4 w-4 text-primary" /> Q&amp;A badges
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {badgesQ.data.map((b: any) => {
+              const meta = BADGE_META[b.code] ?? { label: b.code, desc: "", emoji: "🏅" };
+              return (
+                <div
+                  key={b.code}
+                  className="flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs"
+                  title={meta.desc}
+                >
+                  <span className="text-base leading-none">{meta.emoji}</span>
+                  <span className="font-medium">{meta.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
+      <Card className="p-5">
+        <h3 className="font-semibold text-sm mb-3">Recent questions</h3>
+        {data.questions.length === 0 ? (
+          <p className="text-sm text-muted-foreground">You haven't asked any questions yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {data.questions.map((qq: any) => (
+              <li key={qq.id} className="flex items-center justify-between gap-3">
+                <Link
+                  to="/qa/$questionId"
+                  params={{ questionId: qq.id }}
+                  className="text-sm hover:underline truncate flex-1 min-w-0"
+                >
+                  {qq.title}
+                </Link>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+                  <span className="inline-flex items-center gap-1"><ThumbsUp className="h-3 w-3" />{qq.vote_score}</span>
+                  <span>{qq.answer_count} ans</span>
+                  {qq.accepted_answer_id && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      <Card className="p-5">
+        <h3 className="font-semibold text-sm mb-3">Recent answers</h3>
+        {data.answers.length === 0 ? (
+          <p className="text-sm text-muted-foreground">You haven't answered any questions yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {data.answers.map((a: any) => (
+              <li key={a.id} className="flex items-center justify-between gap-3">
+                <Link
+                  to="/qa/$questionId"
+                  params={{ questionId: a.question_id }}
+                  className="text-sm hover:underline truncate flex-1 min-w-0"
+                >
+                  {a.question_title ?? "Question"}
+                </Link>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+                  <span className="inline-flex items-center gap-1"><ThumbsUp className="h-3 w-3" />{a.vote_score}</span>
+                  {a.is_accepted && <Badge variant="outline" className="text-emerald-600 border-emerald-600">accepted</Badge>}
+                  {a.is_scholar_endorsed && <Badge variant="outline" className="text-amber-600 border-amber-600">endorsed</Badge>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      {data.recentRep && data.recentRep.length > 0 && (
+        <Card className="p-5">
+          <h3 className="font-semibold text-sm mb-3">Reputation activity</h3>
+          <ul className="space-y-1.5 text-sm">
+            {data.recentRep.map((e: any, i: number) => (
+              <li key={i} className="flex items-center justify-between">
+                <span className="text-muted-foreground">{REP_REASON_LABELS[e.reason] ?? e.reason}</span>
+                <span className={e.delta > 0 ? "text-emerald-600 font-medium tabular-nums" : "text-rose-600 font-medium tabular-nums"}>
+                  {e.delta > 0 ? "+" : ""}{e.delta}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
     </div>
   );
 }

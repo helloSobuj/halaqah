@@ -467,6 +467,7 @@ export const getDailyQuests = createServerFn({ method: "GET" })
       answered: data?.answered ?? 0,
       upvoted: data?.upvoted ?? 0,
       asked: data?.asked ?? 0,
+      bonusClaimed: data?.bonus_claimed ?? false,
       goals: { answer: 1, upvote: 3, ask: 1 },
     };
   });
@@ -498,4 +499,136 @@ export const listMyQA = createServerFn({ method: "GET" })
       })),
       recentRep: rep ?? [],
     };
+  });
+
+// ---------------- ADMIN / MOD ----------------
+
+async function assertStaff(supabase: any, userId: string, includeScholar = false) {
+  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  const roles = (data ?? []).map((r: any) => r.role);
+  const allowed = roles.includes("admin") || roles.includes("moderator") || (includeScholar && roles.includes("scholar"));
+  if (!allowed) throw new Error("Forbidden");
+}
+
+export const listFlags = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { data: flags, error } = await supabaseAdmin
+      .from("qa_flags").select("*").eq("status", "open")
+      .order("created_at", { ascending: false }).limit(100);
+    if (error) throw new Error(error.message);
+    const list = flags ?? [];
+    const reporterIds = Array.from(new Set(list.map((f) => f.user_id)));
+    const qIds = list.filter((f) => f.target_type === "question").map((f) => f.target_id);
+    const aIds = list.filter((f) => f.target_type === "answer").map((f) => f.target_id);
+    const [{ data: profiles }, { data: questions }, { data: answers }] = await Promise.all([
+      reporterIds.length ? supabaseAdmin.from("profiles").select("id,display_name").in("id", reporterIds) : Promise.resolve({ data: [] as any[] }),
+      qIds.length ? supabaseAdmin.from("qa_questions").select("id,title,body_md,user_id").in("id", qIds) : Promise.resolve({ data: [] as any[] }),
+      aIds.length ? supabaseAdmin.from("qa_answers").select("id,body_md,user_id,question_id").in("id", aIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p.display_name]));
+    const qMap = new Map((questions ?? []).map((q: any) => [q.id, q]));
+    const aMap = new Map((answers ?? []).map((a: any) => [a.id, a]));
+    return list.map((f) => ({
+      id: f.id,
+      reason: f.reason,
+      createdAt: f.created_at,
+      reporter: pMap.get(f.user_id) ?? "Unknown",
+      target_type: f.target_type,
+      target_id: f.target_id,
+      preview: f.target_type === "question"
+        ? { title: qMap.get(f.target_id)?.title, body: qMap.get(f.target_id)?.body_md?.slice(0, 240) }
+        : { body: aMap.get(f.target_id)?.body_md?.slice(0, 240), questionId: aMap.get(f.target_id)?.question_id },
+    }));
+  });
+
+export const resolveFlag = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({
+    flagId: z.string().uuid(),
+    action: z.enum(["dismiss", "delete_target", "lock_question"]),
+  }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { data: f, error } = await supabaseAdmin.from("qa_flags").select("*").eq("id", data.flagId).maybeSingle();
+    if (error || !f) throw new Error("Flag not found");
+    if (data.action === "delete_target") {
+      if (f.target_type === "question") {
+        await supabaseAdmin.from("qa_questions").update({ is_deleted: true }).eq("id", f.target_id);
+      } else {
+        await supabaseAdmin.from("qa_answers").update({ is_deleted: true }).eq("id", f.target_id);
+      }
+    } else if (data.action === "lock_question") {
+      const qid = f.target_type === "question"
+        ? f.target_id
+        : (await supabaseAdmin.from("qa_answers").select("question_id").eq("id", f.target_id).maybeSingle()).data?.question_id;
+      if (qid) await supabaseAdmin.from("qa_questions").update({ is_locked: true }).eq("id", qid);
+    }
+    await supabaseAdmin.from("qa_flags").update({ status: "resolved" }).eq("id", data.flagId);
+    return { ok: true };
+  });
+
+export const adminListQuestions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({
+    q: z.string().max(120).optional(),
+    filter: z.enum(["all", "deleted", "locked", "needs_review"]).default("all"),
+    limit: z.number().min(1).max(100).default(50),
+  }).parse(i ?? {}))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.supabase, context.userId);
+    let query = supabaseAdmin.from("qa_questions")
+      .select("id,title,user_id,is_deleted,is_locked,scholar_review_required,answer_count,vote_score,created_at")
+      .order("created_at", { ascending: false }).limit(data.limit);
+    if (data.filter === "deleted") query = query.eq("is_deleted", true);
+    else if (data.filter === "locked") query = query.eq("is_locked", true);
+    else if (data.filter === "needs_review") query = query.eq("scholar_review_required", true);
+    if (data.q && data.q.trim().length > 1) query = query.ilike("title", `%${data.q.trim()}%`);
+    const { data: rows, error } = await query;
+    if (error) throw new Error(error.message);
+    const list = rows ?? [];
+    const userIds = Array.from(new Set(list.map((r) => r.user_id)));
+    const { data: profiles } = userIds.length
+      ? await supabaseAdmin.from("profiles").select("id,display_name").in("id", userIds)
+      : { data: [] as any[] };
+    const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p.display_name]));
+    return list.map((r) => ({ ...r, author: pMap.get(r.user_id) ?? "Unknown" }));
+  });
+
+export const adminToggleLock = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid(), locked: z.boolean() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { error } = await supabaseAdmin.from("qa_questions").update({ is_locked: data.locked }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminToggleDelete = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid(), deleted: z.boolean() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { error } = await supabaseAdmin.from("qa_questions").update({ is_deleted: data.deleted }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const claimDailyBonus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("qa_claim_daily_bonus");
+    if (error) throw new Error(error.message);
+    return data as { rep_awarded: number };
+  });
+
+export const getMyBadges = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data } = await supabaseAdmin
+      .from("qa_badges").select("code,awarded_at,meta")
+      .eq("user_id", context.userId).order("awarded_at", { ascending: false });
+    return data ?? [];
   });
