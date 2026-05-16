@@ -3,14 +3,21 @@ import { useTranslation } from "react-i18next";
 import { Heart } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 
-const LINKS = [
+const COL_LEARN = [
   { to: "/quiz", labelKey: "nav.quiz" },
   { to: "/qa", labelKey: "nav.qa" },
+  { to: "/library", labelKey: "nav.library" },
+] as const;
+
+const COL_COMMUNITY = [
   { to: "/notices", labelKey: "nav.notices" },
   { to: "/events", labelKey: "nav.events" },
-  { to: "/library", labelKey: "nav.library" },
-  { to: "/videos", labelKey: "nav.videos" },
   { to: "/blog", labelKey: "nav.blog" },
+] as const;
+
+const COL_MEDIA = [
+  { to: "/videos", labelKey: "nav.videos" },
+  { to: "/tournaments", labelKey: "nav.tournaments" },
 ] as const;
 
 export function SiteFooter() {
