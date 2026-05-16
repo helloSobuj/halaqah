@@ -12,6 +12,7 @@ import { RecentLibrary } from "@/components/home/recent-library";
 import { RecentVideos } from "@/components/home/recent-videos";
 import { BlogStrip } from "@/components/home/blog-strip";
 import { TopContributors } from "@/components/home/top-contributors";
+import { QuizTop } from "@/components/home/quiz-top";
 import { PwaInstall } from "@/components/home/pwa-install";
 
 export const Route = createFileRoute("/")({
@@ -64,9 +65,12 @@ function Index() {
         </div>
       </section>
 
-      {/* Top contributors strip */}
+      {/* Leaderboards: Q&A contributors + Quiz */}
       <section className="px-4 lg:px-8 pb-8 max-w-7xl mx-auto">
-        <TopContributors />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+          <TopContributors />
+          <QuizTop />
+        </div>
       </section>
 
       {/* Row 4: Blog (4-col) */}
