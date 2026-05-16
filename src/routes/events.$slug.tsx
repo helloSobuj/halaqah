@@ -83,7 +83,8 @@ function EventDetail() {
     initialData: initial,
   });
   if (!data) return null;
-  const { event: e, category, counts } = data;
+  const { category, counts } = data;
+  const e = { ...data.event, mode: data.event.mode as "online" | "offline" | "hybrid" };
 
   const startDate = new Date(e.starts_at);
   const endDate = e.ends_at ? new Date(e.ends_at) : null;
