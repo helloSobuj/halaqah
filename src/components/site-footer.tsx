@@ -30,14 +30,8 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="max-w-sm">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-base leading-none">ﺡ</span>
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="font-bold text-sm text-foreground">{t("app.name")}</span>
-                <span className="text-[11px] text-muted-foreground">{t("app.tagline")}</span>
-              </div>
+            <Link to="/" className="flex items-center" aria-label="Halaqah">
+              <img src={halaqahLogo} alt="Halaqah" className="h-9 w-auto" />
             </Link>
             <p className="mt-3 text-xs text-muted-foreground">
               {isBn
