@@ -27,6 +27,9 @@ export type Database = {
           level: number
           location: string | null
           points: number
+          qa_answer_streak: number
+          qa_last_answered_on: string | null
+          qa_reputation: number
           streak: number
           theme: string
           updated_at: string
@@ -43,6 +46,9 @@ export type Database = {
           level?: number
           location?: string | null
           points?: number
+          qa_answer_streak?: number
+          qa_last_answered_on?: string | null
+          qa_reputation?: number
           streak?: number
           theme?: string
           updated_at?: string
@@ -59,6 +65,9 @@ export type Database = {
           level?: number
           location?: string | null
           points?: number
+          qa_answer_streak?: number
+          qa_last_answered_on?: string | null
+          qa_reputation?: number
           streak?: number
           theme?: string
           updated_at?: string
@@ -92,6 +101,393 @@ export type Database = {
           p256dh?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      qa_answers: {
+        Row: {
+          body_md: string
+          citations: Json
+          created_at: string
+          endorsed_at: string | null
+          endorsed_by: string | null
+          id: string
+          is_accepted: boolean
+          is_deleted: boolean
+          is_scholar_endorsed: boolean
+          question_id: string
+          updated_at: string
+          user_id: string
+          vote_score: number
+        }
+        Insert: {
+          body_md: string
+          citations?: Json
+          created_at?: string
+          endorsed_at?: string | null
+          endorsed_by?: string | null
+          id?: string
+          is_accepted?: boolean
+          is_deleted?: boolean
+          is_scholar_endorsed?: boolean
+          question_id: string
+          updated_at?: string
+          user_id: string
+          vote_score?: number
+        }
+        Update: {
+          body_md?: string
+          citations?: Json
+          created_at?: string
+          endorsed_at?: string | null
+          endorsed_by?: string | null
+          id?: string
+          is_accepted?: boolean
+          is_deleted?: boolean
+          is_scholar_endorsed?: boolean
+          question_id?: string
+          updated_at?: string
+          user_id?: string
+          vote_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qa_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "qa_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qa_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      qa_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          parent_id: string
+          parent_type: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          parent_id: string
+          parent_type: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          parent_id?: string
+          parent_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      qa_daily_quests: {
+        Row: {
+          answered: number
+          asked: number
+          bonus_claimed: boolean
+          date: string
+          upvoted: number
+          user_id: string
+        }
+        Insert: {
+          answered?: number
+          asked?: number
+          bonus_claimed?: boolean
+          date: string
+          upvoted?: number
+          user_id: string
+        }
+        Update: {
+          answered?: number
+          asked?: number
+          bonus_claimed?: boolean
+          date?: string
+          upvoted?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      qa_flags: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          status: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          status?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          status?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      qa_follows: {
+        Row: {
+          created_at: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qa_follows_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "qa_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qa_question_tags: {
+        Row: {
+          question_id: string
+          tag_id: string
+        }
+        Insert: {
+          question_id: string
+          tag_id: string
+        }
+        Update: {
+          question_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qa_question_tags_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "qa_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qa_question_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "qa_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qa_questions: {
+        Row: {
+          accepted_answer_id: string | null
+          answer_count: number
+          body_md: string
+          category_id: string | null
+          created_at: string
+          duplicate_of: string | null
+          id: string
+          is_anonymous: boolean
+          is_deleted: boolean
+          language: string
+          last_activity_at: string
+          scholar_review_required: boolean
+          search_tsv: unknown
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          view_count: number
+          vote_score: number
+        }
+        Insert: {
+          accepted_answer_id?: string | null
+          answer_count?: number
+          body_md: string
+          category_id?: string | null
+          created_at?: string
+          duplicate_of?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_deleted?: boolean
+          language?: string
+          last_activity_at?: string
+          scholar_review_required?: boolean
+          search_tsv?: unknown
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          view_count?: number
+          vote_score?: number
+        }
+        Update: {
+          accepted_answer_id?: string | null
+          answer_count?: number
+          body_md?: string
+          category_id?: string | null
+          created_at?: string
+          duplicate_of?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_deleted?: boolean
+          language?: string
+          last_activity_at?: string
+          scholar_review_required?: boolean
+          search_tsv?: unknown
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          view_count?: number
+          vote_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qa_questions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "qa_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qa_reputation_events: {
+        Row: {
+          created_at: string
+          delta: number
+          id: string
+          reason: string
+          source_id: string | null
+          source_type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          id?: string
+          reason: string
+          source_id?: string | null
+          source_type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          id?: string
+          reason?: string
+          source_id?: string | null
+          source_type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      qa_tags: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          slug: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          slug: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          slug?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
+      qa_votes: {
+        Row: {
+          created_at: string
+          id: string
+          target_id: string
+          target_type: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_id: string
+          target_type: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+          value?: number
         }
         Relationships: []
       }
@@ -636,6 +1032,16 @@ export type Database = {
     }
     Functions: {
       _advance_byes: { Args: { _tournament_id: string }; Returns: undefined }
+      _qa_add_rep: {
+        Args: {
+          _delta: number
+          _reason: string
+          _src_id: string
+          _src_type: string
+          _user: string
+        }
+        Returns: undefined
+      }
       attempts_left:
         | {
             Args: { _fingerprint: string; _ip: string; _quiz_id: string }
@@ -672,6 +1078,29 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      qa_accept_answer: { Args: { _answer_id: string }; Returns: undefined }
+      qa_attach_tags: {
+        Args: { _labels: string[]; _question_id: string }
+        Returns: undefined
+      }
+      qa_bump_view: { Args: { _question_id: string }; Returns: undefined }
+      qa_cast_vote: {
+        Args: { _target_id: string; _target_type: string; _value: number }
+        Returns: Json
+      }
+      qa_endorse_answer: { Args: { _answer_id: string }; Returns: undefined }
+      qa_leaderboard: {
+        Args: { _period?: string }
+        Returns: {
+          accepted: number
+          answers: number
+          avatar_url: string
+          display_name: string
+          rep_gained: number
+          total_rep: number
+          user_id: string
+        }[]
       }
       set_quiz_reminder: {
         Args: { _minutes_before?: number; _quiz_id: string }
