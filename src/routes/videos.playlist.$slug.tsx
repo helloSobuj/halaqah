@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoCard } from "@/components/videos/video-card";
+import { Markdown } from "@/components/shared/markdown";
 import { getPlaylist } from "@/lib/videos.functions";
 import { useLanguage } from "@/hooks/use-language";
 
@@ -68,7 +69,7 @@ function PlaylistPage() {
             <div className="p-5 flex flex-col">
               <h1 className="text-xl lg:text-2xl font-bold">{title}</h1>
               <p className="text-sm text-muted-foreground mt-1">{videos.length} videos</p>
-              {desc && <p className="text-sm mt-3 whitespace-pre-wrap">{desc}</p>}
+              {desc && <div className="mt-3"><Markdown source={desc} /></div>}
               <div className="mt-auto pt-4">
                 {first && (
                   <Link to="/videos/watch/$slug" params={{ slug: first.slug }}>

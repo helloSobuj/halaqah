@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -231,11 +232,11 @@ function VideoDialog({
           </div>
           <div>
             <Label>Description (English)</Label>
-            <Textarea rows={3} value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} />
+            <MarkdownEditor value={form.description_en} onChange={(v) => setForm({ ...form, description_en: v })} rows={6} />
           </div>
           <div>
             <Label>Description (Bangla)</Label>
-            <Textarea rows={3} value={form.description_bn} onChange={(e) => setForm({ ...form, description_bn: e.target.value })} />
+            <MarkdownEditor value={form.description_bn} onChange={(v) => setForm({ ...form, description_bn: v })} rows={6} />
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
@@ -450,11 +451,11 @@ function PlaylistDialog({
           </div>
           <div>
             <Label>Description (English)</Label>
-            <Textarea rows={3} value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} />
+            <MarkdownEditor value={form.description_en} onChange={(v) => setForm({ ...form, description_en: v })} rows={6} />
           </div>
           <div>
             <Label>Description (Bangla)</Label>
-            <Textarea rows={3} value={form.description_bn} onChange={(e) => setForm({ ...form, description_bn: e.target.value })} />
+            <MarkdownEditor value={form.description_bn} onChange={(v) => setForm({ ...form, description_bn: v })} rows={6} />
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
