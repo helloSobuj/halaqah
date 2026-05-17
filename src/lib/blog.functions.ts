@@ -145,12 +145,21 @@ export const listBlogComments = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { data: rows, error } = await supabaseAdmin
       .from("blog_comments")
-      .select("*, author:profiles(id, display_name, avatar_url)")
+      .select("*")
       .eq("post_id", data.postId)
       .eq("is_deleted", false)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const userIds = Array.from(new Set((rows ?? []).map((r) => r.user_id).filter(Boolean)));
+    let authors: Record<string, { id: string; display_name: string | null; avatar_url: string | null }> = {};
+    if (userIds.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", userIds);
+      authors = Object.fromEntries((profs ?? []).map((p) => [p.id, p]));
+    }
+    return (rows ?? []).map((r) => ({ ...r, author: authors[r.user_id] ?? null }));
   });
 
 export const bumpBlogView = createServerFn({ method: "POST" })
