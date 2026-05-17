@@ -74,7 +74,7 @@ function BlogPostPage() {
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {post.category && (
             <Link to="/blog/category/$slug" params={{ slug: post.category.slug }}>
-              <Badge variant="secondary">{post.category.name_en}</Badge>
+              <Badge variant="secondary">{isBn && post.category.name_bn ? post.category.name_bn : post.category.name_en}</Badge>
             </Link>
           )}
           {post.published_at && (
