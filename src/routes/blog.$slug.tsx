@@ -15,7 +15,6 @@ import { Comments } from "@/components/blog/comments";
 import { ReadingProgress } from "@/components/blog/reading-progress";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
-import { Markdown as _M } from "@/components/shared/markdown";
 import { toast } from "sonner";
 import {
   getPost, bumpBlogView, toggleBlogLike, getBlogLikeState,
