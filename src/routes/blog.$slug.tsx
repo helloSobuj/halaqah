@@ -104,7 +104,7 @@ function BlogPostPage() {
         )}
 
         <div className="prose-container">
-          <Markdown source={post.content_md_en || post.content_md_bn || ""} />
+          <Markdown source={(isBn ? (post.content_md_bn || post.content_md_en) : (post.content_md_en || post.content_md_bn)) || ""} />
         </div>
 
         {data?.tags?.length ? (
