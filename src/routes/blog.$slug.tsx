@@ -14,6 +14,7 @@ import { PostCard } from "@/components/blog/post-card";
 import { Comments } from "@/components/blog/comments";
 import { ReadingProgress } from "@/components/blog/reading-progress";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { toast } from "sonner";
 import {
   getPost, bumpBlogView, toggleBlogLike, getBlogLikeState,
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/blog/$slug")({
 function BlogPostPage() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
+  const isBn = useLanguage().lang === "bn";
   const qc = useQueryClient();
   const getFn = useServerFn(getPost);
   const bumpFn = useServerFn(bumpBlogView);
@@ -72,7 +74,7 @@ function BlogPostPage() {
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {post.category && (
             <Link to="/blog/category/$slug" params={{ slug: post.category.slug }}>
-              <Badge variant="secondary">{post.category.name_en}</Badge>
+              <Badge variant="secondary">{isBn && post.category.name_bn ? post.category.name_bn : post.category.name_en}</Badge>
             </Link>
           )}
           {post.published_at && (
@@ -82,8 +84,8 @@ function BlogPostPage() {
           <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" />{post.view_count} views</span>
         </div>
 
-        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{post.title_en}</h1>
-        {post.excerpt_en && <p className="text-lg text-muted-foreground">{post.excerpt_en}</p>}
+        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{isBn && post.title_bn ? post.title_bn : post.title_en}</h1>
+        {(() => { const ex = isBn && post.excerpt_bn ? post.excerpt_bn : post.excerpt_en; return ex ? <p className="text-lg text-muted-foreground">{ex}</p> : null; })()}
 
         {data?.author && (
           <div className="flex items-center gap-2">
@@ -102,7 +104,7 @@ function BlogPostPage() {
         )}
 
         <div className="prose-container">
-          <Markdown source={post.content_md_en || post.content_md_bn || ""} />
+          <Markdown source={(isBn ? (post.content_md_bn || post.content_md_en) : (post.content_md_en || post.content_md_bn)) || ""} />
         </div>
 
         {data?.tags?.length ? (

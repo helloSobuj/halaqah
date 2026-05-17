@@ -5,7 +5,9 @@ type Lang = "en" | "bn";
 
 export function useLanguage() {
   const { i18n } = useTranslation();
-  const lang = (i18n.resolvedLanguage as Lang) ?? "en";
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
+  const lang: Lang = mounted ? ((i18n.resolvedLanguage as Lang) ?? "en") : "en";
 
   const setLang = React.useCallback(
     (l: Lang) => {
