@@ -28,6 +28,7 @@ export const Route = createFileRoute("/blog/$slug")({
 function BlogPostPage() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
+  const isBn = useLanguage().lang === "bn";
   const qc = useQueryClient();
   const getFn = useServerFn(getPost);
   const bumpFn = useServerFn(bumpBlogView);
