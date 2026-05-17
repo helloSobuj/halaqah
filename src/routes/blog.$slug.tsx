@@ -84,8 +84,8 @@ function BlogPostPage() {
           <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" />{post.view_count} views</span>
         </div>
 
-        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{post.title_en}</h1>
-        {post.excerpt_en && <p className="text-lg text-muted-foreground">{post.excerpt_en}</p>}
+        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{isBn && post.title_bn ? post.title_bn : post.title_en}</h1>
+        {(() => { const ex = isBn && post.excerpt_bn ? post.excerpt_bn : post.excerpt_en; return ex ? <p className="text-lg text-muted-foreground">{ex}</p> : null; })()}
 
         {data?.author && (
           <div className="flex items-center gap-2">
