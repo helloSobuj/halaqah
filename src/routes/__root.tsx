@@ -96,7 +96,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/cdguSQY96GNyEIH6aNQ8P5DGQ4g1/social-images/social-1778995680193-Halaqah_Social_banner.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/cdguSQY96GNyEIH6aNQ8P5DGQ4g1/social-images/social-1778995680193-Halaqah_Social_banner.webp" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap",
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
