@@ -84,6 +84,19 @@ function AdminEventsPage() {
   const [creating, setCreating] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const [rsvpEvent, setRsvpEvent] = React.useState<{ id: string; title: string; capacity: number | null; counts: { going: number; interested: number } } | null>(null);
+  const [hostEdit, setHostEdit] = React.useState<EventRow | null>(null);
+  const [hostClearId, setHostClearId] = React.useState<string | null>(null);
+  const clearHostFn = useServerFn(adminClearHost);
+  const clearHostMut = useMutation({
+    mutationFn: (eventId: string) => clearHostFn({ data: { eventId } }),
+    onSuccess: () => {
+      toast.success("Host removed");
+      qc.invalidateQueries({ queryKey: ["admin-events"] });
+      setHostClearId(null);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   const delMut = useMutation({
     mutationFn: (id: string) => delFn({ data: { id } }),
