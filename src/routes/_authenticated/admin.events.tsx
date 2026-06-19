@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2, Users, Home, UserX } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,9 +27,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
   adminListAllEvents, adminUpsertEvent, adminDeleteEvent, listEventCategories,
-  adminListEventRsvps,
+  adminListEventRsvps, adminUpdateHost, adminClearHost,
 } from "@/lib/events.functions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
+
 
 export const Route = createFileRoute("/_authenticated/admin/events")({
   head: () => ({ meta: [{ title: "Admin · Events — Halaqah" }] }),
@@ -55,7 +57,12 @@ type EventRow = {
   capacity: number | null;
   is_published: boolean;
   is_featured: boolean;
+  host_user_id?: string | null;
+  host_name?: string | null;
+  host_address?: string | null;
+  host_capacity?: number | null;
 };
+
 
 function toLocalInput(iso: string | null | undefined) {
   if (!iso) return "";
@@ -77,6 +84,19 @@ function AdminEventsPage() {
   const [creating, setCreating] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const [rsvpEvent, setRsvpEvent] = React.useState<{ id: string; title: string; capacity: number | null; counts: { going: number; interested: number } } | null>(null);
+  const [hostEdit, setHostEdit] = React.useState<EventRow | null>(null);
+  const [hostClearId, setHostClearId] = React.useState<string | null>(null);
+  const clearHostFn = useServerFn(adminClearHost);
+  const clearHostMut = useMutation({
+    mutationFn: (eventId: string) => clearHostFn({ data: { eventId } }),
+    onSuccess: () => {
+      toast.success("Host removed");
+      qc.invalidateQueries({ queryKey: ["admin-events"] });
+      setHostClearId(null);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   const delMut = useMutation({
     mutationFn: (id: string) => delFn({ data: { id } }),
@@ -139,7 +159,17 @@ function AdminEventsPage() {
                       <Star className="h-3 w-3 mr-1" /> Featured
                     </Badge>
                   )}
+                  {(e as EventRow).host_user_id ? (
+                    <Badge variant="outline" className="text-[10px] border-primary/40 text-primary">
+                      <Home className="h-3 w-3 mr-1" /> Host: {(e as EventRow).host_name}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] text-red-600 border-red-300">
+                      <Home className="h-3 w-3 mr-1" /> No host
+                    </Badge>
+                  )}
                 </div>
+
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {new Date(e.starts_at).toLocaleString()} · {e.mode}
                   {e.venue ? ` · ${e.venue}` : ""}
@@ -173,12 +203,33 @@ function AdminEventsPage() {
                 >
                   <Users className="h-4 w-4" />
                 </Button>
-                <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)}>
+                <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)} title="Edit event">
                   <Pencil className="h-4 w-4" />
                 </Button>
-                <Button size="icon" variant="ghost" onClick={() => setDeleteId(e.id)}>
+                {(e as EventRow).host_user_id && (
+                  <>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      title="Edit host info"
+                      onClick={() => setHostEdit(e as EventRow)}
+                    >
+                      <Home className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      title="Remove host"
+                      onClick={() => setHostClearId(e.id)}
+                    >
+                      <UserX className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+                <Button size="icon" variant="ghost" onClick={() => setDeleteId(e.id)} title="Delete">
                   <Trash2 className="h-4 w-4" />
                 </Button>
+
               </div>
             </Card>
           ))}
@@ -224,6 +275,38 @@ function AdminEventsPage() {
           onClose={() => setRsvpEvent(null)}
         />
       )}
+
+      {hostEdit && (
+        <HostEditDialog
+          event={hostEdit}
+          onClose={() => setHostEdit(null)}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ["admin-events"] });
+            setHostEdit(null);
+          }}
+        />
+      )}
+
+      <AlertDialog open={!!hostClearId} onOpenChange={(o) => !o && setHostClearId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this host?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The host info and accommodation details will be cleared, and the event
+              will be open again for someone else to register as host.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => hostClearId && clearHostMut.mutate(hostClearId)}
+            >
+              Remove host
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
@@ -626,6 +709,88 @@ function EventDialog({
             <Button type="submit" disabled={mut.isPending}>
               {mut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
               {initial ? "Save changes" : "Create event"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function HostEditDialog({
+  event,
+  onClose,
+  onSaved,
+}: {
+  event: EventRow;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const fn = useServerFn(adminUpdateHost);
+  const [name, setName] = React.useState(event.host_name ?? "");
+  const [address, setAddress] = React.useState(event.host_address ?? "");
+  const [capacity, setCapacity] = React.useState(event.host_capacity?.toString() ?? "");
+
+  const mut = useMutation({
+    mutationFn: () =>
+      fn({
+        data: {
+          eventId: event.id,
+          hostName: name.trim(),
+          hostAddress: address.trim(),
+          hostCapacity: Number(capacity),
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Host info updated");
+      onSaved();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim().length < 2) return toast.error("Name required");
+    if (address.trim().length < 2) return toast.error("Address required");
+    const cap = Number(capacity);
+    if (!cap || cap < 1) return toast.error("Capacity must be at least 1");
+    mut.mutate();
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Edit host · {event.title_en}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <Label>Host full name</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} />
+          </div>
+          <div>
+            <Label>Host address</Label>
+            <Textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              maxLength={500}
+              rows={3}
+            />
+          </div>
+          <div>
+            <Label>Capacity</Label>
+            <Input
+              type="number"
+              min={1}
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={mut.isPending}>
+              {mut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+              Save host info
             </Button>
           </DialogFooter>
         </form>

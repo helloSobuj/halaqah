@@ -349,3 +349,101 @@ export const adminListEventRsvps = createServerFn({ method: "POST" })
       profile: pMap.get(r.user_id) ?? null,
     }));
   });
+
+// ------------------- Host registration -------------------
+
+export const registerAsHost = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+        hostName: z.string().trim().min(2).max(120),
+        hostAddress: z.string().trim().min(2).max(500),
+        hostCapacity: z.number().int().min(1).max(100000),
+        agreed: z.literal(true),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: ev, error: evErr } = await supabaseAdmin
+      .from("events")
+      .select("id,host_user_id,allow_host_registration,is_published")
+      .eq("id", data.eventId)
+      .maybeSingle();
+    if (evErr) throw new Error(evErr.message);
+    if (!ev) throw new Error("Event not found");
+    if (!ev.is_published) throw new Error("Event not available");
+    if (ev.allow_host_registration === false) {
+      throw new Error("Host registration is closed for this event");
+    }
+    if (ev.host_user_id) throw new Error("This event already has a host");
+
+    const { error } = await supabaseAdmin
+      .from("events")
+      .update({
+        host_user_id: context.userId,
+        host_name: data.hostName,
+        host_address: data.hostAddress,
+        host_capacity: data.hostCapacity,
+        host_registered_at: new Date().toISOString(),
+        venue: data.hostName,
+        address: data.hostAddress,
+        capacity: data.hostCapacity,
+      })
+      .eq("id", data.eventId)
+      .is("host_user_id", null);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminUpdateHost = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+        hostName: z.string().trim().min(2).max(120),
+        hostAddress: z.string().trim().min(2).max(500),
+        hostCapacity: z.number().int().min(1).max(100000),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { error } = await supabaseAdmin
+      .from("events")
+      .update({
+        host_name: data.hostName,
+        host_address: data.hostAddress,
+        host_capacity: data.hostCapacity,
+        venue: data.hostName,
+        address: data.hostAddress,
+        capacity: data.hostCapacity,
+      })
+      .eq("id", data.eventId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminClearHost = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { error } = await supabaseAdmin
+      .from("events")
+      .update({
+        host_user_id: null,
+        host_name: null,
+        host_address: null,
+        host_capacity: null,
+        host_registered_at: null,
+        venue: null,
+        address: null,
+      })
+      .eq("id", data.eventId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
