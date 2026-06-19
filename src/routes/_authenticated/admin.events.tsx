@@ -27,9 +27,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
   adminListAllEvents, adminUpsertEvent, adminDeleteEvent, listEventCategories,
-  adminListEventRsvps,
+  adminListEventRsvps, adminUpdateHost, adminClearHost,
 } from "@/lib/events.functions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
+
 
 export const Route = createFileRoute("/_authenticated/admin/events")({
   head: () => ({ meta: [{ title: "Admin · Events — Halaqah" }] }),
