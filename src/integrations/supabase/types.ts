@@ -423,6 +423,7 @@ export type Database = {
       events: {
         Row: {
           address: string | null
+          allow_host_registration: boolean
           capacity: number | null
           category_id: string | null
           cover_image_url: string | null
@@ -431,6 +432,11 @@ export type Database = {
           description_md_bn: string
           description_md_en: string
           ends_at: string | null
+          host_address: string | null
+          host_capacity: number | null
+          host_name: string | null
+          host_registered_at: string | null
+          host_user_id: string | null
           id: string
           is_featured: boolean
           is_published: boolean
@@ -448,6 +454,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          allow_host_registration?: boolean
           capacity?: number | null
           category_id?: string | null
           cover_image_url?: string | null
@@ -456,6 +463,11 @@ export type Database = {
           description_md_bn?: string
           description_md_en?: string
           ends_at?: string | null
+          host_address?: string | null
+          host_capacity?: number | null
+          host_name?: string | null
+          host_registered_at?: string | null
+          host_user_id?: string | null
           id?: string
           is_featured?: boolean
           is_published?: boolean
@@ -473,6 +485,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          allow_host_registration?: boolean
           capacity?: number | null
           category_id?: string | null
           cover_image_url?: string | null
@@ -481,6 +494,11 @@ export type Database = {
           description_md_bn?: string
           description_md_en?: string
           ends_at?: string | null
+          host_address?: string | null
+          host_capacity?: number | null
+          host_name?: string | null
+          host_registered_at?: string | null
+          host_user_id?: string | null
           id?: string
           is_featured?: boolean
           is_published?: boolean
