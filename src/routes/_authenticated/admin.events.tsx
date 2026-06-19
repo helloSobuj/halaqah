@@ -275,6 +275,38 @@ function AdminEventsPage() {
           onClose={() => setRsvpEvent(null)}
         />
       )}
+
+      {hostEdit && (
+        <HostEditDialog
+          event={hostEdit}
+          onClose={() => setHostEdit(null)}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ["admin-events"] });
+            setHostEdit(null);
+          }}
+        />
+      )}
+
+      <AlertDialog open={!!hostClearId} onOpenChange={(o) => !o && setHostClearId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this host?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The host info and accommodation details will be cleared, and the event
+              will be open again for someone else to register as host.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => hostClearId && clearHostMut.mutate(hostClearId)}
+            >
+              Remove host
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
