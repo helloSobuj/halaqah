@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2, Users, Home, UserX } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
