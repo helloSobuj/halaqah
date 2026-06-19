@@ -203,12 +203,33 @@ function AdminEventsPage() {
                 >
                   <Users className="h-4 w-4" />
                 </Button>
-                <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)}>
+                <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)} title="Edit event">
                   <Pencil className="h-4 w-4" />
                 </Button>
-                <Button size="icon" variant="ghost" onClick={() => setDeleteId(e.id)}>
+                {(e as EventRow).host_user_id && (
+                  <>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      title="Edit host info"
+                      onClick={() => setHostEdit(e as EventRow)}
+                    >
+                      <Home className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      title="Remove host"
+                      onClick={() => setHostClearId(e.id)}
+                    >
+                      <UserX className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+                <Button size="icon" variant="ghost" onClick={() => setDeleteId(e.id)} title="Delete">
                   <Trash2 className="h-4 w-4" />
                 </Button>
+
               </div>
             </Card>
           ))}
