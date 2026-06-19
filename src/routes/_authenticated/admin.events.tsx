@@ -159,7 +159,17 @@ function AdminEventsPage() {
                       <Star className="h-3 w-3 mr-1" /> Featured
                     </Badge>
                   )}
+                  {(e as EventRow).host_user_id ? (
+                    <Badge variant="outline" className="text-[10px] border-primary/40 text-primary">
+                      <Home className="h-3 w-3 mr-1" /> Host: {(e as EventRow).host_name}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] text-red-600 border-red-300">
+                      <Home className="h-3 w-3 mr-1" /> No host
+                    </Badge>
+                  )}
                 </div>
+
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {new Date(e.starts_at).toLocaleString()} · {e.mode}
                   {e.venue ? ` · ${e.venue}` : ""}
