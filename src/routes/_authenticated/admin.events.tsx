@@ -716,3 +716,85 @@ function EventDialog({
     </Dialog>
   );
 }
+
+function HostEditDialog({
+  event,
+  onClose,
+  onSaved,
+}: {
+  event: EventRow;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const fn = useServerFn(adminUpdateHost);
+  const [name, setName] = React.useState(event.host_name ?? "");
+  const [address, setAddress] = React.useState(event.host_address ?? "");
+  const [capacity, setCapacity] = React.useState(event.host_capacity?.toString() ?? "");
+
+  const mut = useMutation({
+    mutationFn: () =>
+      fn({
+        data: {
+          eventId: event.id,
+          hostName: name.trim(),
+          hostAddress: address.trim(),
+          hostCapacity: Number(capacity),
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Host info updated");
+      onSaved();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim().length < 2) return toast.error("Name required");
+    if (address.trim().length < 2) return toast.error("Address required");
+    const cap = Number(capacity);
+    if (!cap || cap < 1) return toast.error("Capacity must be at least 1");
+    mut.mutate();
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Edit host · {event.title_en}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <Label>Host full name</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} />
+          </div>
+          <div>
+            <Label>Host address</Label>
+            <Textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              maxLength={500}
+              rows={3}
+            />
+          </div>
+          <div>
+            <Label>Capacity</Label>
+            <Input
+              type="number"
+              min={1}
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={mut.isPending}>
+              {mut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+              Save host info
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
