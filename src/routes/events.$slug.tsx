@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/qa/markdown";
 import { RsvpButton } from "@/components/events/rsvp-button";
 import { ShareMenu } from "@/components/events/share-menu";
+import { HostRegistration } from "@/components/events/host-registration";
+
 import { getEventBySlug } from "@/lib/events.functions";
 import { useLanguage } from "@/hooks/use-language";
 
