@@ -229,6 +229,19 @@ function EventDetail() {
           </div>
         </Card>
 
+        <HostRegistration
+          eventId={e.id}
+          eventSlug={params.slug}
+          allowRegistration={(e as { allow_host_registration?: boolean }).allow_host_registration !== false}
+          host={{
+            host_user_id: (e as { host_user_id?: string | null }).host_user_id ?? null,
+            host_name: (e as { host_name?: string | null }).host_name ?? null,
+            host_address: (e as { host_address?: string | null }).host_address ?? null,
+            host_capacity: (e as { host_capacity?: number | null }).host_capacity ?? null,
+          }}
+        />
+
+
         {description && (
           <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
             <Markdown source={description} />
