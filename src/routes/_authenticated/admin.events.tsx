@@ -57,7 +57,12 @@ type EventRow = {
   capacity: number | null;
   is_published: boolean;
   is_featured: boolean;
+  host_user_id?: string | null;
+  host_name?: string | null;
+  host_address?: string | null;
+  host_capacity?: number | null;
 };
+
 
 function toLocalInput(iso: string | null | undefined) {
   if (!iso) return "";
