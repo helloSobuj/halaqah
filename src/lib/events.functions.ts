@@ -447,3 +447,204 @@ export const adminClearHost = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ------------------- Speaker / Participant booking -------------------
+
+const SpeakerInput = z.object({
+  name: z.string().trim().min(2).max(120),
+  topic: z.string().trim().min(2).max(300),
+  startMinute: z.number().int().min(0).max(10000),
+  durationMinutes: z.number().int().min(5).max(45),
+  isForChild: z.boolean().default(false),
+  childName: z.string().trim().max(120).nullable().optional(),
+});
+
+function validateSlot(start: number, duration: number) {
+  if (start % 5 !== 0) throw new Error("Start must align to 5-minute slots");
+  if (duration % 5 !== 0) throw new Error("Duration must be in 5-minute increments");
+  if (duration < 5 || duration > 45) throw new Error("Duration must be between 5 and 45 minutes");
+}
+
+async function assertNoOverlap(
+  eventId: string,
+  start: number,
+  duration: number,
+  excludeId?: string,
+) {
+  const end = start + duration;
+  let q = supabaseAdmin
+    .from("event_speakers")
+    .select("id,start_minute,duration_minutes")
+    .eq("event_id", eventId);
+  if (excludeId) q = q.neq("id", excludeId);
+  const { data, error } = await q;
+  if (error) throw new Error(error.message);
+  for (const row of data ?? []) {
+    const rStart = row.start_minute;
+    const rEnd = row.start_minute + row.duration_minutes;
+    if (start < rEnd && end > rStart) {
+      throw new Error("This time slot is already booked");
+    }
+  }
+}
+
+export const listEventSpeakers = createServerFn({ method: "POST" })
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data }) => {
+    const { data: rows, error } = await supabaseAdmin
+      .from("event_speakers")
+      .select("*")
+      .eq("event_id", data.eventId)
+      .order("start_minute", { ascending: true });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const registerAsSpeaker = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    SpeakerInput.extend({ eventId: z.string().uuid() }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    validateSlot(data.startMinute, data.durationMinutes);
+    if (data.isForChild && (!data.childName || data.childName.trim().length < 2)) {
+      throw new Error("Child name is required");
+    }
+    await assertNoOverlap(data.eventId, data.startMinute, data.durationMinutes);
+    const { data: row, error } = await supabaseAdmin
+      .from("event_speakers")
+      .insert({
+        event_id: data.eventId,
+        user_id: context.userId,
+        name: data.name,
+        topic: data.topic,
+        start_minute: data.startMinute,
+        duration_minutes: data.durationMinutes,
+        is_for_child: data.isForChild,
+        child_name: data.isForChild ? data.childName : null,
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const updateMySpeakerEntry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    SpeakerInput.extend({ id: z.string().uuid() }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    validateSlot(data.startMinute, data.durationMinutes);
+    const { data: existing, error: exErr } = await supabaseAdmin
+      .from("event_speakers")
+      .select("event_id,user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (exErr) throw new Error(exErr.message);
+    if (!existing) throw new Error("Entry not found");
+    if (existing.user_id !== context.userId) throw new Error("Forbidden");
+    await assertNoOverlap(existing.event_id, data.startMinute, data.durationMinutes, data.id);
+    const { error } = await supabaseAdmin
+      .from("event_speakers")
+      .update({
+        name: data.name,
+        topic: data.topic,
+        start_minute: data.startMinute,
+        duration_minutes: data.durationMinutes,
+        is_for_child: data.isForChild,
+        child_name: data.isForChild ? data.childName : null,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteMySpeakerEntry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: existing } = await supabaseAdmin
+      .from("event_speakers")
+      .select("user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!existing) throw new Error("Entry not found");
+    if (existing.user_id !== context.userId) throw new Error("Forbidden");
+    const { error } = await supabaseAdmin
+      .from("event_speakers")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const listMySpeakerEntries = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: rows, error } = await supabaseAdmin
+      .from("event_speakers")
+      .select("*")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const evIds = Array.from(new Set((rows ?? []).map((r) => r.event_id)));
+    const { data: evs } = evIds.length
+      ? await supabaseAdmin
+          .from("events")
+          .select("id,slug,title_en,title_bn,starts_at")
+          .in("id", evIds)
+      : { data: [] as Array<{ id: string; slug: string; title_en: string; title_bn: string; starts_at: string }> };
+    const evMap = new Map((evs ?? []).map((e) => [e.id, e]));
+    return (rows ?? []).map((r) => ({ ...r, event: evMap.get(r.event_id) ?? null }));
+  });
+
+export const adminUpsertSpeaker = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    SpeakerInput.extend({
+      id: z.string().uuid().optional(),
+      eventId: z.string().uuid(),
+    }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    validateSlot(data.startMinute, data.durationMinutes);
+    await assertNoOverlap(data.eventId, data.startMinute, data.durationMinutes, data.id);
+    const payload = {
+      event_id: data.eventId,
+      name: data.name,
+      topic: data.topic,
+      start_minute: data.startMinute,
+      duration_minutes: data.durationMinutes,
+      is_for_child: data.isForChild,
+      child_name: data.isForChild ? data.childName : null,
+    };
+    if (data.id) {
+      const { error } = await supabaseAdmin
+        .from("event_speakers")
+        .update(payload)
+        .eq("id", data.id);
+      if (error) throw new Error(error.message);
+      return { ok: true };
+    }
+    const { error } = await supabaseAdmin
+      .from("event_speakers")
+      .insert({ ...payload, user_id: null });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminDeleteSpeaker = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { error } = await supabaseAdmin
+      .from("event_speakers")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+

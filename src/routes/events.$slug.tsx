@@ -12,6 +12,7 @@ import { Markdown } from "@/components/qa/markdown";
 import { RsvpButton } from "@/components/events/rsvp-button";
 import { ShareMenu } from "@/components/events/share-menu";
 import { HostRegistration } from "@/components/events/host-registration";
+import { SpeakerSection } from "@/components/events/speaker-registration";
 
 import { getEventBySlug } from "@/lib/events.functions";
 import { useLanguage } from "@/hooks/use-language";
@@ -247,6 +248,13 @@ function EventDetail() {
             <Markdown source={description} />
           </div>
         )}
+
+        <SpeakerSection
+          eventId={e.id}
+          eventSlug={params.slug}
+          eventStartsAt={e.starts_at}
+          eventEndsAt={e.ends_at ?? null}
+        />
       </article>
     </AppShell>
   );

@@ -11,6 +11,7 @@ import { AppShell } from "@/components/app-shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listMyAttempts } from "@/lib/quiz.functions";
 import { listMyQA, getMyBadges } from "@/lib/qa.functions";
+import { listMySpeakerEntries, deleteMySpeakerEntry } from "@/lib/events.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -117,9 +118,10 @@ function ProfilePage() {
         </Card>
 
         <Tabs defaultValue="identity">
-          <TabsList className="w-full grid grid-cols-4">
+          <TabsList className="w-full grid grid-cols-5">
             <TabsTrigger value="identity">{t("profile.tabs.identity")}</TabsTrigger>
             <TabsTrigger value="qa">Q&amp;A</TabsTrigger>
+            <TabsTrigger value="speaking">Speaking</TabsTrigger>
             <TabsTrigger value="saved">{t("profile.tabs.saved")}</TabsTrigger>
             <TabsTrigger value="activity">{t("profile.tabs.activity")}</TabsTrigger>
           </TabsList>
@@ -130,6 +132,10 @@ function ProfilePage() {
 
           <TabsContent value="qa">
             <QAPanel />
+          </TabsContent>
+
+          <TabsContent value="speaking">
+            <MySpeakingPanel />
           </TabsContent>
 
           <TabsContent value="saved">
@@ -540,3 +546,96 @@ function QAPanel() {
     </div>
   );
 }
+
+function MySpeakingPanel() {
+  const qc = useQueryClient();
+  const listFn = useServerFn(listMySpeakerEntries);
+  const delFn = useServerFn(deleteMySpeakerEntry);
+  const { data, isLoading } = useQuery({
+    queryKey: ["my-speaker-entries"],
+    queryFn: () => listFn(),
+  });
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
+  const delMut = useMutation({
+    mutationFn: (id: string) => delFn({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Removed");
+      qc.invalidateQueries({ queryKey: ["my-speaker-entries"] });
+      setDeleteId(null);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (isLoading) return <Skeleton className="h-32 w-full" />;
+  if (!data?.length) {
+    return (
+      <Card className="p-6 text-center text-sm text-muted-foreground">
+        You haven't booked any speaking slots yet.
+      </Card>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      {data.map((s: { id: string; name: string; topic: string; start_minute: number; duration_minutes: number; is_for_child: boolean; child_name: string | null; event_id: string }) => {
+        const ev = (s as { event?: { slug: string; title_en: string; starts_at: string } | null }).event;
+        const evStart = ev ? new Date(ev.starts_at) : null;
+        const slotStart = evStart ? new Date(evStart.getTime() + s.start_minute * 60_000) : null;
+        const slotEnd = evStart ? new Date(evStart.getTime() + (s.start_minute + s.duration_minutes) * 60_000) : null;
+        const t = (d: Date) => d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+        return (
+          <Card key={s.id} className="p-4 flex items-start gap-3 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <div className="font-medium truncate">
+                {ev ? (
+                  <Link to="/events/$slug" params={{ slug: ev.slug }} className="hover:underline">
+                    {ev.title_en}
+                  </Link>
+                ) : (
+                  "Event"
+                )}
+              </div>
+              <p className="text-sm mt-1">
+                <span className="font-medium">{s.name}</span> — {s.topic}
+              </p>
+              {s.is_for_child && s.child_name && (
+                <p className="text-xs text-muted-foreground">On behalf of {s.child_name}</p>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                {slotStart && slotEnd ? `${t(slotStart)} – ${t(slotEnd)}` : ""} · {s.duration_minutes} min
+              </p>
+              {ev && (
+                <Button asChild size="sm" variant="outline" className="mt-2">
+                  <Link to="/events/$slug" params={{ slug: ev.slug }}>Edit on event page</Link>
+                </Button>
+              )}
+            </div>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setDeleteId(s.id)}
+              title="Remove"
+            >
+              <span className="sr-only">Remove</span>
+              ✕
+            </Button>
+          </Card>
+        );
+      })}
+
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setDeleteId(null)}>
+          <Card className="p-5 max-w-sm w-full space-y-3" onClick={(e) => e.stopPropagation()}>
+            <p className="font-medium">Remove this booking?</p>
+            <p className="text-sm text-muted-foreground">The time block will be freed up.</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
+              <Button onClick={() => deleteId && delMut.mutate(deleteId)}>Remove</Button>
+            </div>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
