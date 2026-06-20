@@ -256,6 +256,8 @@ function EventDetail() {
           eventStartsAt={e.starts_at}
           eventEndsAt={e.ends_at ?? null}
         />
+
+        <ContributorSection eventId={e.id} eventSlug={params.slug} />
       </article>
     </AppShell>
   );
