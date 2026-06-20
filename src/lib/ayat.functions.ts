@@ -67,7 +67,7 @@ export const getDailyAyat = createServerFn({ method: "GET" }).handler(async () =
     .select("*")
     .eq("date", date)
     .maybeSingle();
-  if (cached) return cached as AyatRow;
+  if (cached) return cached as unknown as AyatRow;
   try {
     const generated = await generateAyatViaAI(date);
     const row: AyatRow = { date, ...generated };
@@ -77,7 +77,7 @@ export const getDailyAyat = createServerFn({ method: "GET" }).handler(async () =
       .select()
       .single();
     if (error) throw error;
-    return inserted as AyatRow;
+    return inserted as unknown as AyatRow;
   } catch (err) {
     const { data: latest } = await supabaseAdmin
       .from("daily_ayat" as any)
@@ -85,7 +85,7 @@ export const getDailyAyat = createServerFn({ method: "GET" }).handler(async () =
       .order("date", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (latest) return latest as AyatRow;
+    if (latest) return latest as unknown as AyatRow;
     throw err instanceof Error ? err : new Error("Failed to load ayat");
   }
 });
