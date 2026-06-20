@@ -146,7 +146,8 @@ export function SpeakerSection({
               if (!user) return toast.error("Please sign in to register");
               setDialog({ mode: "create" });
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            style={{ backgroundColor: "#4B8A63" }}
+            className="text-white hover:opacity-90"
           >
             <Mic className="h-4 w-4 mr-1.5" />
             Register as a Speaker
