@@ -576,7 +576,7 @@ function MySpeakingPanel() {
   }
   return (
     <div className="space-y-2">
-      {data.map((s) => {
+      {data.map((s: { id: string; name: string; topic: string; start_minute: number; duration_minutes: number; is_for_child: boolean; child_name: string | null; event_id: string }) => {
         const ev = (s as { event?: { slug: string; title_en: string; starts_at: string } | null }).event;
         const evStart = ev ? new Date(ev.starts_at) : null;
         const slotStart = evStart ? new Date(evStart.getTime() + s.start_minute * 60_000) : null;
