@@ -117,9 +117,10 @@ function ProfilePage() {
         </Card>
 
         <Tabs defaultValue="identity">
-          <TabsList className="w-full grid grid-cols-4">
+          <TabsList className="w-full grid grid-cols-5">
             <TabsTrigger value="identity">{t("profile.tabs.identity")}</TabsTrigger>
             <TabsTrigger value="qa">Q&amp;A</TabsTrigger>
+            <TabsTrigger value="speaking">Speaking</TabsTrigger>
             <TabsTrigger value="saved">{t("profile.tabs.saved")}</TabsTrigger>
             <TabsTrigger value="activity">{t("profile.tabs.activity")}</TabsTrigger>
           </TabsList>
@@ -130,6 +131,10 @@ function ProfilePage() {
 
           <TabsContent value="qa">
             <QAPanel />
+          </TabsContent>
+
+          <TabsContent value="speaking">
+            <MySpeakingPanel />
           </TabsContent>
 
           <TabsContent value="saved">
