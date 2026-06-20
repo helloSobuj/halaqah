@@ -41,8 +41,8 @@ export function EventsRow() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-64 w-full" />
           ))}
         </div>
@@ -52,12 +52,12 @@ export function EventsRow() {
         </Card>
       ) : (
         <Carousel
-          opts={{ loop: events.length > 4, align: "start" }}
+          opts={{ loop: events.length > 3, align: "start" }}
           className="relative"
         >
           <CarouselContent className="-ml-4">
             {events.map((e: any) => (
-              <CarouselItem key={e.id} className="pl-4 basis-full lg:basis-1/4">
+              <CarouselItem key={e.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
                 <EventCard event={e} />
               </CarouselItem>
             ))}
