@@ -248,6 +248,13 @@ function EventDetail() {
             <Markdown source={description} />
           </div>
         )}
+
+        <SpeakerSection
+          eventId={e.id}
+          eventSlug={params.slug}
+          eventStartsAt={e.starts_at}
+          eventEndsAt={e.ends_at ?? null}
+        />
       </article>
     </AppShell>
   );
