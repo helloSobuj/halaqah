@@ -13,6 +13,7 @@ import { RsvpButton } from "@/components/events/rsvp-button";
 import { ShareMenu } from "@/components/events/share-menu";
 import { HostRegistration } from "@/components/events/host-registration";
 import { SpeakerSection } from "@/components/events/speaker-registration";
+import { ContributorSection } from "@/components/events/contributor-section";
 
 import { getEventBySlug } from "@/lib/events.functions";
 import { useLanguage } from "@/hooks/use-language";
