@@ -173,12 +173,9 @@ export function SpeakerSection({
                 return (
                   <tr key={s.id} className="border-t">
                     <td className="px-3 py-2">
-                      <div className="font-medium">{s.name}</div>
-                      {s.is_for_child && s.child_name && (
-                        <div className="text-xs text-muted-foreground">
-                          On behalf of {s.child_name}
-                        </div>
-                      )}
+                      <div className="font-medium">
+                        {s.is_for_child && s.child_name ? s.child_name : s.name}
+                      </div>
                     </td>
                     <td className="px-3 py-2">{s.topic}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
