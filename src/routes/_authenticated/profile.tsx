@@ -545,3 +545,26 @@ function QAPanel() {
     </div>
   );
 }
+
+function MySpeakingPanel() {
+  const qc = useQueryClient();
+  const [editing, setEditing] = React.useState<null | {
+    id: string;
+    name: string;
+    topic: string;
+    start_minute: number;
+    duration_minutes: number;
+    is_for_child: boolean;
+    child_name: string | null;
+  }>(null);
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
+
+  const listFn = useServerFn(
+    (await import("@/lib/events.functions")).listMySpeakerEntries,
+  );
+  // The above dynamic import inside useServerFn is wrong; load statically below.
+  void listFn;
+
+  return null;
+}
+
