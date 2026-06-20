@@ -11,6 +11,7 @@ import { AppShell } from "@/components/app-shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listMyAttempts } from "@/lib/quiz.functions";
 import { listMyQA, getMyBadges } from "@/lib/qa.functions";
+import { listMySpeakerEntries, deleteMySpeakerEntry } from "@/lib/events.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
