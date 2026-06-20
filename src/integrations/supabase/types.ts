@@ -293,6 +293,42 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_ayat: {
+        Row: {
+          arabic: string
+          ayat_number: number
+          bn: string
+          created_at: string
+          date: string
+          en: string
+          surah_name_bn: string
+          surah_name_en: string
+          surah_number: number
+        }
+        Insert: {
+          arabic: string
+          ayat_number: number
+          bn: string
+          created_at?: string
+          date: string
+          en: string
+          surah_name_bn: string
+          surah_name_en: string
+          surah_number: number
+        }
+        Update: {
+          arabic?: string
+          ayat_number?: number
+          bn?: string
+          created_at?: string
+          date?: string
+          en?: string
+          surah_name_bn?: string
+          surah_name_en?: string
+          surah_number?: number
+        }
+        Relationships: []
+      }
       daily_hadith: {
         Row: {
           arabic: string
