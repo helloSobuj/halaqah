@@ -356,6 +356,47 @@ export type Database = {
         }
         Relationships: []
       }
+      event_contributors: {
+        Row: {
+          contribution: string
+          contributor_name: string
+          created_at: string
+          details: string | null
+          event_id: string
+          id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          contribution: string
+          contributor_name: string
+          created_at?: string
+          details?: string | null
+          event_id: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          contribution?: string
+          contributor_name?: string
+          created_at?: string
+          details?: string | null
+          event_id?: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_contributors_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_rsvps: {
         Row: {
           created_at: string
