@@ -647,4 +647,153 @@ export const adminDeleteSpeaker = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ------------------- Contributors -------------------
+
+const ContributorInput = z.object({
+  contributorName: z.string().trim().min(2).max(120),
+  contribution: z.string().trim().min(2).max(300),
+  details: z.string().trim().max(2000).optional().default(""),
+});
+
+async function assertCanViewContribs(eventId: string, userId: string) {
+  const { data: ev } = await supabaseAdmin
+    .from("events")
+    .select("host_user_id")
+    .eq("id", eventId)
+    .maybeSingle();
+  if (!ev) throw new Error("Event not found");
+  if (ev.host_user_id === userId) return;
+  const { data: roles } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
+  const r = (roles ?? []).map((x) => x.role as string);
+  if (r.includes("admin") || r.includes("moderator")) return;
+  throw new Error("Forbidden");
+}
+
+export const registerAsContributor = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => ContributorInput.extend({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await supabaseAdmin
+      .from("event_contributors")
+      .insert({
+        event_id: data.eventId,
+        user_id: context.userId,
+        contributor_name: data.contributorName,
+        contribution: data.contribution,
+        details: data.details || null,
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const updateMyContribution = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => ContributorInput.extend({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: existing } = await supabaseAdmin
+      .from("event_contributors")
+      .select("user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!existing) throw new Error("Not found");
+    if (existing.user_id !== context.userId) throw new Error("Forbidden");
+    const { error } = await supabaseAdmin
+      .from("event_contributors")
+      .update({
+        contributor_name: data.contributorName,
+        contribution: data.contribution,
+        details: data.details || null,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteMyContribution = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: existing } = await supabaseAdmin
+      .from("event_contributors")
+      .select("user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!existing) throw new Error("Not found");
+    if (existing.user_id !== context.userId) throw new Error("Forbidden");
+    const { error } = await supabaseAdmin.from("event_contributors").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const listEventContributions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertCanViewContribs(data.eventId, context.userId);
+    const { data: rows, error } = await supabaseAdmin
+      .from("event_contributors")
+      .select("*")
+      .eq("event_id", data.eventId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const canViewContributions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    try {
+      await assertCanViewContribs(data.eventId, context.userId);
+      return { allowed: true };
+    } catch {
+      return { allowed: false };
+    }
+  });
+
+export const getMyContribution = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: rows } = await supabaseAdmin
+      .from("event_contributors")
+      .select("*")
+      .eq("event_id", data.eventId)
+      .eq("user_id", context.userId);
+    return rows ?? [];
+  });
+
+export const adminUpdateContribution = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => ContributorInput.extend({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { error } = await supabaseAdmin
+      .from("event_contributors")
+      .update({
+        contributor_name: data.contributorName,
+        contribution: data.contribution,
+        details: data.details || null,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminDeleteContribution = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { error } = await supabaseAdmin.from("event_contributors").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+
 
