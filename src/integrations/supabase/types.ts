@@ -420,6 +420,56 @@ export type Database = {
           },
         ]
       }
+      event_speakers: {
+        Row: {
+          child_name: string | null
+          created_at: string
+          duration_minutes: number
+          event_id: string
+          id: string
+          is_for_child: boolean
+          name: string
+          start_minute: number
+          topic: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          child_name?: string | null
+          created_at?: string
+          duration_minutes: number
+          event_id: string
+          id?: string
+          is_for_child?: boolean
+          name: string
+          start_minute: number
+          topic: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          child_name?: string | null
+          created_at?: string
+          duration_minutes?: number
+          event_id?: string
+          id?: string
+          is_for_child?: boolean
+          name?: string
+          start_minute?: number
+          topic?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_speakers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string | null
