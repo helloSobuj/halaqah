@@ -31,14 +31,16 @@ function Index() {
   return (
     <AppShell>
       <HeroEvents />
-      <ModulesIcons />
-      <LibraryRow />
-      <VideosRow />
-      <EventsRow />
-      <QaRow />
-      <QuizRow />
-      <BlogStrip />
-      <CtaSection />
+      <div className="space-y-16 lg:space-y-24 pb-16 lg:pb-24">
+        <ModulesIcons />
+        <EventsRow />
+        <LibraryRow />
+        <VideosRow />
+        <QaRow />
+        <QuizRow />
+        <BlogStrip />
+        <CtaSection />
+      </div>
       <PwaInstall />
     </AppShell>
   );
