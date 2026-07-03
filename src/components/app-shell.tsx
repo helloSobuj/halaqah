@@ -15,6 +15,8 @@ import {
   Menu,
   Shield,
   Trophy,
+  BookMarked,
+  ScrollText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NotificationsBell } from "@/components/notifications-bell";
@@ -43,6 +45,22 @@ import {
 
 type NavItem = { to: string; labelKey: string; icon: React.ComponentType<{ className?: string }> };
 
+function useCollapseOnScroll(threshold = 8) {
+  const [collapsed, setCollapsed] = React.useState(false);
+  React.useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) < threshold) return;
+      setCollapsed(y > lastY && y > 64);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+  return collapsed;
+}
+
 // 5 primary items shown directly in the top bar
 const TOP_NAV: NavItem[] = [
   { to: "/", labelKey: "nav.home", icon: Home },
@@ -54,6 +72,8 @@ const TOP_NAV: NavItem[] = [
 
 // Extras live under "More"
 const MORE_NAV: NavItem[] = [
+  { to: "/quran", labelKey: "nav.quran", icon: BookMarked },
+  { to: "/hadith", labelKey: "nav.hadith", icon: ScrollText },
   { to: "/tournaments", labelKey: "nav.tournaments", icon: Trophy },
   { to: "/library", labelKey: "nav.library", icon: Library },
   { to: "/videos", labelKey: "nav.videos", icon: Video },
@@ -97,9 +117,15 @@ function DesktopTopBar() {
 
   const isActive = (to: string) =>
     to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(to + "/");
+  const collapsed = useCollapseOnScroll();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-md transition-transform duration-300 will-change-transform",
+        collapsed && "-translate-y-full",
+      )}
+    >
       <div className="max-w-7xl mx-auto h-16 flex items-center gap-3 px-6">
         <Logo />
         <nav className="flex-1 flex justify-center items-center gap-1">
@@ -166,9 +192,15 @@ function MobileTopBar() {
   const { user } = useAuth();
   const [open, setOpen] = React.useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const collapsed = useCollapseOnScroll();
 
   return (
-    <header className="sticky top-0 z-30 h-14 flex items-center gap-2 px-4 border-b border-border/60 bg-background/90 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-30 h-14 flex items-center gap-2 px-4 border-b border-border/60 bg-background/90 backdrop-blur-md transition-transform duration-300 will-change-transform",
+        collapsed && "-translate-y-full",
+      )}
+    >
       <Logo />
       <div className="flex-1" />
       <LanguageToggle />
