@@ -3,7 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2, Users, Home, UserX } from "lucide-react";
+import { Plus, Pencil, Trash2, Calendar, Star, Eye, EyeOff, ImagePlus, Loader2, Users, Home, UserX, Monitor } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -205,6 +206,11 @@ function AdminEventsPage() {
                 </Button>
                 <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)} title="Edit event">
                   <Pencil className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="ghost" asChild title="Manage Event Screen (Stage)">
+                  <Link to="/admin/stage/$eventId" params={{ eventId: e.id }}>
+                    <Monitor className="h-4 w-4" />
+                  </Link>
                 </Button>
                 {(e as EventRow).host_user_id && (
                   <>

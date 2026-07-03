@@ -547,6 +547,54 @@ export type Database = {
           },
         ]
       }
+      event_stage_state: {
+        Row: {
+          announcement_active: boolean
+          announcement_text: string | null
+          current_speaker_id: string | null
+          event_id: string
+          timer_paused_at: string | null
+          timer_remaining_seconds: number
+          timer_started_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          announcement_active?: boolean
+          announcement_text?: string | null
+          current_speaker_id?: string | null
+          event_id: string
+          timer_paused_at?: string | null
+          timer_remaining_seconds?: number
+          timer_started_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          announcement_active?: boolean
+          announcement_text?: string | null
+          current_speaker_id?: string | null
+          event_id?: string
+          timer_paused_at?: string | null
+          timer_remaining_seconds?: number
+          timer_started_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_stage_state_current_speaker_id_fkey"
+            columns: ["current_speaker_id"]
+            isOneToOne: false
+            referencedRelation: "event_speakers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_stage_state_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string | null
@@ -1344,10 +1392,12 @@ export type Database = {
         Row: {
           accepted_answer_id: string | null
           answer_count: number
+          answered_on_stage_at: string | null
           body_md: string
           category_id: string | null
           created_at: string
           duplicate_of: string | null
+          event_id: string | null
           id: string
           is_anonymous: boolean
           is_deleted: boolean
@@ -1366,10 +1416,12 @@ export type Database = {
         Insert: {
           accepted_answer_id?: string | null
           answer_count?: number
+          answered_on_stage_at?: string | null
           body_md: string
           category_id?: string | null
           created_at?: string
           duplicate_of?: string | null
+          event_id?: string | null
           id?: string
           is_anonymous?: boolean
           is_deleted?: boolean
@@ -1388,10 +1440,12 @@ export type Database = {
         Update: {
           accepted_answer_id?: string | null
           answer_count?: number
+          answered_on_stage_at?: string | null
           body_md?: string
           category_id?: string | null
           created_at?: string
           duplicate_of?: string | null
+          event_id?: string | null
           id?: string
           is_anonymous?: boolean
           is_deleted?: boolean
@@ -1413,6 +1467,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "qa_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qa_questions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
