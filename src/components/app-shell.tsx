@@ -126,9 +126,6 @@ function DesktopTopBar() {
         collapsed && "-translate-y-full",
       )}
     >
-
-  return (
-    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="max-w-7xl mx-auto h-16 flex items-center gap-3 px-6">
         <Logo />
         <nav className="flex-1 flex justify-center items-center gap-1">
