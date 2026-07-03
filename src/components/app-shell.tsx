@@ -56,6 +56,8 @@ const TOP_NAV: NavItem[] = [
 
 // Extras live under "More"
 const MORE_NAV: NavItem[] = [
+  { to: "/quran", labelKey: "nav.quran", icon: BookMarked },
+  { to: "/hadith", labelKey: "nav.hadith", icon: ScrollText },
   { to: "/tournaments", labelKey: "nav.tournaments", icon: Trophy },
   { to: "/library", labelKey: "nav.library", icon: Library },
   { to: "/videos", labelKey: "nav.videos", icon: Video },
