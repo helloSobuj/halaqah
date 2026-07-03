@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as QuranRouteImport } from './routes/quran'
 import { Route as NoticesRouteImport } from './routes/notices'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HadithRouteImport } from './routes/hadith'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
@@ -67,6 +69,11 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuranRoute = QuranRouteImport.update({
+  id: '/quran',
+  path: '/quran',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NoticesRoute = NoticesRouteImport.update({
   id: '/notices',
   path: '/notices',
@@ -75,6 +82,11 @@ const NoticesRoute = NoticesRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HadithRoute = HadithRouteImport.update({
+  id: '/hadith',
+  path: '/hadith',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -335,8 +347,10 @@ const ApiPublicEventsSlugQrRoute = ApiPublicEventsSlugQrRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/hadith': typeof HadithRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
+  '/quran': typeof QuranRoute
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
@@ -388,8 +402,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/hadith': typeof HadithRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
+  '/quran': typeof QuranRoute
   '/signup': typeof SignupRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -442,8 +458,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/hadith': typeof HadithRoute
   '/login': typeof LoginRoute
   '/notices': typeof NoticesRoute
+  '/quran': typeof QuranRoute
   '/signup': typeof SignupRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -497,8 +515,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/hadith'
     | '/login'
     | '/notices'
+    | '/quran'
     | '/signup'
     | '/admin'
     | '/profile'
@@ -550,8 +570,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/hadith'
     | '/login'
     | '/notices'
+    | '/quran'
     | '/signup'
     | '/profile'
     | '/blog/$slug'
@@ -603,8 +625,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/hadith'
     | '/login'
     | '/notices'
+    | '/quran'
     | '/signup'
     | '/_authenticated/admin'
     | '/_authenticated/profile'
@@ -658,8 +682,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  HadithRoute: typeof HadithRoute
   LoginRoute: typeof LoginRoute
   NoticesRoute: typeof NoticesRoute
+  QuranRoute: typeof QuranRoute
   SignupRoute: typeof SignupRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EventsSlugRoute: typeof EventsSlugRouteWithChildren
@@ -702,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quran': {
+      id: '/quran'
+      path: '/quran'
+      fullPath: '/quran'
+      preLoaderRoute: typeof QuranRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notices': {
       id: '/notices'
       path: '/notices'
@@ -714,6 +747,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hadith': {
+      id: '/hadith'
+      path: '/hadith'
+      fullPath: '/hadith'
+      preLoaderRoute: typeof HadithRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1128,8 +1168,10 @@ const EventsSlugRouteWithChildren = EventsSlugRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  HadithRoute: HadithRoute,
   LoginRoute: LoginRoute,
   NoticesRoute: NoticesRoute,
+  QuranRoute: QuranRoute,
   SignupRoute: SignupRoute,
   BlogSlugRoute: BlogSlugRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
@@ -1165,13 +1207,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

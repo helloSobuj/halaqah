@@ -15,6 +15,8 @@ import {
   Menu,
   Shield,
   Trophy,
+  BookMarked,
+  ScrollText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NotificationsBell } from "@/components/notifications-bell";
