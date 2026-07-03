@@ -117,6 +117,15 @@ function DesktopTopBar() {
 
   const isActive = (to: string) =>
     to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(to + "/");
+  const collapsed = useCollapseOnScroll();
+
+  return (
+    <header
+      className={cn(
+        "sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-md transition-transform duration-300 will-change-transform",
+        collapsed && "-translate-y-full",
+      )}
+    >
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-md">
