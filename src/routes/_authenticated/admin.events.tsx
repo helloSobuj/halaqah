@@ -207,6 +207,11 @@ function AdminEventsPage() {
                 <Button size="icon" variant="ghost" onClick={() => setEditing(e as EventRow)} title="Edit event">
                   <Pencil className="h-4 w-4" />
                 </Button>
+                <Button size="icon" variant="ghost" asChild title="Manage Event Screen (Stage)">
+                  <Link to="/admin/stage/$eventId" params={{ eventId: e.id }}>
+                    <Monitor className="h-4 w-4" />
+                  </Link>
+                </Button>
                 {(e as EventRow).host_user_id && (
                   <>
                     <Button
