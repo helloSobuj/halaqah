@@ -192,9 +192,15 @@ function MobileTopBar() {
   const { user } = useAuth();
   const [open, setOpen] = React.useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const collapsed = useCollapseOnScroll();
 
   return (
-    <header className="sticky top-0 z-30 h-14 flex items-center gap-2 px-4 border-b border-border/60 bg-background/90 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-30 h-14 flex items-center gap-2 px-4 border-b border-border/60 bg-background/90 backdrop-blur-md transition-transform duration-300 will-change-transform",
+        collapsed && "-translate-y-full",
+      )}
+    >
       <Logo />
       <div className="flex-1" />
       <LanguageToggle />
