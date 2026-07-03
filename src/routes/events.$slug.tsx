@@ -259,6 +259,8 @@ function EventDetail() {
         />
 
         <ContributorSection eventId={e.id} eventSlug={params.slug} />
+
+        <AskQuestionPanel eventId={e.id} />
       </article>
     </AppShell>
   );
