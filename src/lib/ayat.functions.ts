@@ -17,17 +17,17 @@ function todayUtcDate(): string {
 }
 
 async function generateAyatViaAI(dateStr: string): Promise<Omit<AyatRow, "date">> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
 
   const prompt = `Pick ONE short, well-known ayah (verse) from the Holy Quran suitable for daily reflection. Use seed date ${dateStr} to pick a different ayah each day.
 Return STRICT JSON only, no markdown, with keys: arabic (Arabic text of the ayah with diacritics), bn (Bengali translation), en (clear English translation), surah_number (integer 1-114), ayat_number (integer), surah_name_en (e.g. "Al-Baqarah"), surah_name_bn (Bengali surah name, e.g. "আল-বাকারা"). Keep texts under 400 chars.`;
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
+      model: "deepseek/deepseek-v4-flash",
       messages: [
         { role: "system", content: "You output strict JSON only." },
         { role: "user", content: prompt },
