@@ -45,6 +45,22 @@ import {
 
 type NavItem = { to: string; labelKey: string; icon: React.ComponentType<{ className?: string }> };
 
+function useCollapseOnScroll(threshold = 8) {
+  const [collapsed, setCollapsed] = React.useState(false);
+  React.useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) < threshold) return;
+      setCollapsed(y > lastY && y > 64);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+  return collapsed;
+}
+
 // 5 primary items shown directly in the top bar
 const TOP_NAV: NavItem[] = [
   { to: "/", labelKey: "nav.home", icon: Home },
