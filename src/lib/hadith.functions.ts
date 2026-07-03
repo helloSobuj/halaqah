@@ -15,20 +15,20 @@ function todayUtcDate(): string {
 }
 
 async function generateHadithViaAI(dateStr: string): Promise<Omit<HadithRow, "date">> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
 
   const prompt = `You are an authentic Islamic scholar. Return ONE short, authentic, well-known hadith from Sahih Bukhari, Sahih Muslim, Riyad as-Salihin, or 40 Hadith Nawawi suitable for daily reflection. Use seed date ${dateStr} to pick a different hadith each day.
 Return STRICT JSON only, no markdown, with keys: arabic (Arabic text with diacritics), en (clear English translation), bn (Bengali translation), source (collection name and number, e.g. "Sahih Bukhari 6018"). Keep each text under 400 chars.`;
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Lovable-API-Key": apiKey,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
+      model: "deepseek/deepseek-v4-flash",
       messages: [
         { role: "system", content: "You output strict JSON only." },
         { role: "user", content: prompt },
