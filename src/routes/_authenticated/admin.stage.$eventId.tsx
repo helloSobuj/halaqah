@@ -114,23 +114,38 @@ function StageControl() {
 
   return (
     <div className="fixed inset-0 bg-background text-foreground flex flex-col overflow-hidden">
-      <header className="flex items-center justify-between px-4 py-2 border-b bg-card">
-        <div className="flex items-center gap-3">
-          <Link to="/admin/events" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-            <ArrowLeft className="h-4 w-4" /> Back
-          </Link>
-          <h1 className="font-semibold">Stage Control</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          {slug && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={`/events/${slug}/live`} target="_blank" rel="noreferrer">
-                <ExternalLink className="h-4 w-4" /> Open Projection
-              </a>
+      {!fullscreen && (
+        <header className="flex items-center justify-between px-4 py-2 border-b bg-card">
+          <div className="flex items-center gap-3">
+            <Link to="/admin/events" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+              <ArrowLeft className="h-4 w-4" /> Back
+            </Link>
+            <h1 className="font-semibold">Stage Control</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setFullscreen(true)}>
+              <Maximize2 className="h-4 w-4" /> Fullscreen
             </Button>
-          )}
-        </div>
-      </header>
+            {slug && (
+              <Button variant="outline" size="sm" asChild>
+                <a href={`/events/${slug}/live`} target="_blank" rel="noreferrer">
+                  <ExternalLink className="h-4 w-4" /> Open Projection
+                </a>
+              </Button>
+            )}
+          </div>
+        </header>
+      )}
+      {fullscreen && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setFullscreen(false)}
+          className="absolute top-3 right-3 z-50"
+        >
+          <Minimize2 className="h-4 w-4" /> Exit
+        </Button>
+      )}
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] overflow-hidden">
         {/* Main */}
