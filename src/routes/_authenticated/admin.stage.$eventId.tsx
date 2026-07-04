@@ -46,13 +46,21 @@ function StageControl() {
   const setAnn = useServerFn(setAnnouncement);
   const markAns = useServerFn(markQuestionAnsweredOnStage);
 
-  // Load event slug so we can link to the /live page
+  // Load event slug + start time so we can link to /live and render absolute times
   const [slug, setSlug] = React.useState<string | null>(null);
+  const [startsAt, setStartsAt] = React.useState<string | null>(null);
   React.useEffect(() => {
-    supabase.from("events").select("slug").eq("id", eventId).maybeSingle().then(({ data }) => {
+    supabase.from("events").select("slug,starts_at").eq("id", eventId).maybeSingle().then(({ data }) => {
       setSlug(data?.slug ?? null);
+      setStartsAt(data?.starts_at ?? null);
     });
   }, [eventId]);
+
+  const fmtClock = (offsetMin: number) => {
+    if (!startsAt) return "";
+    const d = new Date(new Date(startsAt).getTime() + offsetMin * 60_000);
+    return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  };
 
   const { data: stage } = useQuery({
     queryKey: ["stage-state", eventId],
@@ -221,9 +229,16 @@ function StageControl() {
                       <span className="font-medium truncate">
                         {s.is_for_child ? s.child_name : s.name}
                       </span>
-                      <span className="opacity-70 shrink-0">+{s.start_minute}m · {s.duration_minutes}m</span>
+                      <span className="opacity-70 shrink-0 text-xs tabular-nums">
+                        {startsAt
+                          ? `${fmtClock(s.start_minute)} – ${fmtClock(s.start_minute + s.duration_minutes)}`
+                          : `+${s.start_minute}m`}
+                      </span>
                     </div>
-                    {s.topic && <div className="text-xs opacity-70 truncate">{s.topic}</div>}
+                    <div className="flex justify-between gap-2 text-xs opacity-70">
+                      <span className="truncate">{s.topic ?? ""}</span>
+                      <span className="shrink-0">{s.duration_minutes} min</span>
+                    </div>
                   </button>
                 );
               })}
@@ -239,7 +254,7 @@ function StageControl() {
               {questions.map((q) => (
                 <div
                   key={q.id}
-                  className={`p-2 rounded border text-sm ${q.answered_on_stage_at ? "opacity-50 bg-muted/40" : ""}`}
+                  className={`relative p-2 pr-9 rounded border text-sm ${q.answered_on_stage_at ? "opacity-50 bg-muted/40" : ""}`}
                 >
                   <div className="flex items-start gap-2">
                     <span className="font-bold text-primary shrink-0">▲{q.vote_score}</span>
@@ -250,17 +265,21 @@ function StageControl() {
                       )}
                     </div>
                   </div>
-                  <div className="mt-1 flex justify-end">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="absolute top-1 right-1 h-7 w-7"
+                    title={q.answered_on_stage_at ? "Reopen" : "Mark answered"}
+                    onClick={() =>
+                      mMark.mutate({ questionId: q.id, answered: !q.answered_on_stage_at })
+                    }
+                  >
                     {q.answered_on_stage_at ? (
-                      <Button size="sm" variant="ghost" onClick={() => mMark.mutate({ questionId: q.id, answered: false })}>
-                        <Undo2 className="h-3.5 w-3.5" /> Reopen
-                      </Button>
+                      <Undo2 className="h-3.5 w-3.5" />
                     ) : (
-                      <Button size="sm" variant="ghost" onClick={() => mMark.mutate({ questionId: q.id, answered: true })}>
-                        <CheckCircle2 className="h-3.5 w-3.5" /> Mark answered
-                      </Button>
+                      <CheckCircle2 className="h-3.5 w-3.5" />
                     )}
-                  </div>
+                  </Button>
                 </div>
               ))}
               {questions.length === 0 && (
