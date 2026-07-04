@@ -229,9 +229,16 @@ function StageControl() {
                       <span className="font-medium truncate">
                         {s.is_for_child ? s.child_name : s.name}
                       </span>
-                      <span className="opacity-70 shrink-0">+{s.start_minute}m · {s.duration_minutes}m</span>
+                      <span className="opacity-70 shrink-0 text-xs tabular-nums">
+                        {startsAt
+                          ? `${fmtClock(s.start_minute)} – ${fmtClock(s.start_minute + s.duration_minutes)}`
+                          : `+${s.start_minute}m`}
+                      </span>
                     </div>
-                    {s.topic && <div className="text-xs opacity-70 truncate">{s.topic}</div>}
+                    <div className="flex justify-between gap-2 text-xs opacity-70">
+                      <span className="truncate">{s.topic ?? ""}</span>
+                      <span className="shrink-0">{s.duration_minutes} min</span>
+                    </div>
                   </button>
                 );
               })}
