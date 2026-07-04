@@ -107,6 +107,7 @@ function StageControl() {
   const running = !!state?.timer_started_at;
 
   const [annText, setAnnText] = React.useState("");
+  const [fullscreen, setFullscreen] = React.useState(false);
   React.useEffect(() => {
     if (state?.announcement_text) setAnnText(state.announcement_text);
   }, [state?.announcement_text]);
