@@ -46,13 +46,21 @@ function StageControl() {
   const setAnn = useServerFn(setAnnouncement);
   const markAns = useServerFn(markQuestionAnsweredOnStage);
 
-  // Load event slug so we can link to the /live page
+  // Load event slug + start time so we can link to /live and render absolute times
   const [slug, setSlug] = React.useState<string | null>(null);
+  const [startsAt, setStartsAt] = React.useState<string | null>(null);
   React.useEffect(() => {
-    supabase.from("events").select("slug").eq("id", eventId).maybeSingle().then(({ data }) => {
+    supabase.from("events").select("slug,starts_at").eq("id", eventId).maybeSingle().then(({ data }) => {
       setSlug(data?.slug ?? null);
+      setStartsAt(data?.starts_at ?? null);
     });
   }, [eventId]);
+
+  const fmtClock = (offsetMin: number) => {
+    if (!startsAt) return "";
+    const d = new Date(new Date(startsAt).getTime() + offsetMin * 60_000);
+    return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  };
 
   const { data: stage } = useQuery({
     queryKey: ["stage-state", eventId],
