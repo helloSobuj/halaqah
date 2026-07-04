@@ -148,12 +148,12 @@ export const getEventBySlug = createServerFn({ method: "POST" })
             .eq("id", e.category_id)
             .maybeSingle()
         : Promise.resolve({ data: null as null | { id: string; slug: string; name_en: string; name_bn: string; color: string | null; icon: string | null } }),
-      supabaseAdmin.from("event_rsvps").select("status").eq("event_id", e.id),
+      supabaseAdmin.from("event_rsvps").select("status,guest_count").eq("event_id", e.id),
     ]);
 
     const counts = { going: 0, interested: 0 };
     for (const r of rsvps ?? []) {
-      if (r.status === "going") counts.going += 1;
+      if (r.status === "going") counts.going += 1 + (r.guest_count ?? 0);
       else if (r.status === "interested") counts.interested += 1;
     }
 
@@ -166,11 +166,14 @@ export const getMyRsvp = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: r } = await supabaseAdmin
       .from("event_rsvps")
-      .select("status")
+      .select("status,guest_count")
       .eq("event_id", data.eventId)
       .eq("user_id", context.userId)
       .maybeSingle();
-    return { status: (r?.status as "going" | "interested" | "cancelled" | undefined) ?? null };
+    return {
+      status: (r?.status as "going" | "interested" | "cancelled" | undefined) ?? null,
+      guest_count: r?.guest_count ?? 0,
+    };
   });
 
 export const setMyRsvp = createServerFn({ method: "POST" })
