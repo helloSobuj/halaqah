@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Play, Pause, Plus, Minus, SkipForward, X, Megaphone, ArrowLeft, ExternalLink, CheckCircle2, Undo2,
+  Maximize2, Minimize2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -106,29 +107,45 @@ function StageControl() {
   const running = !!state?.timer_started_at;
 
   const [annText, setAnnText] = React.useState("");
+  const [fullscreen, setFullscreen] = React.useState(false);
   React.useEffect(() => {
     if (state?.announcement_text) setAnnText(state.announcement_text);
   }, [state?.announcement_text]);
 
   return (
     <div className="fixed inset-0 bg-background text-foreground flex flex-col overflow-hidden">
-      <header className="flex items-center justify-between px-4 py-2 border-b bg-card">
-        <div className="flex items-center gap-3">
-          <Link to="/admin/events" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-            <ArrowLeft className="h-4 w-4" /> Back
-          </Link>
-          <h1 className="font-semibold">Stage Control</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          {slug && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={`/events/${slug}/live`} target="_blank" rel="noreferrer">
-                <ExternalLink className="h-4 w-4" /> Open Projection
-              </a>
+      {!fullscreen && (
+        <header className="flex items-center justify-between px-4 py-2 border-b bg-card">
+          <div className="flex items-center gap-3">
+            <Link to="/admin/events" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+              <ArrowLeft className="h-4 w-4" /> Back
+            </Link>
+            <h1 className="font-semibold">Stage Control</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setFullscreen(true)}>
+              <Maximize2 className="h-4 w-4" /> Fullscreen
             </Button>
-          )}
-        </div>
-      </header>
+            {slug && (
+              <Button variant="outline" size="sm" asChild>
+                <a href={`/events/${slug}/live`} target="_blank" rel="noreferrer">
+                  <ExternalLink className="h-4 w-4" /> Open Projection
+                </a>
+              </Button>
+            )}
+          </div>
+        </header>
+      )}
+      {fullscreen && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setFullscreen(false)}
+          className="absolute top-3 right-3 z-50"
+        >
+          <Minimize2 className="h-4 w-4" /> Exit
+        </Button>
+      )}
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] overflow-hidden">
         {/* Main */}
@@ -145,9 +162,13 @@ function StageControl() {
             <>
               <p className="text-lg lg:text-xl uppercase tracking-widest opacity-70">Now Speaking</p>
               <h2 className="text-5xl lg:text-7xl font-black text-center mt-3">
-                {current.is_for_child ? current.child_name : current.name}
+                {current.topic || (current.is_for_child ? current.child_name : current.name)}
               </h2>
-              {current.topic && <p className="text-2xl lg:text-3xl mt-3 opacity-90 text-center">{current.topic}</p>}
+              {current.topic && (
+                <p className="text-2xl lg:text-3xl mt-3 opacity-90 text-center">
+                  {current.is_for_child ? current.child_name : current.name}
+                </p>
+              )}
               <div className="text-7xl lg:text-[10rem] font-mono font-black tabular-nums mt-6">{formatTime(remaining)}</div>
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
                 {running ? (
