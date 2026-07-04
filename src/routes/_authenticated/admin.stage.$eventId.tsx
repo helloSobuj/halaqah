@@ -162,9 +162,13 @@ function StageControl() {
             <>
               <p className="text-lg lg:text-xl uppercase tracking-widest opacity-70">Now Speaking</p>
               <h2 className="text-5xl lg:text-7xl font-black text-center mt-3">
-                {current.is_for_child ? current.child_name : current.name}
+                {current.topic || (current.is_for_child ? current.child_name : current.name)}
               </h2>
-              {current.topic && <p className="text-2xl lg:text-3xl mt-3 opacity-90 text-center">{current.topic}</p>}
+              {current.topic && (
+                <p className="text-2xl lg:text-3xl mt-3 opacity-90 text-center">
+                  {current.is_for_child ? current.child_name : current.name}
+                </p>
+              )}
               <div className="text-7xl lg:text-[10rem] font-mono font-black tabular-nums mt-6">{formatTime(remaining)}</div>
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
                 {running ? (
