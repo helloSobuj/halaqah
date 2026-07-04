@@ -254,7 +254,7 @@ function StageControl() {
               {questions.map((q) => (
                 <div
                   key={q.id}
-                  className={`p-2 rounded border text-sm ${q.answered_on_stage_at ? "opacity-50 bg-muted/40" : ""}`}
+                  className={`relative p-2 pr-9 rounded border text-sm ${q.answered_on_stage_at ? "opacity-50 bg-muted/40" : ""}`}
                 >
                   <div className="flex items-start gap-2">
                     <span className="font-bold text-primary shrink-0">▲{q.vote_score}</span>
@@ -265,17 +265,21 @@ function StageControl() {
                       )}
                     </div>
                   </div>
-                  <div className="mt-1 flex justify-end">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="absolute top-1 right-1 h-7 w-7"
+                    title={q.answered_on_stage_at ? "Reopen" : "Mark answered"}
+                    onClick={() =>
+                      mMark.mutate({ questionId: q.id, answered: !q.answered_on_stage_at })
+                    }
+                  >
                     {q.answered_on_stage_at ? (
-                      <Button size="sm" variant="ghost" onClick={() => mMark.mutate({ questionId: q.id, answered: false })}>
-                        <Undo2 className="h-3.5 w-3.5" /> Reopen
-                      </Button>
+                      <Undo2 className="h-3.5 w-3.5" />
                     ) : (
-                      <Button size="sm" variant="ghost" onClick={() => mMark.mutate({ questionId: q.id, answered: true })}>
-                        <CheckCircle2 className="h-3.5 w-3.5" /> Mark answered
-                      </Button>
+                      <CheckCircle2 className="h-3.5 w-3.5" />
                     )}
-                  </div>
+                  </Button>
                 </div>
               ))}
               {questions.length === 0 && (
