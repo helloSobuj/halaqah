@@ -107,15 +107,15 @@ export const listEvents = createServerFn({ method: "POST" })
         ? supabaseAdmin.from("event_categories").select("id,slug,name_en,name_bn,color,icon").in("id", catIds)
         : Promise.resolve({ data: [] as Array<{ id: string; slug: string; name_en: string; name_bn: string; color: string | null; icon: string | null }> }),
       evIds.length
-        ? supabaseAdmin.from("event_rsvps").select("event_id,status").in("event_id", evIds)
-        : Promise.resolve({ data: [] as Array<{ event_id: string; status: string }> }),
+        ? supabaseAdmin.from("event_rsvps").select("event_id,status,guest_count").in("event_id", evIds)
+        : Promise.resolve({ data: [] as Array<{ event_id: string; status: string; guest_count: number }> }),
     ]);
 
     const catMap = new Map((cats ?? []).map((c) => [c.id, c]));
     const rsvpMap = new Map<string, { going: number; interested: number }>();
     for (const r of rsvps ?? []) {
       const cur = rsvpMap.get(r.event_id) ?? { going: 0, interested: 0 };
-      if (r.status === "going") cur.going += 1;
+      if (r.status === "going") cur.going += 1 + (r.guest_count ?? 0);
       else if (r.status === "interested") cur.interested += 1;
       rsvpMap.set(r.event_id, cur);
     }
