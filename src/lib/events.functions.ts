@@ -183,6 +183,7 @@ export const setMyRsvp = createServerFn({ method: "POST" })
       .object({
         eventId: z.string().uuid(),
         status: z.enum(["going", "interested", "cancelled"]),
+        guest_count: z.number().int().min(0).max(10).optional(),
       })
       .parse(i),
   )
@@ -190,7 +191,12 @@ export const setMyRsvp = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("event_rsvps")
       .upsert(
-        { event_id: data.eventId, user_id: context.userId, status: data.status },
+        {
+          event_id: data.eventId,
+          user_id: context.userId,
+          status: data.status,
+          guest_count: data.status === "going" ? (data.guest_count ?? 0) : 0,
+        },
         { onConflict: "event_id,user_id" },
       );
     if (error) throw new Error(error.message);
