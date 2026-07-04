@@ -1,0 +1,1 @@
+ALTER TABLE public.event_rsvps ADD COLUMN IF NOT EXISTS guest_count integer NOT NULL DEFAULT 0 CHECK (guest_count >= 0 AND guest_count <= 10);
