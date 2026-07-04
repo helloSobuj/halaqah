@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Play, Pause, Plus, Minus, SkipForward, X, Megaphone, ArrowLeft, ExternalLink, CheckCircle2, Undo2,
+  Maximize2, Minimize2,
 } from "lucide-react";
 import { toast } from "sonner";
 
