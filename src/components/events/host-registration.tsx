@@ -109,16 +109,14 @@ export function HostRegistration({
   return (
     <>
       <Card className="p-5 border-dashed">
-        <div className="flex items-start gap-3 flex-wrap">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 sm:flex sm:items-start sm:flex-wrap">
           <div className="h-10 w-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
             <Home className="h-5 w-5 text-red-600" />
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold">This event needs a host</p>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Volunteer to host this gathering and provide the venue & accommodation.
-            </p>
-          </div>
+          <p className="font-semibold min-w-0 sm:flex-1">This event needs a host</p>
+          <p className="col-span-2 text-sm text-muted-foreground sm:mt-0.5 sm:w-full sm:order-3">
+            Volunteer to host this gathering and provide the venue & accommodation.
+          </p>
           <Button
             type="button"
             onClick={() => {
@@ -128,7 +126,7 @@ export function HostRegistration({
               }
               setOpen(true);
             }}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="col-span-2 w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
           >
             <UserPlus className="h-4 w-4 mr-1.5" />
             Register as Host
