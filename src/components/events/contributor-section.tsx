@@ -168,21 +168,19 @@ export function ContributorSection({
 
   return (
     <Card className="p-5 space-y-4">
-      <div className="flex items-start gap-3 flex-wrap">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 sm:flex sm:items-start sm:flex-wrap">
         <div className="h-10 w-10 rounded-full bg-[#4B8A63]/10 flex items-center justify-center shrink-0">
           <HandHeart className="h-5 w-5 text-[#4B8A63]" />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold">Contributors</p>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Volunteer to contribute to this event — food, supplies, transport, support, etc.
-          </p>
-        </div>
+        <p className="font-semibold min-w-0 sm:flex-1">Contributors</p>
+        <p className="col-span-2 text-sm text-muted-foreground sm:mt-0.5 sm:w-full sm:order-3">
+          Volunteer to contribute to this event — food, supplies, transport, support, etc.
+        </p>
         <Button
           type="button"
           onClick={openCreate}
           style={{ backgroundColor: "#4B8A63" }}
-          className="text-white hover:opacity-90"
+          className="col-span-2 w-full sm:w-auto text-white hover:opacity-90"
         >
           Register as a Contributor
         </Button>
