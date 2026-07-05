@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar, MapPin, Globe, Users } from "lucide-react";
+import { Calendar, MapPin, Globe, Users, Home } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/use-language";
@@ -16,6 +16,8 @@ type EventCardProps = {
     mode: "online" | "offline" | "hybrid";
     venue: string | null;
     is_featured: boolean;
+    host_user_id?: string | null;
+    allow_host_registration?: boolean | null;
     category?: {
       slug: string;
       name_en: string;
@@ -96,7 +98,14 @@ export function EventCard({ event }: EventCardProps) {
             {title}
           </h3>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            {event.mode === "online" ? (
+            {event.mode !== "online" && !event.host_user_id && event.allow_host_registration ? (
+              <span className="inline-flex items-center gap-1 font-medium text-red-600 dark:text-red-500 truncate">
+                <Home className="h-3 w-3 shrink-0" />
+                <span className="truncate">
+                  {lang === "bn" ? "এই ইভেন্টের হোস্ট প্রয়োজন" : "This event needs a host"}
+                </span>
+              </span>
+            ) : event.mode === "online" ? (
               <span className="inline-flex items-center gap-1">
                 <Globe className="h-3 w-3" /> Online
               </span>
