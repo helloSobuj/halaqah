@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar, MapPin, Globe, Users } from "lucide-react";
+import { Calendar, MapPin, Globe, Users, Home } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/use-language";
