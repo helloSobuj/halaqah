@@ -16,6 +16,8 @@ type EventCardProps = {
     mode: "online" | "offline" | "hybrid";
     venue: string | null;
     is_featured: boolean;
+    host_user_id?: string | null;
+    allow_host_registration?: boolean | null;
     category?: {
       slug: string;
       name_en: string;
