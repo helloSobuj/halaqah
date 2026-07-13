@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Search, Shield, ShieldCheck, GraduationCap, User as UserIcon } from "lucide-react";
+import { Search, Shield, ShieldCheck, GraduationCap, User as UserIcon, Settings2, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
@@ -11,7 +11,23 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { listUsers, setUserRole } from "@/lib/admin.functions";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  listUsers,
+  setUserRole,
+  getUserDetails,
+  updateUserEmail,
+  updateUserPassword,
+  generatePasswordResetLink,
+} from "@/lib/admin.functions";
 import { useUserRole, type AppRole } from "@/hooks/use-user-role";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
