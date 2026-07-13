@@ -49,6 +49,7 @@ function UsersPage() {
   const [debounced, setDebounced] = React.useState("");
   const qc = useQueryClient();
   const { isAdmin } = useUserRole();
+  const [manageId, setManageId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const id = setTimeout(() => setDebounced(search), 250);
