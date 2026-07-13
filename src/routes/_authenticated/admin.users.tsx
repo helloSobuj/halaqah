@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Search, Shield, ShieldCheck, GraduationCap, User as UserIcon } from "lucide-react";
+import { Search, Shield, ShieldCheck, GraduationCap, User as UserIcon, Settings2, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
@@ -11,7 +11,23 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { listUsers, setUserRole } from "@/lib/admin.functions";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  listUsers,
+  setUserRole,
+  getUserDetails,
+  updateUserEmail,
+  updateUserPassword,
+  generatePasswordResetLink,
+} from "@/lib/admin.functions";
 import { useUserRole, type AppRole } from "@/hooks/use-user-role";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
@@ -33,6 +49,7 @@ function UsersPage() {
   const [debounced, setDebounced] = React.useState("");
   const qc = useQueryClient();
   const { isAdmin } = useUserRole();
+  const [manageId, setManageId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const id = setTimeout(() => setDebounced(search), 250);
@@ -132,10 +149,205 @@ function UsersPage() {
                   })}
                 </div>
               )}
+              {isAdmin && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setManageId(u.id)}
+                  title="Manage user"
+                >
+                  <Settings2 className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           );
         })}
       </Card>
+
+      <ManageUserDialog userId={manageId} onClose={() => setManageId(null)} />
     </div>
+  );
+}
+
+function ManageUserDialog({
+  userId,
+  onClose,
+}: {
+  userId: string | null;
+  onClose: () => void;
+}) {
+  const open = !!userId;
+  const getDetails = useServerFn(getUserDetails);
+  const updateEmail = useServerFn(updateUserEmail);
+  const updatePassword = useServerFn(updateUserPassword);
+  const genLink = useServerFn(generatePasswordResetLink);
+
+  const { data: details, isLoading, refetch } = useQuery({
+    queryKey: ["admin-user-details", userId],
+    enabled: open,
+    queryFn: () => getDetails({ data: { userId: userId! } }),
+  });
+
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [resetLink, setResetLink] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (details?.email) setEmail(details.email);
+    setPassword("");
+    setResetLink(null);
+  }, [details?.email, userId]);
+
+  const emailMut = useMutation({
+    mutationFn: () => updateEmail({ data: { userId: userId!, email } }),
+    onSuccess: () => {
+      toast.success("Email updated");
+      refetch();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const passwordMut = useMutation({
+    mutationFn: () => updatePassword({ data: { userId: userId!, password } }),
+    onSuccess: () => {
+      toast.success("Password updated");
+      setPassword("");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const linkMut = useMutation({
+    mutationFn: () =>
+      genLink({
+        data: {
+          userId: userId!,
+          redirectTo: `${window.location.origin}/reset-password`,
+        },
+      }),
+    onSuccess: (res) => {
+      setResetLink(res.actionLink);
+      toast.success("Reset link generated");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const copyLink = async () => {
+    if (!resetLink) return;
+    await navigator.clipboard.writeText(resetLink);
+    toast.success("Copied to clipboard");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Manage user</DialogTitle>
+          <DialogDescription>View and update user account details.</DialogDescription>
+        </DialogHeader>
+
+        {isLoading || !details ? (
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        ) : (
+          <div className="space-y-5">
+            <div className="rounded-lg border border-border p-3 text-sm space-y-1">
+              <div>
+                <span className="text-muted-foreground">Name: </span>
+                <span className="font-medium">{details.profile?.display_name ?? "—"}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">User ID: </span>
+                <span className="font-mono text-xs">{details.id}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Created: </span>
+                {details.createdAt ? new Date(details.createdAt).toLocaleString() : "—"}
+              </div>
+              <div>
+                <span className="text-muted-foreground">Last sign-in: </span>
+                {details.lastSignInAt
+                  ? new Date(details.lastSignInAt).toLocaleString()
+                  : "Never"}
+              </div>
+              <div>
+                <span className="text-muted-foreground">Roles: </span>
+                {details.roles.length ? details.roles.join(", ") : "none"}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <Button
+                  onClick={() => emailMut.mutate()}
+                  disabled={emailMut.isPending || !email || email === details.email}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new-password">Set new password</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="new-password"
+                  type="text"
+                  placeholder="Min 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  onClick={() => passwordMut.mutate()}
+                  disabled={passwordMut.isPending || password.length < 8}
+                >
+                  Update
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Share the new password with the user securely.
+              </p>
+            </div>
+
+            <div className="space-y-2 border-t border-border pt-4">
+              <Label>Password reset link</Label>
+              <p className="text-xs text-muted-foreground">
+                Generate a one-time link the user can open to set their own password.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => linkMut.mutate()}
+                disabled={linkMut.isPending}
+              >
+                {linkMut.isPending ? "Generating…" : "Generate reset link"}
+              </Button>
+              {resetLink && (
+                <div className="flex gap-2 items-start">
+                  <textarea
+                    readOnly
+                    value={resetLink}
+                    className="flex-1 text-xs font-mono p-2 rounded-md border border-border bg-muted h-20"
+                  />
+                  <Button size="sm" variant="outline" onClick={copyLink}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

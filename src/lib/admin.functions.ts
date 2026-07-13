@@ -120,3 +120,81 @@ export const setUserRole = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export const getUserDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ userId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: authUser, error: authErr } = await supabaseAdmin.auth.admin.getUserById(
+      data.userId,
+    );
+    if (authErr) throw new Error(authErr.message);
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("*")
+      .eq("id", data.userId)
+      .maybeSingle();
+    const { data: rolesData } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    return {
+      id: authUser.user?.id,
+      email: authUser.user?.email ?? null,
+      emailConfirmedAt: authUser.user?.email_confirmed_at ?? null,
+      lastSignInAt: authUser.user?.last_sign_in_at ?? null,
+      createdAt: authUser.user?.created_at ?? null,
+      profile: profile ?? null,
+      roles: (rolesData ?? []).map((r) => r.role as Role),
+    };
+  });
+
+export const updateUserEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ userId: z.string().uuid(), email: z.string().email().max(255) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      email: data.email,
+      email_confirm: true,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updateUserPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ userId: z.string().uuid(), password: z.string().min(8).max(128) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      password: data.password,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const generatePasswordResetLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({ userId: z.string().uuid(), redirectTo: z.string().url().max(500) })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: u, error: uErr } = await supabaseAdmin.auth.admin.getUserById(data.userId);
+    if (uErr || !u.user?.email) throw new Error("User has no email");
+    const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email: u.user.email,
+      options: { redirectTo: data.redirectTo },
+    });
+    if (error) throw new Error(error.message);
+    return { actionLink: link.properties?.action_link ?? null, email: u.user.email };
+  });
