@@ -126,8 +126,9 @@ function ProfilePage() {
             <TabsTrigger value="activity">{t("profile.tabs.activity")}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="identity">
+          <TabsContent value="identity" className="space-y-4">
             {profile && <IdentityForm profile={profile} userId={user!.id} />}
+            <ChangePasswordCard />
           </TabsContent>
 
           <TabsContent value="qa">
@@ -352,6 +353,85 @@ function IdentityForm({ profile, userId }: { profile: ProfileRow; userId: string
         <div className="sm:col-span-2 flex justify-end pt-2">
           <Button type="submit" disabled={mut.isPending}>
             {mut.isPending ? t("common.loading") : t("common.save")}
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+function ChangePasswordCard() {
+  const { t } = useTranslation();
+  const [password, setPassword] = React.useState("");
+  const [confirm, setConfirm] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+    if (password !== confirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(t("profile.passwordUpdated", { defaultValue: "Password updated" }));
+    setPassword("");
+    setConfirm("");
+  };
+
+  return (
+    <Card className="p-6">
+      <h3 className="font-semibold text-foreground mb-1">
+        {t("profile.changePassword", { defaultValue: "Change password" })}
+      </h3>
+      <p className="text-xs text-muted-foreground mb-4">
+        {t("profile.changePasswordDesc", {
+          defaultValue: "Set a new password for your account. Minimum 8 characters.",
+        })}
+      </p>
+      <form onSubmit={onSubmit} className="grid sm:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="new-password">
+            {t("profile.newPassword", { defaultValue: "New password" })}
+          </Label>
+          <Input
+            id="new-password"
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            maxLength={128}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="confirm-password">
+            {t("profile.confirmPassword", { defaultValue: "Confirm password" })}
+          </Label>
+          <Input
+            id="confirm-password"
+            type="password"
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            minLength={8}
+            maxLength={128}
+            required
+          />
+        </div>
+        <div className="sm:col-span-2 flex justify-end">
+          <Button type="submit" disabled={loading}>
+            {loading ? t("common.loading") : t("common.save")}
           </Button>
         </div>
       </form>
