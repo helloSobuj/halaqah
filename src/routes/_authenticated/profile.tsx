@@ -126,8 +126,9 @@ function ProfilePage() {
             <TabsTrigger value="activity">{t("profile.tabs.activity")}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="identity">
+          <TabsContent value="identity" className="space-y-4">
             {profile && <IdentityForm profile={profile} userId={user!.id} />}
+            <ChangePasswordCard />
           </TabsContent>
 
           <TabsContent value="qa">
