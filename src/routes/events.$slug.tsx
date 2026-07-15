@@ -1,13 +1,15 @@
+import * as React from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, MapPin, Globe, Users, Clock, ExternalLink } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Globe, Users, Clock, ExternalLink, UserCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Markdown } from "@/components/qa/markdown";
 import { RsvpButton } from "@/components/events/rsvp-button";
 import { ShareMenu } from "@/components/events/share-menu";
@@ -16,8 +18,10 @@ import { SpeakerSection } from "@/components/events/speaker-registration";
 import { ContributorSection } from "@/components/events/contributor-section";
 import { AskQuestionPanel } from "@/components/events/ask-question-panel";
 
-import { getEventBySlug } from "@/lib/events.functions";
+import { getEventBySlug, hostListEventGoing } from "@/lib/events.functions";
 import { useLanguage } from "@/hooks/use-language";
+import { useAuth } from "@/hooks/use-auth";
+import { useUserRole } from "@/hooks/use-user-role";
 
 export const Route = createFileRoute("/events/$slug")({
   loader: async ({ params }) => {
@@ -245,6 +249,11 @@ function EventDetail() {
         />
 
 
+        <HostAttendeesSection
+          eventId={e.id}
+          hostUserId={(e as { host_user_id?: string | null }).host_user_id ?? null}
+        />
+
         {description && (
           <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
             <Markdown source={description} />
@@ -263,5 +272,82 @@ function EventDetail() {
         <AskQuestionPanel eventId={e.id} />
       </article>
     </AppShell>
+  );
+}
+
+function HostAttendeesSection({
+  eventId,
+  hostUserId,
+}: {
+  eventId: string;
+  hostUserId: string | null;
+}) {
+  const { user } = useAuth();
+  const { isStaff } = useUserRole();
+  const canView = !!user && (user.id === hostUserId || isStaff);
+  const [open, setOpen] = React.useState(false);
+  const fetchGoing = useServerFn(hostListEventGoing);
+  const { data, isLoading } = useQuery({
+    queryKey: ["event-going", eventId],
+    enabled: canView && open,
+    queryFn: () => fetchGoing({ data: { eventId } }),
+  });
+
+  if (!canView) return null;
+
+  return (
+    <Card className="p-5 space-y-3">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <UserCheck className="h-5 w-5 text-primary" />
+          <h2 className="font-semibold">Attendees going</h2>
+          {data && (
+            <span className="text-sm text-muted-foreground">
+              · {data.totalAttendees} people ({data.totalPeople} incl. guests)
+            </span>
+          )}
+        </div>
+        <Button size="sm" variant="outline" onClick={() => setOpen((v) => !v)}>
+          {open ? "Hide list" : "View list"}
+        </Button>
+      </div>
+      {open && (
+        <div className="space-y-2 pt-2 border-t">
+          {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+          {!isLoading && data && data.attendees.length === 0 && (
+            <p className="text-sm text-muted-foreground">No attendees yet.</p>
+          )}
+          {data?.attendees.map((a) => {
+            const name = a.profile?.display_name ?? "User";
+            const initials = name.slice(0, 2).toUpperCase();
+            return (
+              <div key={a.user_id} className="flex items-center gap-3 py-1.5">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={a.profile?.avatar_url ?? undefined} />
+                  <AvatarFallback className="bg-primary/15 text-primary text-xs">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium truncate">
+                    {name}
+                    {a.guest_count > 0 && (
+                      <span className="text-muted-foreground font-normal">
+                        {" "}+ {a.guest_count} guest{a.guest_count === 1 ? "" : "s"}
+                      </span>
+                    )}
+                  </div>
+                  {a.profile?.location && (
+                    <div className="text-xs text-muted-foreground truncate">
+                      {a.profile.location}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
   );
 }
