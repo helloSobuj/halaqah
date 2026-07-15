@@ -78,7 +78,16 @@ function LoginPage() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="password">{t("auth.password")}</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">{t("auth.password")}</Label>
+            <button
+              type="button"
+              onClick={() => setForgotOpen(true)}
+              className="text-xs text-primary hover:underline"
+            >
+              Forgot password?
+            </button>
+          </div>
           <Input
             id="password"
             type="password"
@@ -99,7 +108,95 @@ function LoginPage() {
           {t("auth.signUp")}
         </Link>
       </p>
+
+      <ForgotPasswordDialog
+        open={forgotOpen}
+        initialEmail={email}
+        onClose={() => setForgotOpen(false)}
+      />
     </AuthLayout>
+  );
+}
+
+function ForgotPasswordDialog({
+  open,
+  initialEmail,
+  onClose,
+}: {
+  open: boolean;
+  initialEmail: string;
+  onClose: () => void;
+}) {
+  const [email, setEmail] = React.useState(initialEmail);
+  const [loading, setLoading] = React.useState(false);
+  const [sent, setSent] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open) {
+      setEmail(initialEmail);
+      setSent(false);
+    }
+  }, [open, initialEmail]);
+
+  const onSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = z.string().email().safeParse(email);
+    if (!parsed.success) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setSent(true);
+    toast.success("Reset link sent — check your inbox");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Reset your password</DialogTitle>
+          <DialogDescription>
+            Enter the email for your account and we'll send a link to reset your password.
+          </DialogDescription>
+        </DialogHeader>
+        {sent ? (
+          <p className="text-sm text-muted-foreground">
+            If an account exists for <span className="font-medium">{email}</span>, a reset link
+            has been sent. Please check your inbox (and spam folder).
+          </p>
+        ) : (
+          <form onSubmit={onSend} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="forgot-email">Email</Label>
+              <Input
+                id="forgot-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Sending…" : "Send reset link"}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
