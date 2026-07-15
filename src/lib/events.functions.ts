@@ -359,6 +359,59 @@ export const adminListEventRsvps = createServerFn({ method: "POST" })
     }));
   });
 
+// Host (or staff) can view attendees marked as "going" for their event.
+export const hostListEventGoing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ eventId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: ev, error: evErr } = await supabaseAdmin
+      .from("events")
+      .select("host_user_id")
+      .eq("id", data.eventId)
+      .maybeSingle();
+    if (evErr) throw new Error(evErr.message);
+    if (!ev) throw new Error("Event not found");
+
+    if (ev.host_user_id !== context.userId) {
+      const { data: roles } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", context.userId);
+      const rs = (roles ?? []).map((r) => r.role as string);
+      if (!rs.includes("admin") && !rs.includes("moderator")) {
+        throw new Error("Forbidden");
+      }
+    }
+
+    const { data: rsvps, error } = await supabaseAdmin
+      .from("event_rsvps")
+      .select("user_id,guest_count,created_at")
+      .eq("event_id", data.eventId)
+      .eq("status", "going")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const list = rsvps ?? [];
+    const userIds = Array.from(new Set(list.map((r) => r.user_id)));
+    const profiles = userIds.length
+      ? (await supabaseAdmin
+          .from("profiles")
+          .select("id,display_name,avatar_url,location")
+          .in("id", userIds)).data ?? []
+      : [];
+    const pMap = new Map(profiles.map((p) => [p.id, p]));
+    const totalPeople = list.reduce((s, r) => s + 1 + (r.guest_count ?? 0), 0);
+    return {
+      totalAttendees: list.length,
+      totalPeople,
+      attendees: list.map((r) => ({
+        user_id: r.user_id,
+        guest_count: r.guest_count ?? 0,
+        created_at: r.created_at,
+        profile: pMap.get(r.user_id) ?? null,
+      })),
+    };
+  });
+
 // ------------------- Host registration -------------------
 
 export const registerAsHost = createServerFn({ method: "POST" })

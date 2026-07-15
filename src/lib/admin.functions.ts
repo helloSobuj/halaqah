@@ -198,3 +198,45 @@ export const generatePasswordResetLink = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { actionLink: link.properties?.action_link ?? null, email: u.user.email };
   });
+
+export const adminCreateUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        email: z.string().email().max(255),
+        password: z.string().min(8).max(128),
+        displayName: z.string().trim().min(1).max(120),
+        role: z.enum(ROLES).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true,
+      user_metadata: { display_name: data.displayName },
+    });
+    if (error) throw new Error(error.message);
+    const newId = created.user?.id;
+    if (!newId) throw new Error("User created but no id returned");
+
+    // handle_new_user trigger inserts profile + default 'user' role.
+    // Ensure display_name is set explicitly.
+    await supabaseAdmin
+      .from("profiles")
+      .update({ display_name: data.displayName })
+      .eq("id", newId);
+
+    if (data.role && data.role !== "user") {
+      const { error: rErr } = await supabaseAdmin
+        .from("user_roles")
+        .insert({ user_id: newId, role: data.role });
+      if (rErr && !rErr.message.toLowerCase().includes("duplicate")) {
+        throw new Error(rErr.message);
+      }
+    }
+    return { id: newId, email: data.email };
+  });
