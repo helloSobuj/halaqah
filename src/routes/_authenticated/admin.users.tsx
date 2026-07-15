@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Search, Shield, ShieldCheck, GraduationCap, User as UserIcon, Settings2, Copy } from "lucide-react";
+import { Search, Shield, ShieldCheck, GraduationCap, User as UserIcon, Settings2, Copy, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import {
   updateUserEmail,
   updateUserPassword,
   generatePasswordResetLink,
+  adminCreateUser,
 } from "@/lib/admin.functions";
 import { useUserRole, type AppRole } from "@/hooks/use-user-role";
 
@@ -50,6 +51,7 @@ function UsersPage() {
   const qc = useQueryClient();
   const { isAdmin } = useUserRole();
   const [manageId, setManageId] = React.useState<string | null>(null);
+  const [createOpen, setCreateOpen] = React.useState(false);
 
   React.useEffect(() => {
     const id = setTimeout(() => setDebounced(search), 250);
@@ -76,14 +78,21 @@ function UsersPage() {
 
   return (
     <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("admin.searchUsers")}
-          className="pl-9"
-        />
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("admin.searchUsers")}
+            className="pl-9"
+          />
+        </div>
+        {isAdmin && (
+          <Button onClick={() => setCreateOpen(true)}>
+            <UserPlus className="h-4 w-4 mr-2" /> Add user
+          </Button>
+        )}
       </div>
 
       <Card className="divide-y divide-border">
@@ -165,7 +174,106 @@ function UsersPage() {
       </Card>
 
       <ManageUserDialog userId={manageId} onClose={() => setManageId(null)} />
+      <CreateUserDialog open={createOpen} onClose={() => setCreateOpen(false)} />
     </div>
+  );
+}
+
+function CreateUserDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const qc = useQueryClient();
+  const createFn = useServerFn(adminCreateUser);
+  const [displayName, setDisplayName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [role, setRole] = React.useState<AppRole>("user");
+
+  React.useEffect(() => {
+    if (!open) {
+      setDisplayName("");
+      setEmail("");
+      setPassword("");
+      setRole("user");
+    }
+  }, [open]);
+
+  const mut = useMutation({
+    mutationFn: () =>
+      createFn({ data: { displayName, email, password, role } }),
+    onSuccess: () => {
+      toast.success("User created");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      onClose();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const canSubmit = displayName.trim().length > 0 && email.includes("@") && password.length >= 8;
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add new user</DialogTitle>
+          <DialogDescription>
+            Create a user account and profile. Email is auto-confirmed.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="new-name">Display name</Label>
+            <Input
+              id="new-name"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Abdullah"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="new-email">Email</Label>
+            <Input
+              id="new-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="user@example.com"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="new-pass">Password</Label>
+            <Input
+              id="new-pass"
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Min 8 characters"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="new-role">Role</Label>
+            <select
+              id="new-role"
+              value={role}
+              onChange={(e) => setRole(e.target.value as AppRole)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              {ALL_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={() => mut.mutate()} disabled={!canSubmit || mut.isPending}>
+            {mut.isPending ? "Creating…" : "Create user"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
