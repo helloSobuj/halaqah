@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, Eye, MessageSquare, ThumbsUp, CheckCircle2, Sparkles } from "lucide-react";
+import { LogOut, Flame, Trophy, Award, Star, Camera, Activity, Eye, MessageSquare, ThumbsUp, CheckCircle2, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
