@@ -14,32 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      blog_bookmarks: {
-        Row: {
-          created_at: string
-          post_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          post_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          post_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "blog_bookmarks_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "blog_posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       blog_categories: {
         Row: {
           color: string | null
@@ -1615,42 +1589,6 @@ export type Database = {
           },
           {
             foreignKeyName: "quiz_attempts_user_id_profiles_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      quiz_bookmarks: {
-        Row: {
-          created_at: string
-          id: string
-          quiz_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          quiz_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          quiz_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "quiz_bookmarks_quiz_id_fkey"
-            columns: ["quiz_id"]
-            isOneToOne: false
-            referencedRelation: "quizzes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "quiz_bookmarks_user_id_profiles_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

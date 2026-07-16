@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LogOut, Flame, Trophy, Award, Star, Camera, Bookmark, Activity, Eye, MessageSquare, ThumbsUp, CheckCircle2, Sparkles } from "lucide-react";
+import { LogOut, Flame, Trophy, Award, Star, Camera, Activity, Eye, MessageSquare, ThumbsUp, CheckCircle2, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -118,11 +118,10 @@ function ProfilePage() {
         </Card>
 
         <Tabs defaultValue="identity">
-          <TabsList className="w-full grid grid-cols-5">
+          <TabsList className="w-full grid grid-cols-4">
             <TabsTrigger value="identity">{t("profile.tabs.identity")}</TabsTrigger>
             <TabsTrigger value="qa">Q&amp;A</TabsTrigger>
             <TabsTrigger value="speaking">Speaking</TabsTrigger>
-            <TabsTrigger value="saved">{t("profile.tabs.saved")}</TabsTrigger>
             <TabsTrigger value="activity">{t("profile.tabs.activity")}</TabsTrigger>
           </TabsList>
 
@@ -137,16 +136,6 @@ function ProfilePage() {
 
           <TabsContent value="speaking">
             <MySpeakingPanel />
-          </TabsContent>
-
-          <TabsContent value="saved">
-            <Card className="p-6 text-center space-y-3">
-              <Bookmark className="h-8 w-8 text-muted-foreground mx-auto" />
-              <p className="text-sm text-muted-foreground">{t("profile.bookmarksDesc", { defaultValue: "Your bookmarked quizzes." })}</p>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/quiz/bookmarks">{t("quiz.bookmarks", { defaultValue: "Open bookmarks" })}</Link>
-              </Button>
-            </Card>
           </TabsContent>
 
           <TabsContent value="activity">

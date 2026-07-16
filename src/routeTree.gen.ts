@@ -27,7 +27,6 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as QuizMyAttemptsRouteImport } from './routes/quiz.my-attempts'
 import { Route as QuizLeaderboardRouteImport } from './routes/quiz.leaderboard'
-import { Route as QuizBookmarksRouteImport } from './routes/quiz.bookmarks'
 import { Route as QuizCategoryRouteImport } from './routes/quiz.$category'
 import { Route as QaLeaderboardRouteImport } from './routes/qa.leaderboard'
 import { Route as QaAskRouteImport } from './routes/qa.ask'
@@ -152,11 +151,6 @@ const QuizMyAttemptsRoute = QuizMyAttemptsRouteImport.update({
 const QuizLeaderboardRoute = QuizLeaderboardRouteImport.update({
   id: '/quiz/leaderboard',
   path: '/quiz/leaderboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizBookmarksRoute = QuizBookmarksRouteImport.update({
-  id: '/quiz/bookmarks',
-  path: '/quiz/bookmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuizCategoryRoute = QuizCategoryRouteImport.update({
@@ -370,7 +364,6 @@ export interface FileRoutesByFullPath {
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
   '/quiz/$category': typeof QuizCategoryRoute
-  '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
@@ -425,7 +418,6 @@ export interface FileRoutesByTo {
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
   '/quiz/$category': typeof QuizCategoryRoute
-  '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
@@ -483,7 +475,6 @@ export interface FileRoutesById {
   '/qa/ask': typeof QaAskRoute
   '/qa/leaderboard': typeof QaLeaderboardRoute
   '/quiz/$category': typeof QuizCategoryRoute
-  '/quiz/bookmarks': typeof QuizBookmarksRoute
   '/quiz/leaderboard': typeof QuizLeaderboardRoute
   '/quiz/my-attempts': typeof QuizMyAttemptsRoute
   '/tournaments/$id': typeof TournamentsIdRoute
@@ -541,7 +532,6 @@ export interface FileRouteTypes {
     | '/qa/ask'
     | '/qa/leaderboard'
     | '/quiz/$category'
-    | '/quiz/bookmarks'
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
@@ -596,7 +586,6 @@ export interface FileRouteTypes {
     | '/qa/ask'
     | '/qa/leaderboard'
     | '/quiz/$category'
-    | '/quiz/bookmarks'
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
@@ -653,7 +642,6 @@ export interface FileRouteTypes {
     | '/qa/ask'
     | '/qa/leaderboard'
     | '/quiz/$category'
-    | '/quiz/bookmarks'
     | '/quiz/leaderboard'
     | '/quiz/my-attempts'
     | '/tournaments/$id'
@@ -709,7 +697,6 @@ export interface RootRouteChildren {
   QaAskRoute: typeof QaAskRoute
   QaLeaderboardRoute: typeof QaLeaderboardRoute
   QuizCategoryRoute: typeof QuizCategoryRoute
-  QuizBookmarksRoute: typeof QuizBookmarksRoute
   QuizLeaderboardRoute: typeof QuizLeaderboardRoute
   QuizMyAttemptsRoute: typeof QuizMyAttemptsRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
@@ -858,13 +845,6 @@ declare module '@tanstack/react-router' {
       path: '/quiz/leaderboard'
       fullPath: '/quiz/leaderboard'
       preLoaderRoute: typeof QuizLeaderboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz/bookmarks': {
-      id: '/quiz/bookmarks'
-      path: '/quiz/bookmarks'
-      fullPath: '/quiz/bookmarks'
-      preLoaderRoute: typeof QuizBookmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quiz/$category': {
@@ -1203,7 +1183,6 @@ const rootRouteChildren: RootRouteChildren = {
   QaAskRoute: QaAskRoute,
   QaLeaderboardRoute: QaLeaderboardRoute,
   QuizCategoryRoute: QuizCategoryRoute,
-  QuizBookmarksRoute: QuizBookmarksRoute,
   QuizLeaderboardRoute: QuizLeaderboardRoute,
   QuizMyAttemptsRoute: QuizMyAttemptsRoute,
   TournamentsIdRoute: TournamentsIdRoute,
