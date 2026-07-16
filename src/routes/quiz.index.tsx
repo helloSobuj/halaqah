@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Trophy, Sparkles, BookOpen, Bookmark, History } from "lucide-react";
+import { Trophy, Sparkles, BookOpen, History } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
@@ -48,9 +48,6 @@ function QuizHome() {
           <div className="flex gap-2">
             <Button asChild variant="outline" size="sm">
               <Link to="/quiz/my-attempts"><History className="h-4 w-4 mr-1.5" />{t("quiz.myAttempts", { defaultValue: "My attempts" })}</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/quiz/bookmarks"><Bookmark className="h-4 w-4 mr-1.5" />{t("quiz.bookmarks", { defaultValue: "Bookmarks" })}</Link>
             </Button>
             <Button asChild variant="outline" size="sm">
               <Link to="/quiz/leaderboard"><Trophy className="h-4 w-4 mr-1.5" />{t("quiz.leaderboard")}</Link>

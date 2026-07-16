@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
-import { Bookmark, BookmarkCheck, Clock, ListChecks, CalendarClock } from "lucide-react";
+import { Clock, ListChecks, CalendarClock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,15 +52,7 @@ function formatDelta(ms: number): string {
   return `${s}s`;
 }
 
-export function QuizCard({
-  quiz,
-  bookmarked,
-  onToggleBookmark,
-}: {
-  quiz: Quiz;
-  bookmarked?: boolean;
-  onToggleBookmark?: () => void;
-}) {
+export function QuizCard({ quiz }: { quiz: Quiz }) {
   const { t, i18n } = useTranslation();
   const isBn = i18n.language === "bn";
   const title = isBn ? quiz.title_bn : quiz.title_en;
@@ -78,21 +70,10 @@ export function QuizCard({
 
   return (
     <Card className="p-5 hover:border-primary/40 hover:shadow-elegant transition-all flex flex-col">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          {cat && <div className="text-[11px] font-medium text-primary mb-1">{cat}</div>}
-          <h3 className="font-semibold text-foreground line-clamp-2">{title}</h3>
-          {desc && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{desc}</p>}
-        </div>
-        {onToggleBookmark && (
-          <button
-            onClick={onToggleBookmark}
-            className="text-muted-foreground hover:text-primary transition-colors shrink-0"
-            aria-label="bookmark"
-          >
-            {bookmarked ? <BookmarkCheck className="h-5 w-5 text-primary" /> : <Bookmark className="h-5 w-5" />}
-          </button>
-        )}
+      <div className="min-w-0">
+        {cat && <div className="text-[11px] font-medium text-primary mb-1">{cat}</div>}
+        <h3 className="font-semibold text-foreground line-clamp-2">{title}</h3>
+        {desc && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{desc}</p>}
       </div>
       <div className="flex items-center gap-2 mt-3 flex-wrap">
         <Badge variant="secondary" className={DIFF_TONE[quiz.difficulty] ?? ""}>

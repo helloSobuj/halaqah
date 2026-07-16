@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS public.blog_bookmarks CASCADE; DROP TABLE IF EXISTS public.quiz_bookmarks CASCADE;

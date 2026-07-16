@@ -187,38 +187,6 @@ export const submitAttempt = createServerFn({ method: "POST" })
     return { result, questions: questions ?? [] };
   });
 
-export const toggleBookmark = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((i) => z.object({ quizId: z.string().uuid() }).parse(i))
-  .handler(async ({ data, context }) => {
-    const { data: existing } = await context.supabase
-      .from("quiz_bookmarks")
-      .select("id")
-      .eq("quiz_id", data.quizId)
-      .eq("user_id", context.userId)
-      .maybeSingle();
-    if (existing) {
-      const { error } = await context.supabase.from("quiz_bookmarks").delete().eq("id", existing.id);
-      if (error) throw new Error(error.message);
-      return { bookmarked: false };
-    }
-    const { error } = await context.supabase
-      .from("quiz_bookmarks")
-      .insert({ quiz_id: data.quizId, user_id: context.userId });
-    if (error) throw new Error(error.message);
-    return { bookmarked: true };
-  });
-
-export const listBookmarks = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("quiz_bookmarks")
-      .select("quiz_id, created_at, quizzes(id, title_en, title_bn, description_en, description_bn, difficulty, time_limit_seconds, starts_at, ends_at, timezone, category_id, quiz_categories(slug, name_en, name_bn, color))")
-      .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return data ?? [];
-  });
 
 export const listMyAttempts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
